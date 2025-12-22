@@ -9,6 +9,14 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// Debug logging toggle
+const DEBUG_LOG = true; // Set to false to disable debug logging
+
+// Debug log helper - only logs when DEBUG_LOG is true
+const debugLog = (...args) => {
+  if (DEBUG_LOG) console.log(...args);
+};
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -61,7 +69,7 @@ async function sendEmailToShubharthak(message, userContext = '') {
         };
 
         const info = await emailTransporter.sendMail(mailOptions);
-        console.log('Email sent:', info.messageId);
+        debugLog('Email sent:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
         console.error('Email error:', error);
@@ -255,22 +263,22 @@ Software Engineer and AI/ML Specialist with expertise in Full-Stack Development,
 const wss = new WebSocket.Server({ noServer: true });
 
 wss.on('connection', (clientWs) => {
-    console.log('Client connected');
+    debugLog('Client connected');
     let geminiWs = null;
     let currentModality = 'AUDIO'; // Track current modality
 
     // Connect to Gemini Live API with specific modality
     const connectToGemini = async (modality = 'AUDIO') => {
-        console.log(`🔄 Connecting to Gemini Live API with modality: ${modality}...`);
+        debugLog(`🔄 Connecting to Gemini Live API with modality: ${modality}...`);
         
         // Close existing connection if any and WAIT for it to fully close
         if (geminiWs) {
-            console.log('🔌 Closing existing Gemini connection...');
+            debugLog('🔌 Closing existing Gemini connection...');
             try {
                 geminiWs.close();
                 // Wait for the old session to fully close (500ms to ensure clean shutdown)
                 await new Promise(resolve => setTimeout(resolve, 500));
-                console.log('⏱️  Old session closed');
+                debugLog('⏱️  Old session closed');
             } catch (e) {
                 console.error('Error closing old session:', e);
             }
@@ -281,7 +289,7 @@ wss.on('connection', (clientWs) => {
         
         const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
         const model = 'gemini-2.5-flash-native-audio-preview-12-2025'; // Use half-cascade for better tool support
-        console.log('📡 Using model:', model);
+        debugLog('📡 Using model:', model);
         
         // Function declarations for tools
         const tools = [
@@ -336,7 +344,7 @@ wss.on('connection', (clientWs) => {
             tools: tools
         };
 
-        console.log('🔧 Session config:', { 
+        debugLog('🔧 Session config:', { 
             modality, 
             responseModalities: responseModalities.map(m => m === Modality.AUDIO ? 'AUDIO' : 'TEXT'),
             hasSpeechConfig: !!config.speechConfig,
@@ -347,11 +355,11 @@ wss.on('connection', (clientWs) => {
             model: model,
             callbacks: {
                 onopen: () => {
-                    console.log('Connected to Gemini');
+                    debugLog('Connected to Gemini');
                     clientWs.send(JSON.stringify({ type: 'status', status: 'connected' }));
                 },
                 onmessage: async (message) => {
-                    console.log('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
+                    debugLog('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
                     
                     // Extract audio from serverContent.inlineData - ONLY in AUDIO mode
                     let audioData = null;
@@ -363,13 +371,13 @@ wss.on('connection', (clientWs) => {
                             if (currentModality === 'AUDIO' && part.inlineData) {
                                 if (part.inlineData.mimeType && part.inlineData.mimeType.includes('audio')) {
                                     audioData = part.inlineData.data;
-                                    console.log('🔊 AUDIO DATA LENGTH:', audioData.length);
+                                    debugLog('🔊 AUDIO DATA LENGTH:', audioData.length);
                                 }
                             }
                             // Extract text in TEXT mode
                             if (currentModality === 'TEXT' && part.text) {
                                 textData = part.text;
-                                console.log('📝 TEXT DATA:', textData.substring(0, 100));
+                                debugLog('📝 TEXT DATA:', textData.substring(0, 100));
                             }
                         }
                     }
@@ -408,7 +416,7 @@ wss.on('connection', (clientWs) => {
                     clientWs.send(JSON.stringify({ type: 'error', error: error.message }));
                 },
                 onclose: (event) => {
-                    console.log('Gemini connection closed:', event.reason);
+                    debugLog('Gemini connection closed:', event.reason);
                     clientWs.send(JSON.stringify({ type: 'status', status: 'disconnected' }));
                 }
             },
@@ -417,7 +425,7 @@ wss.on('connection', (clientWs) => {
 
         geminiWs = session;
         currentModality = modality;
-        console.log(`✅ Connected to Gemini with ${modality} modality`);
+        debugLog(`✅ Connected to Gemini with ${modality} modality`);
     };
 
     // Initial connection with AUDIO modality
@@ -431,21 +439,21 @@ wss.on('connection', (clientWs) => {
             // Handle modality change
             if (message.type === 'set_modality') {
                 const newModality = message.modality; // 'AUDIO' or 'TEXT'
-                console.log(`🔄 Modality change requested: ${currentModality} -> ${newModality}`);
+                debugLog(`🔄 Modality change requested: ${currentModality} -> ${newModality}`);
                 
                 if (newModality !== currentModality) {
                     // CRITICAL: Mark modality as changing to reject any in-flight messages
                     const oldModality = currentModality;
                     currentModality = 'SWITCHING'; // Temporary state to reject all messages
                     
-                    console.log('🚫 Rejecting any in-flight messages during switch...');
+                    debugLog('🚫 Rejecting any in-flight messages during switch...');
                     
                     // Add delay to ensure all in-flight audio messages are processed/rejected
                     await new Promise(resolve => setTimeout(resolve, 300));
                     
                     // Reconnect with new modality
                     connectToGemini(newModality).then(() => {
-                        console.log(`✅ Modality switched: ${oldModality} -> ${newModality}`);
+                        debugLog(`✅ Modality switched: ${oldModality} -> ${newModality}`);
                     }).catch(err => {
                         console.error('❌ Error switching modality:', err);
                         // Fallback to old modality
@@ -459,7 +467,7 @@ wss.on('connection', (clientWs) => {
                 }
             } 
             else if (message.type === 'interrupt' && geminiWs) {
-                console.log('⏸️  Interrupt signal received');
+                debugLog('⏸️  Interrupt signal received');
                 // Stop any ongoing audio playback on backend side if needed
                 // For now, just acknowledge
                 clientWs.send(JSON.stringify({ 
@@ -474,7 +482,7 @@ wss.on('connection', (clientWs) => {
                     return; // Hard reject - prevents "Cannot extract voices" error
                 }
                 
-                console.log('🎤 Forwarding audio to Gemini (AUDIO mode)...');
+                debugLog('🎤 Forwarding audio to Gemini (AUDIO mode)...');
                 try {
                     geminiWs.sendRealtimeInput({
                         audio: {
@@ -489,13 +497,50 @@ wss.on('connection', (clientWs) => {
                         console.error('🚨 CRITICAL: Audio sent in TEXT mode - this should not happen!');
                     }
                 }
+            } else if (message.type === 'video' && geminiWs) {
+                // Handle video/screen sharing frames
+                if (currentModality === 'SWITCHING') {
+                    console.warn('⚠️ REJECTED video frame during modality switch');
+                    return;
+                }
+                
+                debugLog('📹 Forwarding video frame to Gemini...');
+                try {
+                    geminiWs.sendRealtimeInput({
+                        video: {
+                            data: message.data, // base64 encoded video frame
+                            mimeType: message.mimeType || 'image/jpeg'
+                        }
+                    });
+                } catch (err) {
+                    console.error('❌ Error sending video to Gemini:', err);
+                }
+            } else if (message.type === 'camera' && geminiWs) {
+                // Handle camera frames (prepared for future use)
+                if (currentModality === 'SWITCHING') {
+                    console.warn('⚠️ REJECTED camera frame during modality switch');
+                    return;
+                }
+                
+                debugLog('📷 Forwarding camera frame to Gemini...');
+                try {
+                    geminiWs.sendRealtimeInput({
+                        video: {
+                            data: message.data, // base64 encoded camera frame
+                            mimeType: message.mimeType || 'image/jpeg'
+                        }
+                    });
+                } catch (err) {
+                    console.error('❌ Error sending camera to Gemini:', err);
+                }
             } else if (message.type === 'text' && geminiWs) {
+                // Existing text handling
                 // Allow text in both TEXT and AUDIO modes
                 if (currentModality === 'SWITCHING') {
                     console.warn('⚠️ REJECTED text message during modality switch');
                     return;
                 }
-                console.log(`📝 Forwarding text to Gemini (${currentModality} mode)...`);
+                debugLog(`📝 Forwarding text to Gemini (${currentModality} mode)...`);
                 try {
                     // Use sendClientContent method from the session object
                     geminiWs.sendClientContent({
@@ -515,7 +560,7 @@ wss.on('connection', (clientWs) => {
     });
 
     clientWs.on('close', () => {
-        console.log('Client disconnected');
+        debugLog('Client disconnected');
         if (geminiWs) {
             geminiWs.close();
         }
@@ -524,8 +569,8 @@ wss.on('connection', (clientWs) => {
 
 // HTTP server
 const server = app.listen(PORT, () => {
-    console.log(`🚀 Apsara Live Backend running on port ${PORT}`);
-    console.log(`📧 Email service configured for: shubharthaksangharsha@gmail.com`);
+    debugLog(`🚀 Apsara Live Backend running on port ${PORT}`);
+    debugLog(`📧 Email service configured for: shubharthaksangharsha@gmail.com`);
 });
 
 // Upgrade HTTP connection to WebSocket

@@ -1,13 +1,13 @@
 # Apsara AI - Voice Assistant System 🎙️✨
 
-**Version 1.0.0** - Complete Production Release
+**Version 1.1.0** - Enhanced Desktop Experience
 
-A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app, and Node.js backend with WebSocket communication.
+A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with screen sharing, and Node.js backend with WebSocket communication.
 
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.0.0-blue)
+![Version](https://img.shields.io/badge/Version-1.1.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 🌟 Features
@@ -33,7 +33,7 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 
 ### Platform Support
 - ✅ **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
-- ✅ **Linux Desktop**: Native desktop widget with Electron (fully functional)
+- ✅ **Linux Desktop**: Native desktop widget with Electron (fully functional with screen sharing!)
 - 🔄 **Windows Desktop**: Native desktop widget with Electron (coming soon)
 - 🔄 **macOS Desktop**: Native desktop widget with Electron (coming soon)
 
@@ -43,6 +43,11 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 - **Draggable Widget**: Click and drag the widget panel to move it anywhere
 - **Clickable Controls**: All buttons remain fully functional while dragging
 - **Close Button**: Red X button at top-right corner to exit the app
+- **Screen Sharing**: Full native screen capture with visual indicators
+  - 🔴 **Fullscreen Red Border**: Animated pulsing border around entire monitor
+  - 📺 **Click-Through Overlay**: Border doesn't interfere with desktop interaction
+  - 🎯 **Automatic Primary Screen**: No dialog needed, instantly shares main display
+  - ⚡ **2 FPS Streaming**: Optimized frame rate for Gemini Live API
 - **Auto-Exit**: Properly closes both Electron and React dev server when closed
 - **No Sandbox Issues**: Configured to run without SUID sandbox errors on Linux
 - **Bottom-Right Position**: Automatically positions in bottom-right corner on launch
@@ -57,7 +62,9 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 - **Status Indicators**: Clear visual feedback for connection, listening, and speaking states
 - **Responsive Design**: Works on desktop and mobile devices
 - **Smooth Animations**: Professional transitions and hover effects
-- **Placeholder Icons**: Screen share and video cam buttons (coming soon)
+- **Screen Share Controls**: Functional screen sharing with visual feedback
+- **Debug Logging**: Comprehensive logging system with on/off toggle
+- **Placeholder Icons**: Video cam button (coming soon)
 
 ## 📦 Project Structure
 
@@ -254,7 +261,7 @@ update-desktop-database ~/.local/share/applications/
 | Button | Function | Description |
 |--------|----------|-------------|
 | 🎤 **Mute** | Mute/Unmute Microphone | Stops your audio from being sent (Apsara can still speak) |
-| 📺 **Screen Share** | Share Screen | Coming soon - share your screen with Apsara |
+| 📺 **Screen Share** | Share Screen | ✅ **Working!** Share your entire screen with Apsara (Electron: Auto-captures primary display with red border) |
 | 📹 **Video** | Toggle Video | Coming soon - enable video chat |
 | ❌ **End** | End/Start Call | Ends the current session or starts a new one |
 | ✖️ **Close** | Close Widget | Closes the desktop widget (Electron only) |
@@ -264,13 +271,44 @@ update-desktop-database ~/.local/share/applications/
 - **Green/Gold Bars**: You are speaking
 - **Orange Bars**: Apsara is speaking (more dramatic spikes!)
 - **No Bars**: Muted or idle
-- **Status Text**: Shows current state (Connecting, Listening, Speaking, etc.)
+- **Status Text**: Shows current state (Connecting, Listening, Speaking, Sharing screen, etc.)
+- **🔴 Red Border (Electron)**: Fullscreen animated border when sharing screen
+- **🔴 Floating Indicator**: "Screen Sharing Active" badge visible during screen share
 
 ### Interrupt Feature
 
 You can interrupt Apsara at any time while she's speaking:
 - Just start talking, and Apsara will stop and listen to you
 - Perfect for follow-up questions or corrections
+
+### Screen Sharing Feature (Electron) 🆕
+
+**New in Version 1.1.0!** Share your screen with Apsara for visual assistance:
+
+**How to Use:**
+1. Click the **📺 Screen Share** button (must be connected first)
+2. Electron automatically captures your primary display
+3. A fullscreen **animated red border** appears around your monitor
+4. Frames are sent to Gemini at 2 FPS for analysis
+5. Ask Apsara questions about what's on your screen!
+6. Click the button again to stop sharing
+
+**Visual Feedback:**
+- 🔴 **Pulsing Red Border**: Fullscreen overlay around entire monitor (5-8px animated)
+- 🎯 **Click-Through**: Border doesn't interfere with desktop interaction
+- 💬 **Floating Indicator**: "🔴 Screen Sharing Active" badge
+- 📝 **Status Text**: Shows "Sharing screen..." in widget
+
+**Platform Differences:**
+- **Electron (Desktop)**: Automatic primary screen capture, fullscreen red border
+- **Browser (Web)**: Shows system dialog to select screen/window, border on browser window only
+
+**Technical Details:**
+- Captures at 640x360 resolution
+- Streams at 2 FPS (optimized for Gemini API)
+- Uses JPEG compression (80% quality)
+- Sends base64-encoded frames via WebSocket
+- Backend forwards frames to Gemini Live API as video input
 
 ## 🏗️ Architecture
 
@@ -318,6 +356,8 @@ The backend server (`backend/server.js`) provides:
 5. **Google Search**: Automatic real-time information retrieval
 6. **System Prompt**: Custom personality and capabilities for Apsara
 7. **Error Handling**: Robust error handling and logging
+8. **Video Frame Processing**: Handles screen sharing frames from frontend
+9. **Debug Logging**: Conditional logging system (toggle with `DEBUG_LOG` variable)
 
 ### Environment Variables
 
@@ -357,6 +397,10 @@ npm run dev        # Start development server with auto-reload
    - Frontend: Open browser DevTools (F12)
    - Backend: Check server logs in terminal
    - Electron: Press Ctrl+Shift+I for DevTools
+5. **Toggle Debug Logging**:
+   - Frontend: Set `DEBUG_LOG = false` in `ApsaraWidget.js` (line 5)
+   - Backend: Set `DEBUG_LOG = false` in `server.js` (line 12)
+   - Reduces console noise in production
 
 ### Backend API Endpoints
 
@@ -367,6 +411,22 @@ npm run dev        # Start development server with auto-reload
   - Manages session state
 
 ### Customization
+
+#### Toggle Debug Logging
+
+**Frontend** (`apsara-widget-app/src/components/ApsaraWidget.js`):
+```javascript
+// Line 5
+const DEBUG_LOG = false; // Set to false to disable all debug logs
+```
+
+**Backend** (`backend/server.js`):
+```javascript
+// Line 12
+const DEBUG_LOG = false; // Set to false to disable all debug logs
+```
+
+This controls all `debugLog()` calls throughout the codebase. Set to `false` for production to reduce console noise.
 
 #### Change Backend Port
 
@@ -460,6 +520,17 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Check if Electron is installed: `npm list electron`
 - Try running with debug: `npm run electron`
 
+**Screen sharing not working (Electron):**
+- Verify Electron has screen capture permissions
+- Check for IPC errors in console
+- Linux: May need to grant permissions to Electron
+- Check logs for "get-screen-sources" errors
+
+**Red border not appearing around screen:**
+- Verify `show-screen-border` IPC is being sent
+- Check Electron console for overlay creation logs
+- Border window may be behind other windows (try alt-tab)
+
 **Visualizer not showing:**
 - Check console for audio analyser errors
 - Verify microphone permission granted
@@ -511,84 +582,29 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - ✅ Complete cleanup when window closes
 - ✅ Production-ready Electron setup
 
-### Phase 7: Cross-Platform Support
+### Phase 7: Screen Sharing & Visual Feedback
+- ✅ Implemented native screen sharing for Electron
+- ✅ Electron desktopCapturer integration
+- ✅ Automatic primary display selection
+- ✅ Fullscreen red border overlay (click-through, animated)
+- ✅ Floating "Screen Sharing Active" indicator
+- ✅ 2 FPS frame capture and streaming to backend
+- ✅ Backend video frame forwarding to Gemini API
+- ✅ IPC communication for border overlay control
+
+### Phase 8: Developer Experience
+- ✅ Added debug logging system (frontend & backend)
+- ✅ Conditional logging with `DEBUG_LOG` toggle
+- ✅ Clean console output control
+- ✅ Comprehensive error handling
+- ✅ Production-ready logging setup
+
+### Phase 9: Cross-Platform Support
 - ✅ Auto-switching between local and production backends
 - ✅ Mobile-responsive design
 - ✅ Desktop integration for Linux
 - ✅ Comprehensive documentation
 - ✅ Version 1.0 release ready!
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-1. Fork the repository
-2. Clone your fork
-3. Create feature branch (`git checkout -b feature/amazing-feature`)
-4. Make your changes
-5. Test thoroughly (frontend + backend)
-6. Commit changes (`git commit -m 'Add amazing feature'`)
-7. Push to branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- **Google Gemini**: For the incredible AI model and Live API
-- **React**: For the powerful UI framework
-- **Electron**: For cross-platform desktop support
-- **Node.js**: For the robust backend runtime
-- **Web Audio API**: For real-time audio processing
-- **Community**: For all the support and feedback
-
-## 📞 Support
-
-If you encounter any issues or have questions:
-
-1. Check the [Troubleshooting](#-troubleshooting) section
-2. Look for similar issues in console logs (frontend & backend)
-3. Verify environment variables are set correctly
-4. Check that both frontend and backend are running
-5. Open an issue on GitHub with:
-   - Detailed description
-   - Steps to reproduce
-   - Console logs (frontend & backend)
-   - Environment info (OS, Node version, etc.)
-
-## 🎯 Roadmap
-
-### Version 1.0 (Completed! 🎉)
-- ✅ React widget with Gemini Live API
-- ✅ Electron desktop app for Linux
-- ✅ WebSocket backend server
-- ✅ Real-time audio visualization
-- ✅ Dual-analyser system for user and AI
-- ✅ Smart muting and controls
-- ✅ Draggable, transparent widget
-- ✅ Complete documentation
-
-### Version 1.1 (Next Release)
-- [ ] Screen share functionality
-- [ ] Video chat capability
-- [ ] Conversation history panel
-- [ ] Export conversations to file
-- [ ] Customizable themes
-
-### Version 2.0 (Future)
-- [ ] Windows desktop installer (.exe)
-- [ ] macOS desktop installer (.dmg)
-- [ ] Mobile apps (iOS/Android)
-- [ ] Custom wake word detection
-- [ ] Voice settings (speed, pitch, language)
-- [ ] Multi-language support
-- [ ] Keyboard shortcuts
-- [ ] System tray integration
-- [ ] Auto-start on boot option
 
 ---
 
@@ -596,24 +612,50 @@ If you encounter any issues or have questions:
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.0.0** - December 2024
+**Version 1.1.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant*
-- [ ] Multi-language support
-- [ ] Voice settings (speed, pitch, language)
-
-### Long Term
-- [ ] Custom themes and backgrounds
-- [ ] Keyboard shortcuts
-- [ ] Plugin system
-- [ ] Multi-user support
-- [ ] Cloud sync
-- [ ] Advanced analytics
+*Talk to Apsara - Your Intelligent Voice Assistant with Screen Sharing*
 
 ---
 
-**Built with ❤️ using React, Electron, Node.js, and Google Gemini AI**
+## 📋 Changelog
 
-*Talk to Apsara - Your AI Voice Assistant*
+### Version 1.1.0 (December 23, 2024)
+**New Features:**
+- ✨ Native screen sharing for Electron desktop widget
+- 🔴 Fullscreen animated red border overlay during screen sharing
+- 📺 Automatic primary display capture (no dialog needed)
+- 🎯 Click-through border overlay (doesn't block desktop interaction)
+- 🖥️ Backend video frame processing and Gemini API integration
+- 📝 Debug logging system for frontend and backend
+- 💬 Floating "Screen Sharing Active" indicator
+
+**Improvements:**
+- Optimized frame capture at 2 FPS (640x360 JPEG)
+- Enhanced IPC communication for border control
+- Better visual feedback during screen sharing
+- Cleaner console output with toggleable debug logs
+- Improved error handling for screen capture
+
+**Technical:**
+- Added `desktopCapturer` integration for Electron
+- Created separate fullscreen border overlay window
+- Implemented conditional logging with `DEBUG_LOG` variable
+- Enhanced backend to forward video frames to Gemini
+- Fixed screen sharing permissions for Electron
+
+### Version 1.0.0 (December 2024)
+**Initial Release:**
+- ✅ React widget with Gemini Live API integration
+- ✅ Electron desktop app for Linux
+- ✅ WebSocket backend server
+- ✅ Real-time audio visualization with dual analyzers
+- ✅ Smart muting and controls
+- ✅ Draggable, transparent widget
+- ✅ Email integration
+- ✅ Google Search integration
+- ✅ Complete documentation
+
+---
 
 🌐 [Production Demo](https://apsara-devshubh.devshubh.me) | 📧 [Contact](mailto:shubharthaksangharsha@gmail.com)
