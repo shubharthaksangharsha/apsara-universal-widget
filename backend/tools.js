@@ -1164,20 +1164,38 @@ async function generateImage(prompt, model, aspectRatio = '1:1', imageSize = '1K
     
     const selectedModel = modelMap[model] || modelMap[imageGenerationModel];
     
-    // Initialize Google GenAI with IMAGE_API_KEY (falls back to GEMINI_API_KEY)
-    const apiKey = process.env.IMAGE_API_KEY || process.env.GEMINI_API_KEY;
+    // Initialize Google GenAI with IMAGE_API_KEY (falls back to GEMINI_API_KEY, then GOOGLE_API_KEY)
+    const apiKey = process.env.IMAGE_API_KEY || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
     if (!apiKey) {
-      return { success: false, error: 'IMAGE_API_KEY or GEMINI_API_KEY not found in environment' };
+      return { success: false, error: 'IMAGE_API_KEY, GEMINI_API_KEY, or GOOGLE_API_KEY not found in environment' };
     }
     
     // Always log which API key is being used (not just debug mode)
-    const keySource = process.env.IMAGE_API_KEY ? 'IMAGE_API_KEY' : 'GEMINI_API_KEY (fallback)';
+    let keySource = 'UNKNOWN';
+    if (process.env.IMAGE_API_KEY) {
+      keySource = 'IMAGE_API_KEY';
+    } else if (process.env.GEMINI_API_KEY) {
+      keySource = 'GEMINI_API_KEY (fallback)';
+    } else if (process.env.GOOGLE_API_KEY) {
+      keySource = 'GOOGLE_API_KEY (fallback)';
+    }
+    
     const keyPreview = apiKey ? `${apiKey.substring(0, 8)}...` : 'none';
     console.log(`🔑 Image Generation API Key Source: ${keySource}`);
     console.log(`🔑 API Key Preview: ${keyPreview}`);
-    debugLog('tools', `🎨 Generating image with model: ${selectedModel}`);
+    console.log(`🎨 Generating image with model: ${selectedModel}`);
+    
+    // Temporarily unset other env vars to prevent library confusion
+    const originalGoogleKey = process.env.GOOGLE_API_KEY;
+    const originalGeminiKey = process.env.GEMINI_API_KEY;
+    delete process.env.GOOGLE_API_KEY;
+    delete process.env.GEMINI_API_KEY;
     
     const ai = new GoogleGenAI({ apiKey });
+    
+    // Restore original env vars
+    if (originalGoogleKey) process.env.GOOGLE_API_KEY = originalGoogleKey;
+    if (originalGeminiKey) process.env.GEMINI_API_KEY = originalGeminiKey;
     
     // Build config based on model
     const config = {
