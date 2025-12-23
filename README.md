@@ -42,9 +42,11 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 
 ### Platform Support
 - ✅ **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
-- ✅ **Linux Desktop**: Native desktop widget with Electron (fully functional with screen sharing!)
-- 🔄 **Windows Desktop**: Native desktop widget with Electron (coming soon)
-- 🔄 **macOS Desktop**: Native desktop widget with Electron (coming soon)
+- ✅ **Linux Desktop**: Native desktop widget with Electron (fully tested and production-ready!)
+- ✅ **Windows Desktop**: Electron supports Windows - same codebase works (requires testing)
+- ✅ **macOS Desktop**: Electron supports macOS - same codebase works (requires testing)
+
+**Note on Cross-Platform:** The Electron app is built with cross-platform compatibility in mind. While fully tested on Linux, the same codebase should work on Windows and macOS with minimal to no changes. Electron abstracts OS-specific details, and our tools (screenshot, clipboard) include platform-specific implementations for Windows, macOS, and Linux.
 
 ### Desktop Widget Features (Electron)
 - **Frameless Window**: Transparent, borderless window showing only the widget
@@ -373,12 +375,34 @@ The backend server (`backend/server.js`) provides:
 1. **WebSocket Proxy**: Secure connection between frontend and Gemini API
 2. **API Key Management**: Keeps your Gemini API key secure on the server
 3. **CORS Configuration**: Allows requests from authorized origins
-4. **Email Integration**: Send messages via Nodemailer
-5. **Google Search**: Automatic real-time information retrieval
-6. **System Prompt**: Custom personality and capabilities for Apsara
-7. **Error Handling**: Robust error handling and logging
-8. **Video Frame Processing**: Handles screen sharing frames from frontend
-9. **Debug Logging**: Conditional logging system (toggle with `DEBUG_LOG` variable)
+4. **Modular Tools System** (`backend/tools.js`): Organized tool functions including:
+   - **Email with Attachments**: Send messages and images to Shubharthak
+   - **Screenshot Capture**: Take screenshots of the current screen
+   - **Clipboard Operations**: Copy text to clipboard or read from it
+   - **Google Search**: Automatic real-time information retrieval
+5. **System Prompt**: Custom personality and capabilities for Apsara
+6. **Error Handling**: Robust error handling and logging
+7. **Video Frame Processing**: Handles camera and screen sharing frames from frontend
+8. **Debug Logging**: Conditional logging system (toggle with `DEBUG_LOG` variable)
+9. **Debug Frame Saving**: Optional frame saving for debugging (toggle with `SAVE_DEBUG_FRAMES` variable, default: OFF)
+10. **High-Quality Video**: Uses `MEDIA_RESOLUTION_HIGH` for optimal video quality
+
+### Available Tools
+
+Apsara can use these tools to help you:
+
+| Tool | Description | Example Usage |
+|------|-------------|---------------|
+| **send_email_to_shubharthak** | Send messages to Shubharthak with optional image attachments | "Email this screenshot to Shubharthak" |
+| **take_screenshot** | Capture the current screen | "Take a screenshot" |
+| **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" |
+| **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" |
+| **googleSearch** | Real-time web search | "What's the weather today?" |
+
+**Example Workflows:**
+- 📸 "Screenshot this and email it" → Takes screenshot + sends email with image
+- 📋 "Copy this text from the screen" → OCR text + copy to clipboard
+- 📧 "Send a message to Shubharthak with this image" → Attach image to email
 
 ### Environment Variables
 
@@ -675,16 +699,27 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Enhanced backend to forward video frames to Gemini
 - Fixed screen sharing permissions for Electron
 
-### Version 1.2.0 (December 2024)
-**UI/UX Enhancement & Visual Consistency:**
+### Version 1.2.0 (December 23, 2024)
+**UI/UX Enhancement & Visual Consistency + Advanced Tools:**
 - ✨ **Clean Green Indicators**: Both camera and screen share now use elegant green pulsing dots
 - 🎨 **Removed Floating Banners**: No more red "Screen Sharing Active" floating indicator
 - 🟢 **Consistent Styling**: Camera and screen share indicators use identical styling for visual harmony
 - 🔧 **Backend Debug Controls**: Added `SAVE_DEBUG_FRAMES` toggle for optional frame saving (default: OFF)
 - 📹 **Camera Support**: Full camera integration with green indicator dot
 - ⚙️ **High-Quality Video**: Backend configured with `MEDIA_RESOLUTION_HIGH` for optimal quality
-- 📝 **Enhanced Documentation**: Updated README with all UI/UX improvements and widget screenshot
-- 🐛 **Bug Fixes**: Fixed CSS corruption and duplicate indicator definitions
+- 🛠️ **Modular Tools System**: Created `backend/tools.js` for organized tool management
+- 📸 **Screenshot Tool**: Take screenshots and email them to Shubharthak
+- 📋 **Clipboard Tools**: Copy text to clipboard or read from clipboard
+- 📧 **Email with Attachments**: Send images and screenshots via email
+- 🌐 **Cross-Platform Tools**: Screenshot and clipboard work on Linux, Windows, and macOS
+- 📝 **Enhanced Documentation**: Updated README with tools, cross-platform support, and widget screenshot
+- 🐛 **Bug Fixes**: Fixed CSS corruption, duplicate indicator definitions, and README formatting
+
+**New Capabilities:**
+- "Take a screenshot" - Captures current screen
+- "Copy this text" - Copies to clipboard
+- "Screenshot this and email it to Shubharthak" - Combined workflow
+- "What's in my clipboard?" - Reads clipboard content
 
 ### Version 1.0.0 (December 2024)
 **Initial Release:**

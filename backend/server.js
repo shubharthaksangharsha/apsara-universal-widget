@@ -341,7 +341,7 @@ wss.on('connection', (clientWs) => {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: tools,
+            tools: toolDeclarations,  // Use imported tool declarations
             speechConfig: {
                 voiceConfig: {
                     prebuiltVoiceConfig: {
@@ -354,7 +354,7 @@ wss.on('connection', (clientWs) => {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: tools
+            tools: toolDeclarations  // Use imported tool declarations
         };
 
         debugLog('🔧 Session config:', { 
@@ -366,12 +366,12 @@ wss.on('connection', (clientWs) => {
 
         const session = await ai.live.connect({
             model: model,
-        const config = modality === 'AUDIO' ? {
-            responseModalities: responseModalities,
-            systemInstruction: SYSTEM_PROMPT,
-            mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: toolDeclarations,  // Use imported tool declarations
-            speechConfig: {async (message) => {
+            config: config
+        }, {
+            onopen: () => {
+                debugLog('✅ Gemini session opened');
+            },
+            onmessage: async (message) => {
                     debugLog('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
                     
                     // Extract audio from serverContent.inlineData - ONLY in AUDIO mode
@@ -424,17 +424,15 @@ wss.on('connection', (clientWs) => {
                         }
                     };
                     clientWs.send(JSON.stringify(messageToSend));
-                },
-                onerror: (error) => {
-                    console.error('Gemini error:', error);
-                    clientWs.send(JSON.stringify({ type: 'error', error: error.message }));
-                },
-                onclose: (event) => {
-                    debugLog('Gemini connection closed:', event.reason);
-                    clientWs.send(JSON.stringify({ type: 'status', status: 'disconnected' }));
-                }
             },
-            config: config
+            onerror: (error) => {
+                console.error('Gemini error:', error);
+                clientWs.send(JSON.stringify({ type: 'error', error: error.message }));
+            },
+            onclose: (event) => {
+                debugLog('Gemini connection closed:', event.reason);
+                clientWs.send(JSON.stringify({ type: 'status', status: 'disconnected' }));
+            }
         });
 
         geminiWs = session;
@@ -611,6 +609,7 @@ app.get('/health', (req, res) => {
 // Test email endpoint (for debugging)
 app.post('/test-email', async (req, res) => {
     const { message } = req.body;
+    const { sendEmailToShubharthak } = require('./tools');
     const result = await sendEmailToShubharthak(message || 'Test message from Apsara Live');
     res.json(result);
 });
