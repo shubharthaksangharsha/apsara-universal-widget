@@ -1,23 +1,18 @@
 # Apsara AI - Voice Assistant System 🎙️✨
 
-**Version 1.2.0** - Enhanced UI/UX & Visual Consistency
-
-A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with screen sharing, and Node.js backend with WebSocket communication.
-
-![Apsara Widget](assets/widget.png)5. **Email Integration**: Send messages via Nodemailer
-6. **Google Search**: Automatic real-time information retrieval
-7. **System Prompt**: Custom personality and capabilities for Apsara
-8. **Error Handling**: Robust error handling and logging
-9. **Video Frame Processing**: Handles camera and screen sharing frames from frontend
-10. **Debug Logging**: Conditional logging system (toggle with `DEBUG_LOG` variable)
-11. **Debug Frame Saving**: Optional frame saving for debugging (toggle with `SAVE_DEBUG_FRAMES` variable, default: OFF)
-12. **High-Quality Video**: Uses `MEDIA_RESOLUTION_HIGH` for optimal video quality
-
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
 ![Version](https://img.shields.io/badge/Version-1.2.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+**Version 1.2.0** - Enhanced UI/UX & Visual Consistency
+
+A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
+
+![Apsara Widget](assets/widget.png)
+
+## 🌟 Features
 
 ### Voice Interaction
 - **Real-time Voice Chat**: Talk naturally to Apsara AI with ultra-low latency streaming
@@ -26,9 +21,13 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 - **Dynamic Visualizer**: Beautiful audio visualization that changes based on who's speaking
   - 🟢 **Green/Gold bars** when you speak
   - 🟠 **Dramatic orange spikes** when Apsara speaks
-- **Clean Visual Indicators**: Minimalist green pulsing dots show active camera/screen share statusion that changes based on who's speaking
-  - 🟢 **Green/Gold bars** when you speak
-  - 🟠 **Dramatic orange spikes** when Apsara speaks
+- **Clean Visual Indicators**: Minimalist green pulsing dots show active camera/screen share status
+
+### Visual Capabilities
+- **Camera Sharing**: Share your camera feed with Apsara for visual interaction (green dot indicator when active)
+- **Screen Sharing**: Share your entire screen for visual assistance (green dot indicator when active)
+- **Real-time Video Processing**: Apsara can see and analyze what you show via camera or screen
+- **High-Quality Streaming**: Optimized video compression and frame rate for smooth experience
 
 ### What Apsara Can Do
 Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time voice capabilities:
@@ -53,9 +52,13 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 - **Draggable Widget**: Click and drag the widget panel to move it anywhere
 - **Clickable Controls**: All buttons remain fully functional while dragging
 - **Close Button**: Red X button at top-right corner to exit the app
-- **Screen Sharing**: Full native screen capture with visual indicators
-  - 🔴 **Fullscreen Red Border**: Animated pulsing border around entire monitor
-  - 📺 **Click-Through Overlay**: Border doesn't interfere with desktop interaction
+- **Camera Sharing**: Full camera integration with visual feedback
+  - 🟢 **Green Indicator Dot**: Pulsing green dot on camera button when active
+  - 📹 **Real-time Streaming**: Camera feed sent to Gemini for visual interaction
+  - ⚡ **Optimized Quality**: High-quality video with efficient compression
+- **Screen Sharing**: Full native screen capture with clean visual feedback
+  - 🟢 **Green Indicator Dot**: Pulsing green dot on screen share button when active
+  - 🔴 **Fullscreen Red Border**: Animated pulsing border around entire monitor (Electron only)
   - 🎯 **Automatic Primary Screen**: No dialog needed, instantly shares main display
   - ⚡ **2 FPS Streaming**: Optimized frame rate for Gemini Live API
 - **Auto-Exit**: Properly closes both Electron and React dev server when closed
@@ -672,6 +675,17 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Enhanced backend to forward video frames to Gemini
 - Fixed screen sharing permissions for Electron
 
+### Version 1.2.0 (December 2024)
+**UI/UX Enhancement & Visual Consistency:**
+- ✨ **Clean Green Indicators**: Both camera and screen share now use elegant green pulsing dots
+- 🎨 **Removed Floating Banners**: No more red "Screen Sharing Active" floating indicator
+- 🟢 **Consistent Styling**: Camera and screen share indicators use identical styling for visual harmony
+- 🔧 **Backend Debug Controls**: Added `SAVE_DEBUG_FRAMES` toggle for optional frame saving (default: OFF)
+- 📹 **Camera Support**: Full camera integration with green indicator dot
+- ⚙️ **High-Quality Video**: Backend configured with `MEDIA_RESOLUTION_HIGH` for optimal quality
+- 📝 **Enhanced Documentation**: Updated README with all UI/UX improvements and widget screenshot
+- 🐛 **Bug Fixes**: Fixed CSS corruption and duplicate indicator definitions
+
 ### Version 1.0.0 (December 2024)
 **Initial Release:**
 - ✅ React widget with Gemini Live API integration
@@ -687,3 +701,4 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 ---
 
 🌐 [Production Demo](https://apsara-devshubh.devshubh.me) | 📧 [Contact](mailto:shubharthaksangharsha@gmail.com)
+
