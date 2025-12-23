@@ -1,22 +1,32 @@
 # Apsara AI - Voice Assistant System 🎙️✨
 
-**Version 1.1.0** - Enhanced Desktop Experience
+**Version 1.2.0** - Enhanced UI/UX & Visual Consistency
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with screen sharing, and Node.js backend with WebSocket communication.
+
+![Apsara Widget](assets/widget.png)5. **Email Integration**: Send messages via Nodemailer
+6. **Google Search**: Automatic real-time information retrieval
+7. **System Prompt**: Custom personality and capabilities for Apsara
+8. **Error Handling**: Robust error handling and logging
+9. **Video Frame Processing**: Handles camera and screen sharing frames from frontend
+10. **Debug Logging**: Conditional logging system (toggle with `DEBUG_LOG` variable)
+11. **Debug Frame Saving**: Optional frame saving for debugging (toggle with `SAVE_DEBUG_FRAMES` variable, default: OFF)
+12. **High-Quality Video**: Uses `MEDIA_RESOLUTION_HIGH` for optimal video quality
 
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.1.0-blue)
+![Version](https://img.shields.io/badge/Version-1.2.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
-
-## 🌟 Features
 
 ### Voice Interaction
 - **Real-time Voice Chat**: Talk naturally to Apsara AI with ultra-low latency streaming
 - **Interrupt Capability**: Interrupt Apsara at any time to ask follow-up questions
 - **Smart Muting**: Mute your microphone while still seeing Apsara's responses
 - **Dynamic Visualizer**: Beautiful audio visualization that changes based on who's speaking
+  - 🟢 **Green/Gold bars** when you speak
+  - 🟠 **Dramatic orange spikes** when Apsara speaks
+- **Clean Visual Indicators**: Minimalist green pulsing dots show active camera/screen share statusion that changes based on who's speaking
   - 🟢 **Green/Gold bars** when you speak
   - 🟠 **Dramatic orange spikes** when Apsara speaks
 
@@ -64,7 +74,7 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
 - **Smooth Animations**: Professional transitions and hover effects
 - **Screen Share Controls**: Functional screen sharing with visual feedback
 - **Debug Logging**: Comprehensive logging system with on/off toggle
-- **Placeholder Icons**: Video cam button (coming soon)
+- **Consistent Styling**: Camera and screen share indicators use identical styling for visual harmony
 
 ## 📦 Project Structure
 
@@ -261,8 +271,8 @@ update-desktop-database ~/.local/share/applications/
 | Button | Function | Description |
 |--------|----------|-------------|
 | 🎤 **Mute** | Mute/Unmute Microphone | Stops your audio from being sent (Apsara can still speak) |
-| 📺 **Screen Share** | Share Screen | ✅ **Working!** Share your entire screen with Apsara (Electron: Auto-captures primary display with red border) |
-| 📹 **Video** | Toggle Video | Coming soon - enable video chat |
+| 📺 **Screen Share** | Share Screen | ✅ **Working!** Share your entire screen with Apsara (Shows green dot when active) |
+| 📹 **Camera** | Toggle Camera | ✅ **Working!** Enable camera for visual interaction (Shows green dot when active) |
 | ❌ **End** | End/Start Call | Ends the current session or starts a new one |
 | ✖️ **Close** | Close Widget | Closes the desktop widget (Electron only) |
 
@@ -271,9 +281,10 @@ update-desktop-database ~/.local/share/applications/
 - **Green/Gold Bars**: You are speaking
 - **Orange Bars**: Apsara is speaking (more dramatic spikes!)
 - **No Bars**: Muted or idle
-- **Status Text**: Shows current state (Connecting, Listening, Speaking, Sharing screen, etc.)
-- **🔴 Red Border (Electron)**: Fullscreen animated border when sharing screen
-- **🔴 Floating Indicator**: "Screen Sharing Active" badge visible during screen share
+- **Status Text**: Shows current state (Connecting, Listening, Speaking, Sharing screen, Camera active, etc.)
+- **🟢 Green Dot (Camera)**: Pulsing green indicator on camera button when active
+- **🟢 Green Dot (Screen Share)**: Pulsing green indicator on screen share button when active
+- **🔴 Red Border (Electron)**: Fullscreen animated border around monitor when sharing screen
 
 ### Interrupt Feature
 
@@ -283,29 +294,35 @@ You can interrupt Apsara at any time while she's speaking:
 
 ### Screen Sharing Feature (Electron) 🆕
 
-**New in Version 1.1.0!** Share your screen with Apsara for visual assistance:
+**Enhanced in Version 1.2.0!** Share your screen with Apsara for visual assistance with beautiful, minimalist UI:
 
 **How to Use:**
 1. Click the **📺 Screen Share** button (must be connected first)
 2. Electron automatically captures your primary display
-3. A fullscreen **animated red border** appears around your monitor
-4. Frames are sent to Gemini at 2 FPS for analysis
-5. Ask Apsara questions about what's on your screen!
-6. Click the button again to stop sharing
+3. A **green pulsing dot** appears on the screen share button
+4. Fullscreen **animated red border** appears around your monitor (Electron only)
+5. Frames are sent to Gemini at 2 FPS for analysis
+6. Ask Apsara questions about what's on your screen!
+7. Click the button again to stop sharing
 
 **Visual Feedback:**
-- 🔴 **Pulsing Red Border**: Fullscreen overlay around entire monitor (5-8px animated)
+- 🟢 **Green Indicator Dot**: Clean, pulsing green dot on the screen share button (matches camera style)
+- 🔴 **Pulsing Red Border**: Fullscreen overlay around entire monitor (5-8px animated, Electron only)
 - 🎯 **Click-Through**: Border doesn't interfere with desktop interaction
-- 💬 **Floating Indicator**: "🔴 Screen Sharing Active" badge
-- 📝 **Status Text**: Shows "Sharing screen..." in widget
+-  **Status Text**: Shows "Sharing screen..." in widget
+- 🎨 **No Floating Banners**: Clean UI with indicators only on buttons
 
 **Platform Differences:**
-- **Electron (Desktop)**: Automatic primary screen capture, fullscreen red border
-- **Browser (Web)**: Shows system dialog to select screen/window, border on browser window only
+- **Electron (Desktop)**: Automatic primary screen capture, fullscreen red border + green dot indicator
+- **Browser (Web)**: Shows system dialog to select screen/window, border on browser window + green dot indicator
 
 **Technical Details:**
-- Captures at 640x360 resolution
+- Captures at 640x360 resolution (configurable)
 - Streams at 2 FPS (optimized for Gemini API)
+- Uses JPEG compression (80% quality)
+- Sends base64-encoded frames via WebSocket
+- Backend forwards frames to Gemini Live API as video input with `MEDIA_RESOLUTION_HIGH`
+- Debug frame saving can be toggled (default: OFF)
 - Uses JPEG compression (80% quality)
 - Sends base64-encoded frames via WebSocket
 - Backend forwards frames to Gemini Live API as video input
@@ -314,12 +331,13 @@ You can interrupt Apsara at any time while she's speaking:
 
 ### Technology Stack
 
-**Frontend:**
-- React 18.3.1
-- Electron (for desktop widget)
-- Web Audio API for real-time audio processing
-- WebSocket client for backend communication
-- Modern CSS with animations
+**Backend:**
+- Node.js with Express
+- WebSocket (ws library) for real-time communication
+- Google Gemini 2.5 Flash Native Audio Preview API
+- Nodemailer for email functionality
+- CORS enabled for cross-origin requests
+- Configurable debug logging and frame saving
 
 **Backend:**
 - Node.js with Express
@@ -405,13 +423,17 @@ npm run dev        # Start development server with auto-reload
 ### Backend API Endpoints
 
 - **WebSocket**: `ws://localhost:3000` (or your configured port)
-  - Handles bidirectional audio streaming
-  - Receives audio from frontend
-  - Sends Gemini responses back
-  - Manages session state
+**Backend** (`backend/server.js`):
+```javascript
+// Line 15
+const DEBUG_LOG = false; // Set to false to disable all debug logs
 
-### Customization
+// Line 18
+const SAVE_DEBUG_FRAMES = false; // Set to true to save camera/screen frames for debugging
+```
 
+- `DEBUG_LOG`: Controls all `debugLog()` calls throughout the codebase. Set to `false` for production to reduce console noise.
+- `SAVE_DEBUG_FRAMES`: When `true`, saves the last 2 camera and screen frames to `backend/debug_frames/` for debugging purposes. Default is `false` to avoid unnecessary disk usage.
 #### Toggle Debug Logging
 
 **Frontend** (`apsara-widget-app/src/components/ApsaraWidget.js`):
@@ -501,16 +523,22 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 ### Frontend Issues
 
 **Microphone not working:**
-- Check browser microphone permissions
-- Linux: Check `pavucontrol` or `alsamixer`
-- Chrome: Go to `chrome://settings/content/microphone`
+**Screen sharing not working (Electron):**
+- Verify Electron has screen capture permissions
+- Check for IPC errors in console
+- Linux: May need to grant permissions to Electron
+- Check logs for "get-screen-sources" errors
+- Ensure backend is running and receiving frames
 
-**No audio from Apsara:**
-- Check speaker/headphone volume
-- Check browser audio settings
-- Look for errors in console (F12)
+**Green indicator not appearing on button:**
+- Check that `isScreenSharing` or `isCameraActive` state is true
+- Verify CSS for `.screen-share-indicator` or `.camera-indicator` is loaded
+- Check browser console for React component errors
 
-**Connection errors:**
+**Red border not appearing around screen (Electron):**
+- Verify `show-screen-border` IPC is being sent
+- Check Electron console for overlay creation logs
+- Border window may be behind other windows (try alt-tab)
 - Make sure backend server is running
 - Check WebSocket URL in `ApsaraWidget.js`
 - Look for CORS errors in console

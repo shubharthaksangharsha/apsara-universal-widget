@@ -15,7 +15,7 @@ require('dotenv').config();
 const DEBUG_LOG = true; // Set to false to disable debug logging
 
 // Debug frame saving toggle
-const SAVE_DEBUG_FRAMES = true; // Set to false to disable saving screen frames
+const SAVE_DEBUG_FRAMES = false; // Set to false to disable saving screen frames
 
 // Debug log helper - only logs when DEBUG_LOG is true
 const debugLog = (...args) => {
@@ -383,6 +383,7 @@ wss.on('connection', (clientWs) => {
         const config = modality === 'AUDIO' ? {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
+            mediaResolution: 'MEDIA_RESOLUTION_HIGH',
             tools: tools,
             speechConfig: {
                 voiceConfig: {
@@ -395,6 +396,7 @@ wss.on('connection', (clientWs) => {
             // TEXT mode - no audio/speech config at all
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
+            mediaResolution: 'MEDIA_RESOLUTION_HIGH',
             tools: tools
         };
 
@@ -590,7 +592,8 @@ wss.on('connection', (clientWs) => {
                         video: {
                             data: message.data, // base64 encoded camera frame
                             mimeType: message.mimeType || 'image/jpeg'
-                        }
+                        },
+                        
                     });
                 } catch (err) {
                     console.error('❌ Error sending camera to Gemini:', err);
