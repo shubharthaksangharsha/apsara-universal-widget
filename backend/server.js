@@ -6,10 +6,12 @@
 const express = require('express');
 const WebSocket = require('ws');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
+
+// Import tools module
+const { toolDeclarations, executeTool } = require('./tools');
 
 // Debug logging toggle
 const DEBUG_LOG = true; // Set to false to disable debug logging
@@ -98,65 +100,49 @@ app.use(cors({
 
 app.use(express.json());
 
-// Email configuration
-const emailTransporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_APP_PASSWORD // Use App Password, not regular password
-    }
-});
-
-// Function to send email
-async function sendEmailToShubharthak(message, userContext = '') {
-    try {
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: 'shubharthaksangharsha@gmail.com',
-            subject: `Message from Apsara Live Assistant`,
-            html: `
-                <h2>New message from Apsara Live</h2>
-                <p><strong>Message:</strong> ${message}</p>
-                ${userContext ? `<p><strong>Context:</strong> ${userContext}</p>` : ''}
-                <p><em>Sent at: ${new Date().toLocaleString()}</em></p>
-            `
-        };
-
-        const info = await emailTransporter.sendMail(mailOptions);
-        debugLog('Email sent:', info.messageId);
-        return { success: true, messageId: info.messageId };
-    } catch (error) {
-        console.error('Email error:', error);
-        return { success: false, error: error.message };
-    }
-}
-
 // System prompt with all your data
 const SYSTEM_PROMPT = `You are Apsara, an advanced AI voice assistant created by Shubharthak Sangharasha. You are friendly, helpful, and conversational. When greeting users or introducing yourself, be warm and professional.
 
 **Your Capabilities:**
 - Real-time voice conversations with natural interruption handling
-- Sending messages to Shubharthak via email
+- Viewing camera and screen share - you can see what users show you
+- Sending messages and screenshots to Shubharthak via email (with image attachments)
+- Taking screenshots of the current screen
+- Copying text to the system clipboard
+- Reading text from the system clipboard
 - Searching Google for real-time information (current events, news, weather, sports, latest tech updates, etc.)
 - Answering questions about Shubharthak's work, projects, and experience
 - Providing information about his skills, education, and background
 - Discussing his freelance work and client projects
 - Explaining his technical expertise in detail
 
-
 **How to interact with users:**
 - Be conversational and friendly
 - Respond only in English until user dont want to speak in other language
 - Answer questions naturally about Shubharthak's experience and projects
 - If someone wants to contact Shubharthak, offer to send a message via email
+- When users show you something via camera or screen share, you can see and analyze it
+- If users ask you to copy text, use copy_to_clipboard function
+- If users want to take a screenshot, use take_screenshot function
+- You can email screenshots to Shubharthak by combining take_screenshot and send_email_to_shubharthak
 - Provide detailed but concise information
 - Show enthusiasm about the projects and work
 - For questions about current events, news, weather, sports scores, latest tech updates, or anything requiring real-time information, Google Search will automatically provide accurate, up-to-date answers
 - Always cite sources when sharing information from Google Search
 
-**Important:** 
-- When users ask you to send a message to Shubharthak, use the send_email_to_shubharthak function.
-- Google Search is available for real-time information - the system will handle it automatically when needed.*/
+**Important Tool Usage:**
+- send_email_to_shubharthak: Send messages to Shubharthak, can include image attachments
+- take_screenshot: Capture the current screen (returns base64 image)
+- copy_to_clipboard: Copy text for easy pasting
+- get_clipboard_text: Read what's currently in clipboard
+- Google Search: Automatic real-time information retrieval
+
+**Example workflows:**
+- "Screenshot this and email it to Shubharthak" → Use take_screenshot, then send_email_to_shubharthak with image
+- "Copy this message from the screen" → Extract text from camera/screen, then use copy_to_clipboard
+- "Take a screenshot" → Use take_screenshot and confirm it was captured
+- "What's in my clipboard?" → Use get_clipboard_text
+
 **About Shubharthak Sangharasha:**
 
 
@@ -345,35 +331,6 @@ wss.on('connection', (clientWs) => {
         const model = 'gemini-2.5-flash-native-audio-preview-12-2025'; // Use half-cascade for better tool support
         debugLog('📡 Using model:', model);
         
-        // Function declarations for tools
-        const tools = [
-            // Google Search - Built-in tool (no function declaration needed)
-            { googleSearch: {} },
-            // Custom function for sending emails
-            {
-                functionDeclarations: [
-                    {
-                        name: 'send_email_to_shubharthak',
-                        description: 'Send an email message to Shubharthak Sangharasha. Use this when users want to contact him, leave a message, or send inquiries.',
-                        parameters: {
-                            type: 'object',
-                            properties: {
-                                message: {
-                                    type: 'string',
-                                    description: 'The message content to send to Shubharthak'
-                                },
-                                senderInfo: {
-                                    type: 'string',
-                                    description: 'Optional information about the sender (name, contact info if provided)'
-                                }
-                            },
-                            required: ['message']
-                        }
-                    }
-                ]
-            }
-        ];
-
         // Set response modalities based on selected mode
         const responseModalities = modality === 'AUDIO' 
             ? [Modality.AUDIO] 
@@ -409,12 +366,12 @@ wss.on('connection', (clientWs) => {
 
         const session = await ai.live.connect({
             model: model,
-            callbacks: {
-                onopen: () => {
-                    debugLog('Connected to Gemini');
-                    clientWs.send(JSON.stringify({ type: 'status', status: 'connected' }));
-                },
-                onmessage: async (message) => {
+        const config = modality === 'AUDIO' ? {
+            responseModalities: responseModalities,
+            systemInstruction: SYSTEM_PROMPT,
+            mediaResolution: 'MEDIA_RESOLUTION_HIGH',
+            tools: toolDeclarations,  // Use imported tool declarations
+            speechConfig: {async (message) => {
                     debugLog('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
                     
                     // Extract audio from serverContent.inlineData - ONLY in AUDIO mode
@@ -441,18 +398,19 @@ wss.on('connection', (clientWs) => {
                     // Handle tool calls
                     if (message.toolCall) {
                         for (const fc of message.toolCall.functionCalls) {
-                            if (fc.name === 'send_email_to_shubharthak') {
-                                const { message: emailMessage, senderInfo } = fc.args;
-                                const result = await sendEmailToShubharthak(emailMessage, senderInfo);
-                                
-                                session.sendToolResponse({
-                                    functionResponses: [{
-                                        id: fc.id,
-                                        name: fc.name,
-                                        response: result
-                                    }]
-                                });
-                            }
+                            debugLog(`🔧 Tool call received: ${fc.name}`, fc.args);
+                            
+                            // Execute tool using tools module
+                            const result = await executeTool(fc.name, fc.args);
+                            
+                            // Send response back to Gemini
+                            session.sendToolResponse({
+                                functionResponses: [{
+                                    id: fc.id,
+                                    name: fc.name,
+                                    response: result
+                                }]
+                            });
                         }
                     }
                     
