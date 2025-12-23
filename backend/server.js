@@ -110,6 +110,7 @@ const SYSTEM_PROMPT = `You are Apsara, an advanced AI voice assistant created by
 - Taking screenshots of the current screen
 - Copying text to the system clipboard
 - Reading text from the system clipboard
+- Pasting clipboard content into active applications
 - Searching Google for real-time information (current events, news, weather, sports, latest tech updates, etc.)
 - Answering questions about Shubharthak's work, projects, and experience
 - Providing information about his skills, education, and background
@@ -135,13 +136,15 @@ const SYSTEM_PROMPT = `You are Apsara, an advanced AI voice assistant created by
 - take_screenshot: Capture the current screen (returns base64 image)
 - copy_to_clipboard: Copy text for easy pasting
 - get_clipboard_text: Read what's currently in clipboard
+- paste_from_clipboard: Simulate keyboard paste (Ctrl+V/Cmd+V) to insert clipboard content
 - Google Search: Automatic real-time information retrieval
 
 **Example workflows:**
 - "Screenshot this and email it to Shubharthak" → Use take_screenshot, then send_email_to_shubharthak with image
-- "Copy this message from the screen" → Extract text from camera/screen, then use copy_to_clipboard
+- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard
 - "Take a screenshot" → Use take_screenshot and confirm it was captured
 - "What's in my clipboard?" → Use get_clipboard_text
+- "Paste what I copied earlier" → Use paste_from_clipboard
 
 **About Shubharthak Sangharasha:**
 
@@ -366,12 +369,12 @@ wss.on('connection', (clientWs) => {
 
         const session = await ai.live.connect({
             model: model,
-            config: config
-        }, {
-            onopen: () => {
-                debugLog('✅ Gemini session opened');
-            },
-            onmessage: async (message) => {
+            callbacks: {
+                onopen: () => {
+                    debugLog('✅ Connected to Gemini');
+                    clientWs.send(JSON.stringify({ type: 'status', status: 'connected' }));
+                },
+                onmessage: async (message) => {
                     debugLog('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
                     
                     // Extract audio from serverContent.inlineData - ONLY in AUDIO mode
@@ -424,15 +427,17 @@ wss.on('connection', (clientWs) => {
                         }
                     };
                     clientWs.send(JSON.stringify(messageToSend));
+                },
+                onerror: (error) => {
+                    console.error('❌ Gemini error:', error);
+                    clientWs.send(JSON.stringify({ type: 'error', error: error.message }));
+                },
+                onclose: (event) => {
+                    debugLog('🔌 Gemini connection closed:', event?.reason || 'Unknown reason');
+                    clientWs.send(JSON.stringify({ type: 'status', status: 'disconnected' }));
+                }
             },
-            onerror: (error) => {
-                console.error('Gemini error:', error);
-                clientWs.send(JSON.stringify({ type: 'error', error: error.message }));
-            },
-            onclose: (event) => {
-                debugLog('Gemini connection closed:', event.reason);
-                clientWs.send(JSON.stringify({ type: 'status', status: 'disconnected' }));
-            }
+            config: config
         });
 
         geminiWs = session;

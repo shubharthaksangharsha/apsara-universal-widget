@@ -188,6 +188,37 @@ async function getClipboardText() {
 }
 
 /**
+ * Paste text from clipboard using keyboard shortcut (Ctrl+V / Cmd+V)
+ * @returns {Promise<Object>} Result object
+ */
+async function pasteFromClipboard() {
+  try {
+    const platform = process.platform;
+    
+    let command;
+    if (platform === 'linux') {
+      // Use xdotool to simulate Ctrl+V
+      command = 'xdotool key ctrl+v';
+    } else if (platform === 'darwin') {
+      // macOS - use AppleScript to simulate Cmd+V
+      command = 'osascript -e \'tell application "System Events" to keystroke "v" using command down\'';
+    } else if (platform === 'win32') {
+      // Windows - use PowerShell with SendKeys
+      command = 'powershell -command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait(\'^v\')"';
+    } else {
+      return { success: false, error: 'Unsupported platform' };
+    }
+
+    await execAsync(command);
+    debugLog('✅ Paste command executed');
+    return { success: true, message: 'Paste command executed successfully' };
+  } catch (error) {
+    console.error('❌ Paste error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Tool function declarations for Gemini API
  */
 const toolDeclarations = [
@@ -254,6 +285,15 @@ const toolDeclarations = [
           properties: {},
           required: []
         }
+      },
+      {
+        name: 'paste_from_clipboard',
+        description: 'Simulate keyboard paste (Ctrl+V or Cmd+V) to paste clipboard content into the active application. Use when user asks to paste, insert clipboard content, or use what was copied.',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: []
+        }
       }
     ]
   }
@@ -287,6 +327,9 @@ async function executeTool(functionName, args) {
       case 'get_clipboard_text':
         return await getClipboardText();
       
+      case 'paste_from_clipboard':
+        return await pasteFromClipboard();
+      
       default:
         return { success: false, error: `Unknown function: ${functionName}` };
     }
@@ -302,5 +345,6 @@ module.exports = {
   sendEmailToShubharthak,
   takeScreenshot,
   copyToClipboard,
-  getClipboardText
+  getClipboardText,
+  pasteFromClipboard
 };

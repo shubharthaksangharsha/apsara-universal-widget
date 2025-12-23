@@ -378,7 +378,7 @@ The backend server (`backend/server.js`) provides:
 4. **Modular Tools System** (`backend/tools.js`): Organized tool functions including:
    - **Email with Attachments**: Send messages and images to Shubharthak
    - **Screenshot Capture**: Take screenshots of the current screen
-   - **Clipboard Operations**: Copy text to clipboard or read from it
+   - **Clipboard Operations**: Copy text to clipboard, read from clipboard, and paste
    - **Google Search**: Automatic real-time information retrieval
 5. **System Prompt**: Custom personality and capabilities for Apsara
 6. **Error Handling**: Robust error handling and logging
@@ -397,12 +397,14 @@ Apsara can use these tools to help you:
 | **take_screenshot** | Capture the current screen | "Take a screenshot" |
 | **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" |
 | **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" |
+| **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" |
 | **googleSearch** | Real-time web search | "What's the weather today?" |
 
 **Example Workflows:**
 - 📸 "Screenshot this and email it" → Takes screenshot + sends email with image
-- 📋 "Copy this text from the screen" → OCR text + copy to clipboard
+- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut
 - 📧 "Send a message to Shubharthak with this image" → Attach image to email
+- 📄 "Paste what I copied earlier" → Simulates Ctrl+V/Cmd+V
 
 ### Environment Variables
 
@@ -709,15 +711,16 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - ⚙️ **High-Quality Video**: Backend configured with `MEDIA_RESOLUTION_HIGH` for optimal quality
 - 🛠️ **Modular Tools System**: Created `backend/tools.js` for organized tool management
 - 📸 **Screenshot Tool**: Take screenshots and email them to Shubharthak
-- 📋 **Clipboard Tools**: Copy text to clipboard or read from clipboard
+- 📋 **Clipboard Tools**: Copy, read, and paste clipboard content
 - 📧 **Email with Attachments**: Send images and screenshots via email
 - 🌐 **Cross-Platform Tools**: Screenshot and clipboard work on Linux, Windows, and macOS
 - 📝 **Enhanced Documentation**: Updated README with tools, cross-platform support, and widget screenshot
-- 🐛 **Bug Fixes**: Fixed CSS corruption, duplicate indicator definitions, and README formatting
+- 🐛 **Bug Fixes**: Fixed Gemini API event handling (async iterator), CSS corruption, duplicate indicators
 
 **New Capabilities:**
 - "Take a screenshot" - Captures current screen
 - "Copy this text" - Copies to clipboard
+- "Paste what I copied" - Simulates Ctrl+V/Cmd+V keyboard shortcut
 - "Screenshot this and email it to Shubharthak" - Combined workflow
 - "What's in my clipboard?" - Reads clipboard content
 
