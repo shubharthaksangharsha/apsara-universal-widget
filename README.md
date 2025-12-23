@@ -3,14 +3,14 @@
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.2.0-blue)
+![Version](https://img.shields.io/badge/Version-1.3.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Version 1.2.0** - Enhanced UI/UX & Visual Consistency
+**Version 1.3.0** - Advanced Theme System & Adaptive UI
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
-![Apsara Widget](assets/widget2.png)
+![Apsara Widget](assets/widget3.png)
 
 ## 🌟 Features
 
@@ -73,6 +73,17 @@ Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time
   - 🟢 **Green/Gold bars** (user speaking) - Standard amplitude
   - 🟠 **Dramatic orange spikes** (Apsara speaking) - 2.5x larger, zero-smoothing, instant response
   - Speech-frequency-focused for more reactive Apsara visualization
+- **Advanced Theme System** (NEW in v1.3.0): 8 beautiful minimalist themes with complete UI consistency
+  - 🎨 **8 Themes**: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
+  - 🔄 **Persistent Themes**: Theme selection saved to localStorage
+  - 🎯 **Adaptive Menus**: All dropdowns (theme selector, resolution menus) match the selected theme
+  - 🖌️ **Consistent Styling**: Button colors, text colors, and backgrounds adapt to each theme
+  - ⚙️ **Settings Button**: Gear icon positioned between camera and start button for easy access
+  - 💾 **Theme Persistence**: Your selected theme is remembered across sessions
+- **Resolution Selectors**: Configurable screen and camera resolution with themed dropdowns
+  - 📺 **Screen Resolution**: Choose from 6 presets (720p to 4K)
+  - 📹 **Camera Resolution**: Choose from 4 presets (VGA to Full HD)
+  - 🎨 **Themed Menus**: Resolution menus match your selected theme
 - **Smart Mute**: Mute button only works when connected, doesn't auto-connect
 - **Status Indicators**: Clear visual feedback for connection, listening, and speaking states
 - **Responsive Design**: Works on desktop and mobile devices
@@ -93,7 +104,8 @@ apsara_ai/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── ApsaraWidget.js  # Main widget component
-│   │   │   └── ApsaraWidget.css # Widget styles
+│   │   │   ├── ApsaraWidget.css # Widget styles
+│   │   │   └── themes.css       # Theme system styles (NEW in v1.3.0)
 │   │   ├── App.js           # Root component
 │   │   └── index.js         # Entry point
 │   └── package.json         # Frontend dependencies
@@ -278,6 +290,7 @@ update-desktop-database ~/.local/share/applications/
 | 🎤 **Mute** | Mute/Unmute Microphone | Stops your audio from being sent (Apsara can still speak) |
 | 📺 **Screen Share** | Share Screen | ✅ **Working!** Share your entire screen with Apsara (Shows green dot when active) |
 | 📹 **Camera** | Toggle Camera | ✅ **Working!** Enable camera for visual interaction (Shows green dot when active) |
+| ⚙️ **Settings** | Theme Selector | 🎨 **NEW!** Choose from 8 beautiful themes (positioned between camera and start button) |
 | ❌ **End** | End/Start Call | Ends the current session or starts a new one |
 | ✖️ **Close** | Close Widget | Closes the desktop widget (Electron only) |
 
@@ -391,20 +404,23 @@ The backend server (`backend/server.js`) provides:
 
 Apsara can use these tools to help you:
 
-| Tool | Description | Example Usage |
-|------|-------------|---------------|
-| **send_email_to_shubharthak** | Send messages to Shubharthak with optional image attachments | "Email this screenshot to Shubharthak" |
-| **take_screenshot** | Capture the current screen | "Take a screenshot" |
-| **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" |
-| **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" |
-| **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" |
-| **googleSearch** | Real-time web search | "What's the weather today?" |
+| Tool | Description | Example Usage | Status |
+|------|-------------|---------------|--------|
+| **send_email_to_shubharthak** | Send messages to Shubharthak with optional image attachments | "Email this screenshot to Shubharthak" | ⚠️ Text emails work; screenshot attachments need fixing |
+| **take_screenshot** | Capture the current screen | "Take a screenshot" | ✅ Working |
+| **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" | ✅ Working |
+| **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" | ✅ Working |
+| **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" | ✅ Working |
+| **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
 
 **Example Workflows:**
-- 📸 "Screenshot this and email it" → Takes screenshot + sends email with image
-- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut
-- 📧 "Send a message to Shubharthak with this image" → Attach image to email
-- 📄 "Paste what I copied earlier" → Simulates Ctrl+V/Cmd+V
+- 📸 "Screenshot this and email it" → Takes screenshot + sends email with image (⚠️ attachment issue)
+- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut ✅
+- 📧 "Send a message to Shubharthak" → Send text email ✅
+- 📄 "Paste what I copied earlier" → Simulates Ctrl+V/Cmd+V ✅
+
+**Known Issues:**
+- ⚠️ **Email with Screenshot Attachment**: Text emails work perfectly, but attaching screenshots to emails needs debugging. The screenshot is captured successfully, but the attachment mechanism requires fixing.
 
 ### Environment Variables
 
@@ -663,21 +679,68 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - ✅ Comprehensive documentation
 - ✅ Version 1.0 release ready!
 
+### Phase 10: Advanced Theme System (v1.3.0)
+- ✅ Created comprehensive theme system with 8 minimalist themes
+- ✅ Implemented theme persistence with localStorage
+- ✅ Built adaptive UI that changes all components based on selected theme
+- ✅ Added settings button between camera and start button
+- ✅ Made theme selector panel theme-aware
+- ✅ Made resolution menus (screen & camera) theme-aware
+- ✅ Added theme-specific button colors and styling
+- ✅ Positioned theme selector for optimal UX
+- ✅ Increased widget width to accommodate new controls
+- ✅ Created `themes.css` for organized theme management
+
 ---
 
 **Built with ❤️ by Shubharthak Sangharsha**
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.1.0** - December 2024
+**Version 1.3.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Screen Sharing*
+*Talk to Apsara - Your Intelligent Voice Assistant with Beautiful Themes*
 
 ---
 
 ## 📋 Changelog
 
-### Version 1.1.0 (December 23, 2024)
+### Version 1.3.0 (December 23, 2024)
+**🎨 Advanced Theme System & Adaptive UI:**
+- ✨ **8 Beautiful Themes**: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
+- 🎯 **Complete UI Consistency**: All menus and dropdowns adapt to the selected theme
+- 💾 **Theme Persistence**: Selected theme saved to localStorage and restored on reload
+- ⚙️ **Settings Button**: Gear icon positioned between camera and start button
+- 🎨 **Adaptive Theme Selector**: Theme picker panel matches current theme colors
+- 📺 **Themed Resolution Menus**: Screen and camera resolution selectors match theme
+- 🖌️ **Theme-Specific Styling**: Buttons, text, backgrounds, and accents change per theme
+- 📐 **Increased Widget Width**: Expanded to fit new controls comfortably
+- 📁 **New File**: Created `themes.css` for organized theme management
+- 🔄 **React Portal Theming**: Wrapped all portals with theme classes for consistency
+
+**Theme Details:**
+Each theme includes custom colors for:
+- Widget panel background and shadow
+- Status text and button colors
+- End button styling
+- Settings button styling
+- Theme selector panel (background, borders, text, active states)
+- Resolution menus (background, borders, options, selected states)
+- Hover effects and transitions
+
+**Technical Implementation:**
+- CSS class-based theming system
+- React state management for theme selection
+- localStorage integration for persistence
+- Portal-based dropdown menus with theme awareness
+- Comprehensive CSS selectors for all UI elements
+
+**Files Modified:**
+- `apsara-widget-app/src/components/ApsaraWidget.js` - Added theme state, selector UI, portal wrapping
+- `apsara-widget-app/src/components/themes.css` - NEW file with complete theme system
+- `README.md` - Updated documentation with theme features
+
+### Version 1.2.0 (December 23, 2024)
 **New Features:**
 - ✨ Native screen sharing for Electron desktop widget
 - 🔴 Fullscreen animated red border overlay during screen sharing

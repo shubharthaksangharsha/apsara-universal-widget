@@ -20,6 +20,9 @@ const debugLog = (...args) => {
 // Email configuration
 let emailTransporter = null;
 
+// Memory storage (in-memory for now, can be persisted to file later)
+let memoryStore = [];
+
 /**
  * Initialize email transporter
  */
@@ -219,6 +222,105 @@ async function pasteFromClipboard() {
 }
 
 /**
+ * Store a memory/note for later retrieval
+ * @param {string} content - The content to remember
+ * @param {string} category - Optional category/tag for the memory
+ * @returns {Promise<Object>} Result object
+ */
+async function storeMemory(content, category = 'general') {
+  try {
+    const memory = {
+      id: Date.now(),
+      content: content,
+      category: category,
+      timestamp: new Date().toISOString(),
+      date: new Date().toLocaleString()
+    };
+    
+    memoryStore.push(memory);
+    debugLog(`💾 Memory stored: [${category}] ${content.substring(0, 50)}...`);
+    
+    return { 
+      success: true, 
+      message: `Memory stored successfully`,
+      memoryId: memory.id,
+      totalMemories: memoryStore.length
+    };
+  } catch (error) {
+    console.error('❌ Memory storage error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Retrieve memories based on search query or category
+ * @param {string} query - Search query or category
+ * @returns {Promise<Object>} Result with matching memories
+ */
+async function retrieveMemories(query = '') {
+  try {
+    let results;
+    
+    if (!query || query.trim() === '') {
+      // Return all memories if no query
+      results = memoryStore;
+    } else {
+      // Search in content and category
+      const searchTerm = query.toLowerCase();
+      results = memoryStore.filter(mem => 
+        mem.content.toLowerCase().includes(searchTerm) ||
+        mem.category.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    debugLog(`🔍 Memory search for "${query}": ${results.length} results`);
+    
+    return {
+      success: true,
+      count: results.length,
+      memories: results.map(m => ({
+        content: m.content,
+        category: m.category,
+        date: m.date
+      }))
+    };
+  } catch (error) {
+    console.error('❌ Memory retrieval error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Clear all memories or specific category
+ * @param {string} category - Optional category to clear (clears all if not specified)
+ * @returns {Promise<Object>} Result object
+ */
+async function clearMemories(category = null) {
+  try {
+    const beforeCount = memoryStore.length;
+    
+    if (category) {
+      memoryStore = memoryStore.filter(m => m.category.toLowerCase() !== category.toLowerCase());
+      debugLog(`🗑️ Cleared memories in category: ${category}`);
+    } else {
+      memoryStore = [];
+      debugLog('🗑️ Cleared all memories');
+    }
+    
+    const clearedCount = beforeCount - memoryStore.length;
+    
+    return {
+      success: true,
+      message: category ? `Cleared ${clearedCount} memories from category "${category}"` : `Cleared all ${clearedCount} memories`,
+      remainingMemories: memoryStore.length
+    };
+  } catch (error) {
+    console.error('❌ Memory clear error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Tool function declarations for Gemini API
  */
 const toolDeclarations = [
@@ -236,7 +338,7 @@ const toolDeclarations = [
           properties: {
             message: {
               type: 'string',
-              description: 'The message content to send to Shubharthak'
+              description: 'The message content to send to Shubharthark'
             },
             senderInfo: {
               type: 'string',
@@ -260,6 +362,24 @@ const toolDeclarations = [
         parameters: {
           type: 'object',
           properties: {},
+          required: []
+        }
+      },
+      {
+        name: 'screenshot_and_email',
+        description: 'Take a screenshot and immediately email it to Shubharthak. This is a COMBINED operation that does both in one step. Use this when user says "screenshot and email", "take a screenshot and send it", or similar combined requests.',
+        parameters: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'The email message to send with the screenshot (default: "Screenshot attached")'
+            },
+            senderInfo: {
+              type: 'string',
+              description: 'Optional information about the sender or context'
+            }
+          },
           required: []
         }
       },
@@ -294,6 +414,70 @@ const toolDeclarations = [
           properties: {},
           required: []
         }
+      },
+      {
+        name: 'store_memory',
+        description: 'Store a memory/note for later retrieval. Optionally categorize memories. Use this to remember important information, user preferences, or any notes the user wants to keep.',
+        parameters: {
+          type: 'object',
+          properties: {
+            content: {
+              type: 'string',
+              description: 'The content of the memory/note'
+            },
+            category: {
+              type: 'string',
+              description: 'Optional category or tag for the memory'
+            }
+          },
+          required: ['content']
+        }
+      },
+      {
+        name: 'retrieve_memories',
+        description: 'Retrieve stored memories/notes. Can search by query or filter by category. Use this to recall information, check stored notes, or find specific memories.',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Optional search query or category to filter memories'
+            }
+          },
+          required: []
+        }
+      },
+      {
+        name: 'clear_memories',
+        description: 'Clear all memories or those in a specific category. Use with caution. Use this to delete unnecessary memories, free up space, or remove outdated information.',
+        parameters: {
+          type: 'object',
+          properties: {
+            category: {
+              type: 'string',
+              description: 'Optional category to clear (clears all if not specified)'
+            }
+          },
+          required: []
+        }
+      },
+      {
+        name: 'screenshot_and_email',
+        description: 'Take a screenshot and email it to Shubharthak in one operation. Use this to quickly capture and send screen content without multiple steps.',
+        parameters: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Email message content'
+            },
+            senderInfo: {
+              type: 'string',
+              description: 'Optional sender information'
+            }
+          },
+          required: []
+        }
       }
     ]
   }
@@ -321,6 +505,9 @@ async function executeTool(functionName, args) {
       case 'take_screenshot':
         return await takeScreenshot();
       
+      case 'screenshot_and_email':
+        return await screenshotAndEmail(args.message, args.senderInfo);
+      
       case 'copy_to_clipboard':
         return await copyToClipboard(args.text);
       
@@ -329,6 +516,18 @@ async function executeTool(functionName, args) {
       
       case 'paste_from_clipboard':
         return await pasteFromClipboard();
+      
+      case 'store_memory':
+        return await storeMemory(args.content, args.category);
+      
+      case 'retrieve_memories':
+        return await retrieveMemories(args.query);
+      
+      case 'clear_memories':
+        return await clearMemories(args.category);
+      
+      case 'screenshot_and_email':
+        return await screenshotAndEmail(args.message, args.senderInfo);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };
@@ -339,12 +538,60 @@ async function executeTool(functionName, args) {
   }
 }
 
+/**
+ * Take screenshot and email it to Shubharthak in one operation
+ * @param {string} message - Email message
+ * @param {string} senderInfo - Optional sender information
+ * @returns {Promise<Object>} Result object
+ */
+async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = '') {
+  try {
+    debugLog('📸 Taking screenshot for email...');
+    
+    // Step 1: Take screenshot
+    const screenshotResult = await takeScreenshot();
+    
+    if (!screenshotResult.success) {
+      return { success: false, error: `Screenshot failed: ${screenshotResult.error}` };
+    }
+    
+    debugLog('✅ Screenshot captured, now sending email...');
+    
+    // Step 2: Send email with screenshot
+    const emailResult = await sendEmailToShubharthak(
+      message,
+      senderInfo,
+      screenshotResult.image,
+      screenshotResult.filename
+    );
+    
+    if (!emailResult.success) {
+      return { success: false, error: `Email failed: ${emailResult.error}` };
+    }
+    
+    debugLog('✅ Screenshot emailed successfully');
+    return {
+      success: true,
+      message: 'Screenshot captured and emailed successfully',
+      emailId: emailResult.messageId,
+      filename: screenshotResult.filename
+    };
+  } catch (error) {
+    console.error('❌ Screenshot+Email error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 module.exports = {
   toolDeclarations,
   executeTool,
   sendEmailToShubharthak,
   takeScreenshot,
+  screenshotAndEmail,
   copyToClipboard,
   getClipboardText,
-  pasteFromClipboard
+  pasteFromClipboard,
+  storeMemory,
+  retrieveMemories,
+  clearMemories
 };
