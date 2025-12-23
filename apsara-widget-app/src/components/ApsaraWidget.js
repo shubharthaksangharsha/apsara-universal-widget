@@ -161,6 +161,26 @@ const ApsaraWidget = () => {
   useEffect(() => {
     const fetchTools = async () => {
       try {
+        // Load saved tools state from localStorage
+        const savedToolsState = localStorage.getItem('apsara-enabled-tools');
+        
+        // If we have saved state, apply it to backend first
+        if (savedToolsState) {
+          try {
+            const toolsState = JSON.parse(savedToolsState);
+            debugLog('📦 Restoring saved tools state:', toolsState);
+            
+            await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ enabled: toolsState })
+            });
+          } catch (e) {
+            console.error('❌ Error restoring tools state:', e);
+          }
+        }
+        
+        // Fetch current tools from backend
         const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools`);
         const data = await response.json();
         if (data.success) {
@@ -430,10 +450,15 @@ const ApsaraWidget = () => {
       processor.onaudioprocess = (e) => {
         if (!isCapturing) return;
         
-        const ws = wsRef.current;
-        const muted = isMutedRef.current; // Use ref instead of state
+        // Check mute status FIRST before anything else
+        const muted = isMutedRef.current;
+        if (muted) {
+          // Don't even process the audio when muted
+          return;
+        }
         
-        if (!ws || ws.readyState !== WebSocket.OPEN || muted) return;
+        const ws = wsRef.current;
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
         const inputData = e.inputBuffer.getChannelData(0);
         const pcmData = convertToPCM16(inputData);
@@ -442,10 +467,14 @@ const ApsaraWidget = () => {
         // 🔍 DEBUG: Log audio being sent
         debugLog('🎤 Sending audio chunk:', base64Audio.length, 'bytes');
 
-        ws.send(JSON.stringify({
-          type: 'audio',
-          data: base64Audio
-        }));
+        try {
+          ws.send(JSON.stringify({
+            type: 'audio',
+            data: base64Audio
+          }));
+        } catch (error) {
+          console.error('Error sending audio:', error);
+        }
       };
 
       // Store the capturing state
@@ -795,7 +824,9 @@ const ApsaraWidget = () => {
     // Toggle mute
     const newMutedState = !isMicMuted;
     setIsMicMuted(newMutedState);
-    isMutedRef.current = newMutedState; // Update ref immediately
+    isMutedRef.current = newMutedState; // Update ref immediately - audio processor will check this
+    
+    console.log('🔇 Mute toggled:', newMutedState ? 'MUTED ✓' : 'UNMUTED', '| isMutedRef.current =', isMutedRef.current);
     debugLog('🔇 Mute toggled:', newMutedState ? 'MUTED' : 'UNMUTED');
   };
 
@@ -1281,6 +1312,13 @@ const ApsaraWidget = () => {
       
       if (data.success) {
         debugLog('✅ Tools configuration updated:', data.tools);
+        
+        // Save to localStorage
+        const toolsState = {};
+        updatedTools.forEach(tool => {
+          toolsState[tool.id] = tool.enabled;
+        });
+        localStorage.setItem('apsara-enabled-tools', JSON.stringify(toolsState));
       } else {
         console.error('❌ Failed to update tools:', data.error);
         // Revert on error - refetch tools
@@ -1339,6 +1377,140 @@ const ApsaraWidget = () => {
       }
     } catch (error) {
       console.error('❌ Error toggling async:', error);
+    }
+  };
+
+  // Handle Select All
+  const handleSelectAll = async () => {
+    if (isConnected) {
+      setStatusText('Stop session first!');
+      setTimeout(() => {
+        setStatusText('Talk to Apsara');
+      }, 2000);
+      debugLog('🚫 Cannot change tools while connected');
+      return;
+    }
+
+    try {
+      console.log('🔄 Enabling all tools...');
+      // Enable all tools
+      const enabled = {};
+      availableTools.forEach(tool => {
+        enabled[tool.id] = true;
+      });
+
+      console.log('📤 Sending to backend:', enabled);
+
+      // Send update to backend (backend expects 'tools' not 'enabled')
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tools: enabled })
+      });
+
+      const data = await response.json();
+      console.log('📥 Backend response:', data);
+      
+      if (data.success) {
+        // Refresh tools from backend
+        console.log('🔄 Refreshing tools list...');
+        const fetchResponse = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools`);
+        const fetchData = await fetchResponse.json();
+        console.log('📥 Fetched tools:', fetchData);
+        
+        if (fetchData.success) {
+          // Create completely new object instances to force React re-render
+          const freshTools = fetchData.tools.map(tool => ({
+            id: tool.id,
+            name: tool.name,
+            description: tool.description,
+            enabled: tool.enabled,
+            async: tool.async
+          }));
+          setAvailableTools(freshTools);
+          console.log('✅ All tools enabled', freshTools);
+          
+          // Save enabled tools to localStorage
+          const toolsState = {};
+          freshTools.forEach(tool => {
+            toolsState[tool.id] = tool.enabled;
+          });
+          localStorage.setItem('apsara-enabled-tools', JSON.stringify(toolsState));
+        }
+      } else {
+        console.error('❌ Backend returned error:', data);
+      }
+    } catch (error) {
+      console.error('❌ Error selecting all tools:', error);
+    }
+  };
+
+  // Handle Clear All
+  const handleClearAll = async () => {
+    if (isConnected) {
+      setStatusText('Stop session first!');
+      setTimeout(() => {
+        setStatusText('Talk to Apsara');
+      }, 2000);
+      debugLog('🚫 Cannot change tools while connected');
+      return;
+    }
+
+    try {
+      console.log('🔄 Disabling all tools...');
+      // Disable all tools
+      const enabled = {};
+      availableTools.forEach(tool => {
+        enabled[tool.id] = false;
+      });
+
+      console.log('📤 Sending to backend:', enabled);
+
+      // Send update to backend (backend expects 'tools' not 'enabled')
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tools: enabled })
+      });
+
+      const data = await response.json();
+      console.log('📥 Backend response:', data);
+      
+      if (data.success) {
+        // Refresh tools from backend
+        console.log('🔄 Refreshing tools list...');
+        const fetchResponse = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools`);
+        const fetchData = await fetchResponse.json();
+        console.log('📥 Fetched tools:', fetchData);
+        
+        if (fetchData.success) {
+          // Create completely new object instances to force React re-render
+          const freshTools = fetchData.tools.map(tool => ({
+            id: tool.id,
+            name: tool.name,
+            description: tool.description,
+            enabled: tool.enabled,
+            async: tool.async
+          }));
+          setAvailableTools(freshTools);
+          console.log('✅ All tools disabled', freshTools);
+          
+          // Save enabled tools to localStorage
+          const toolsState = {};
+          freshTools.forEach(tool => {
+            toolsState[tool.id] = tool.enabled;
+          });
+          localStorage.setItem('apsara-enabled-tools', JSON.stringify(toolsState));
+        }
+      } else {
+        console.error('❌ Backend returned error:', data);
+      }
+    } catch (error) {
+      console.error('❌ Error clearing all tools:', error);
     }
   };
 
@@ -1600,8 +1772,30 @@ const ApsaraWidget = () => {
               className="tools-selector-panel"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="panel-title">
-                Configure Tools {isConnected && <span className="warning-text">(Stop session first)</span>}
+              <div className="panel-header">
+                <div className="panel-title">
+                  Configure Tools {isConnected && <span className="warning-text">(Stop session first)</span>}
+                </div>
+                {availableTools.length > 0 && (
+                  <div className="panel-actions">
+                    <button 
+                      className="action-button select-all" 
+                      onClick={handleSelectAll}
+                      disabled={isConnected}
+                      title="Enable all tools"
+                    >
+                      ✓ All
+                    </button>
+                    <button 
+                      className="action-button clear-all" 
+                      onClick={handleClearAll}
+                      disabled={isConnected}
+                      title="Disable all tools"
+                    >
+                      ✗ Clear
+                    </button>
+                  </div>
+                )}
               </div>
               {availableTools.length === 0 ? (
                 <div className="tools-error">
@@ -1618,7 +1812,7 @@ const ApsaraWidget = () => {
                   <div className="tools-list">
                     {availableTools.map((tool) => (
                       <div
-                        key={tool.id}
+                        key={`${tool.id}-${tool.enabled}-${tool.async}`}
                         className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
                         onClick={() => handleToolToggle(tool.id)}
                       >

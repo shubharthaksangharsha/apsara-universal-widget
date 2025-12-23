@@ -663,13 +663,61 @@ body.screen-sharing-active::before {
     overflow-y: auto;
 }
 
+.tools-selector-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
 .tools-selector-panel .panel-title {
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.tools-selector-panel .panel-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.tools-selector-panel .action-button {
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    -webkit-app-region: no-drag;
+}
+
+.tools-selector-panel .action-button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.tools-selector-panel .action-button.select-all {
+    color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+.tools-selector-panel .action-button.select-all:not(:disabled):hover {
+    background: #4CAF50;
+    color: white;
+}
+
+.tools-selector-panel .action-button.clear-all {
+    color: #f44336;
+    border-color: #f44336;
+}
+
+.tools-selector-panel .action-button.clear-all:not(:disabled):hover {
+    background: #f44336;
+    color: white;
 }
 
 .tools-selector-panel .warning-text {

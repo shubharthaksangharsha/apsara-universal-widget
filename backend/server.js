@@ -171,6 +171,12 @@ function generateSystemPrompt() {
   if (enabledTools.clear_memories) {
     toolUsageLines.push('- clear_memories: Delete memories (use with caution)');
   }
+  if (enabledTools.read_file) {
+    toolUsageLines.push('- read_file: Read any file from the filesystem (text or binary as base64)');
+  }
+  if (enabledTools.browse_files) {
+    toolUsageLines.push('- browse_files: List files and directories with details');
+  }
   if (enabledTools.googleSearch) {
     toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
   }
@@ -192,7 +198,7 @@ ${capabilities.map(c => `- ${c}`).join('\n')}
 - Provide detailed but concise information
 - Show enthusiasm about the projects and work${enabledTools.send_email_to_shubharthak ? '\n- If someone wants to contact Shubharthak, offer to send a message via email' : ''}${enabledTools.googleSearch ? '\n- For questions about current events, news, weather, sports scores, latest tech updates, or anything requiring real-time information, Google Search will automatically provide accurate, up-to-date answers\n- Always cite sources when sharing information from Google Search' : ''}${toolUsageSection}
 
-**Example workflows:**${enabledTools.screenshot_and_email ? '\n- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)' : ''}${enabledTools.take_screenshot ? '\n- "Take a screenshot" → Use take_screenshot (just capture, don\'t email)' : ''}${enabledTools.copy_to_clipboard && enabledTools.paste_from_clipboard ? '\n- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard' : ''}${enabledTools.store_memory ? '\n- "Remember this for later" → Use store_memory with the content' : ''}${enabledTools.retrieve_memories ? '\n- "What did I ask you to remember?" → Use retrieve_memories' : ''}${enabledTools.get_clipboard_text ? '\n- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don\'t just read it back)' : ''}${enabledTools.paste_from_clipboard ? '\n- "Paste what I copied earlier" → Use paste_from_clipboard' : ''}
+**Example workflows:**${enabledTools.screenshot_and_email ? '\n- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)' : ''}${enabledTools.take_screenshot ? '\n- "Take a screenshot" → Use take_screenshot (just capture, don\'t email)' : ''}${enabledTools.read_file && enabledTools.send_email_to_shubharthak ? '\n- "Read the file /path/to/file.txt and email it to me" → Use read_file with asBase64=true, then send_email_to_shubharthak with the base64Content from read_file result' : ''}${enabledTools.browse_files ? '\n- "Show me files in /home/user/Documents" → Use browse_files with dirPath parameter' : ''}${enabledTools.copy_to_clipboard && enabledTools.paste_from_clipboard ? '\n- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard' : ''}${enabledTools.store_memory ? '\n- "Remember this for later" → Use store_memory with the content' : ''}${enabledTools.retrieve_memories ? '\n- "What did I ask you to remember?" → Use retrieve_memories' : ''}${enabledTools.get_clipboard_text ? '\n- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don\'t just read it back)' : ''}${enabledTools.paste_from_clipboard ? '\n- "Paste what I copied earlier" → Use paste_from_clipboard' : ''}
 
 **About Shubharthak Sangharasha:**
 

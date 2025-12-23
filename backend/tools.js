@@ -51,27 +51,29 @@ let ENABLED_TOOLS = {
   // Disabled by default for Gemini stability
   send_email_to_shubharthak: false,
   take_screenshot: false,
-  screenshot_and_email: false,
   copy_to_clipboard: false,
   get_clipboard_text: false,
   paste_from_clipboard: false,
   store_memory: false,
   retrieve_memories: false,
-  clear_memories: false
+  clear_memories: false,
+  read_file: false,
+  browse_files: false
 };
 
 // Tool metadata for UI display (with async behavior support)
 const TOOL_METADATA = {
   googleSearch: { name: 'Google Search', description: 'Real-time web search', async: false },
-  send_email_to_shubharthak: { name: 'Send Email', description: 'Send messages to Shubharthak', async: true },
+  send_email_to_shubharthak: { name: 'Send Email', description: 'Send messages with file attachments', async: true },
   take_screenshot: { name: 'Take Screenshot', description: 'Capture screen', async: true },
-  screenshot_and_email: { name: 'Screenshot & Email', description: 'Capture and send screenshot', async: true },
   copy_to_clipboard: { name: 'Copy to Clipboard', description: 'Copy text', async: true },
   get_clipboard_text: { name: 'Get Clipboard', description: 'Read clipboard text', async: false },
   paste_from_clipboard: { name: 'Paste Clipboard', description: 'Paste clipboard content', async: true },
   store_memory: { name: 'Store Memory', description: 'Save information', async: true },
   retrieve_memories: { name: 'Retrieve Memories', description: 'Recall stored info', async: false },
-  clear_memories: { name: 'Clear Memories', description: 'Delete stored info', async: true }
+  clear_memories: { name: 'Clear Memories', description: 'Delete stored info', async: true },
+  read_file: { name: 'Read File', description: 'Read local files (text or base64)', async: false },
+  browse_files: { name: 'Browse Files', description: 'List files and directories', async: false }
 };
 
 // Tool order and async settings (can be customized by user)
@@ -171,8 +173,38 @@ function setEnabledTools(newConfig) {
 // Email configuration
 let emailTransporter = null;
 
-// Memory storage (in-memory for now, can be persisted to file later)
+// Memory storage - persistent to JSON file
+const MEMORY_FILE = path.join(__dirname, 'apsara-memory.json');
 let memoryStore = [];
+
+// Load memories from file on startup
+function loadMemories() {
+  try {
+    if (fs.existsSync(MEMORY_FILE)) {
+      const data = fs.readFileSync(MEMORY_FILE, 'utf8');
+      memoryStore = JSON.parse(data);
+      console.log(`💾 Loaded ${memoryStore.length} memories from persistent storage`);
+    } else {
+      console.log('💾 No existing memory file found, starting fresh');
+    }
+  } catch (error) {
+    console.error('❌ Error loading memories:', error);
+    memoryStore = [];
+  }
+}
+
+// Save memories to file
+function saveMemories() {
+  try {
+    fs.writeFileSync(MEMORY_FILE, JSON.stringify(memoryStore, null, 2), 'utf8');
+    debugLog('memory', `💾 Saved ${memoryStore.length} memories to persistent storage`);
+  } catch (error) {
+    console.error('❌ Error saving memories:', error);
+  }
+}
+
+// Initialize memories on module load
+loadMemories();
 
 /**
  * Initialize email transporter
@@ -198,20 +230,35 @@ function initEmailTransporter() {
 }
 
 /**
- * Send email to Shubharthak with optional image attachment
+ * Send email with optional file attachment
  * @param {string} message - The message content
+ * @param {string} recipientEmail - Email address to send to (defaults to Shubharthak)
  * @param {string} senderInfo - Optional sender information
- * @param {string} imageBase64 - Optional base64 encoded image
- * @param {string} imageFilename - Optional filename for the image
+ * @param {string} fileBase64 - Optional base64 encoded file (or 'use_last_screenshot')
+ * @param {string} filename - Optional filename for the attachment
+ * @param {string} mimeType - Optional MIME type (e.g., 'image/png', 'application/pdf')
  * @returns {Promise<Object>} Result object with success status
  */
-async function sendEmailToShubharthak(message, senderInfo = '', imageBase64 = null, imageFilename = 'screenshot.jpg') {
+async function sendEmailToShubharthak(message, recipientEmail = 'shubharthaksangharsha@gmail.com', senderInfo = '', fileBase64 = null, filename = 'attachment.dat', mimeType = null) {
   try {
     const transporter = initEmailTransporter();
     
+    // If fileBase64 is placeholder or 'use_last_screenshot', use the stored screenshot
+    if (fileBase64 === 'base64_encoded_screenshot_data' || fileBase64 === 'use_last_screenshot' || (!fileBase64 && lastScreenshotData)) {
+      if (lastScreenshotData) {
+        console.log('📎 Using last screenshot for email attachment');
+        fileBase64 = lastScreenshotData.image;
+        filename = lastScreenshotData.filename;
+        mimeType = lastScreenshotData.mimeType;
+      } else {
+        console.warn('⚠️ No screenshot available, sending without attachment');
+        fileBase64 = null;
+      }
+    }
+    
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: 'shubharthaksangharsha@gmail.com',
+      to: recipientEmail,
       subject: `Message from Apsara Live Assistant`,
       html: `
         <h2>New message from Apsara Live</h2>
@@ -221,19 +268,34 @@ async function sendEmailToShubharthak(message, senderInfo = '', imageBase64 = nu
       `
     };
 
-    // Add image attachment if provided
-    if (imageBase64) {
-      mailOptions.attachments = [{
-        filename: imageFilename,
-        content: imageBase64,
+    // Add file attachment if provided (works with any file type)
+    if (fileBase64 && fileBase64 !== 'base64_encoded_screenshot_data') {
+      const attachment = {
+        filename: filename,
+        content: fileBase64,
         encoding: 'base64'
-      }];
+      };
+      
+      // Add MIME type if provided
+      if (mimeType) {
+        attachment.contentType = mimeType;
+      }
+      
+      mailOptions.attachments = [attachment];
+      console.log(`📎 Attaching file: ${filename} (${mimeType || 'unknown type'})`);
     }
 
-    debugLog('email', '📧 Sending email...', mailOptions);
+    console.log(`📧 Sending email to: ${recipientEmail}`);
     const info = await transporter.sendMail(mailOptions);
     debugLog('email', '✅ Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    
+    // Clear last screenshot after successful email
+    if (lastScreenshotData) {
+      lastScreenshotData = null;
+      console.log('🗑️ Cleared screenshot cache');
+    }
+    
+    return { success: true, messageId: info.messageId, sentTo: recipientEmail };
   } catch (error) {
     console.error('❌ Email error:', error);
     return { success: false, error: error.message };
@@ -426,12 +488,13 @@ async function storeMemory(content, category = 'general') {
       date: new Date().toLocaleString()
     };
     
-  memoryStore.push(memory);
-  debugLog('memory', `💾 Memory stored: [${category}] ${content.substring(0, 50)}...`);
+    memoryStore.push(memory);
+    saveMemories(); // Persist to file
+    debugLog('memory', `💾 Memory stored: [${category}] ${content.substring(0, 50)}...`);
     
     return { 
       success: true, 
-      message: `Memory stored successfully`,
+      message: `Memory stored successfully and persisted`,
       memoryId: memory.id,
       totalMemories: memoryStore.length
     };
@@ -496,6 +559,7 @@ async function clearMemories(category = null) {
       debugLog('memory', '🗑️ Cleared all memories');
     }
     
+    saveMemories(); // Persist to file
     const clearedCount = beforeCount - memoryStore.length;
     
     return {
@@ -507,6 +571,187 @@ async function clearMemories(category = null) {
     console.error('❌ Memory clear error:', error);
     return { success: false, error: error.message };
   }
+}
+
+/**
+ * Read a file from the local filesystem and return its content
+ * @param {string} filePath - Absolute or relative path to the file
+ * @param {boolean} asBase64 - Return as base64 encoded string (useful for binary files)
+ * @returns {Promise<Object>} Result with file content
+ */
+async function readFile(filePath, asBase64 = false) {
+  try {
+    // Resolve to absolute path
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+    
+    // Check if file exists
+    if (!fs.existsSync(absolutePath)) {
+      return { 
+        success: false, 
+        error: `File not found: ${filePath}` 
+      };
+    }
+    
+    // Check if it's a file (not a directory)
+    const stats = fs.statSync(absolutePath);
+    if (!stats.isFile()) {
+      return { 
+        success: false, 
+        error: `Path is not a file: ${filePath}` 
+      };
+    }
+    
+    // Read file
+    if (asBase64) {
+      const buffer = fs.readFileSync(absolutePath);
+      const base64 = buffer.toString('base64');
+      const mimeType = getMimeType(path.basename(absolutePath));
+      
+      return {
+        success: true,
+        filename: path.basename(absolutePath),
+        filepath: absolutePath,
+        size: stats.size,
+        sizeKB: Math.round(stats.size / 1024),
+        mimeType: mimeType,
+        base64Content: base64,
+        message: `File read successfully: ${path.basename(absolutePath)} (${Math.round(stats.size / 1024)}KB)`
+      };
+    } else {
+      const content = fs.readFileSync(absolutePath, 'utf8');
+      
+      return {
+        success: true,
+        filename: path.basename(absolutePath),
+        filepath: absolutePath,
+        size: stats.size,
+        sizeKB: Math.round(stats.size / 1024),
+        content: content,
+        message: `File read successfully: ${path.basename(absolutePath)} (${Math.round(stats.size / 1024)}KB)`
+      };
+    }
+  } catch (error) {
+    console.error('❌ File read error:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  }
+}
+
+/**
+ * Browse files and directories in a given path
+ * @param {string} dirPath - Directory path to browse (defaults to home directory)
+ * @param {boolean} includeHidden - Include hidden files/folders
+ * @returns {Promise<Object>} Result with directory listing
+ */
+async function browseFiles(dirPath = require('os').homedir(), includeHidden = false) {
+  try {
+    // Resolve to absolute path
+    const absolutePath = path.isAbsolute(dirPath) ? dirPath : path.resolve(dirPath);
+    
+    // Check if directory exists
+    if (!fs.existsSync(absolutePath)) {
+      return { 
+        success: false, 
+        error: `Directory not found: ${dirPath}` 
+      };
+    }
+    
+    // Check if it's a directory
+    const stats = fs.statSync(absolutePath);
+    if (!stats.isDirectory()) {
+      return { 
+        success: false, 
+        error: `Path is not a directory: ${dirPath}` 
+      };
+    }
+    
+    // Read directory
+    let items = fs.readdirSync(absolutePath);
+    
+    // Filter hidden files if requested
+    if (!includeHidden) {
+      items = items.filter(item => !item.startsWith('.'));
+    }
+    
+    // Get detailed info for each item
+    const itemDetails = items.map(item => {
+      const itemPath = path.join(absolutePath, item);
+      try {
+        const itemStats = fs.statSync(itemPath);
+        return {
+          name: item,
+          path: itemPath,
+          type: itemStats.isDirectory() ? 'directory' : 'file',
+          size: itemStats.isFile() ? itemStats.size : 0,
+          sizeKB: itemStats.isFile() ? Math.round(itemStats.size / 1024) : 0,
+          modified: itemStats.mtime.toISOString()
+        };
+      } catch (e) {
+        return {
+          name: item,
+          path: itemPath,
+          type: 'unknown',
+          error: 'Permission denied or inaccessible'
+        };
+      }
+    });
+    
+    // Sort: directories first, then files, alphabetically
+    itemDetails.sort((a, b) => {
+      if (a.type === 'directory' && b.type !== 'directory') return -1;
+      if (a.type !== 'directory' && b.type === 'directory') return 1;
+      return a.name.localeCompare(b.name);
+    });
+    
+    return {
+      success: true,
+      currentPath: absolutePath,
+      parentPath: path.dirname(absolutePath),
+      itemCount: itemDetails.length,
+      directories: itemDetails.filter(i => i.type === 'directory').length,
+      files: itemDetails.filter(i => i.type === 'file').length,
+      items: itemDetails,
+      message: `Found ${itemDetails.length} items in ${absolutePath}`
+    };
+  } catch (error) {
+    console.error('❌ File browse error:', error);
+    return { 
+      success: false, 
+      error: error.message 
+    };
+  }
+}
+
+/**
+ * Get MIME type from filename
+ * @param {string} filename
+ * @returns {string} MIME type
+ */
+function getMimeType(filename) {
+  const ext = path.extname(filename).toLowerCase();
+  const mimeTypes = {
+    '.txt': 'text/plain',
+    '.pdf': 'application/pdf',
+    '.doc': 'application/msword',
+    '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.zip': 'application/zip',
+    '.json': 'application/json',
+    '.xml': 'application/xml',
+    '.csv': 'text/csv',
+    '.html': 'text/html',
+    '.css': 'text/css',
+    '.js': 'application/javascript',
+    '.mp3': 'audio/mpeg',
+    '.mp4': 'video/mp4',
+    '.wav': 'audio/wav'
+  };
+  return mimeTypes[ext] || 'application/octet-stream';
 }
 
 /**
@@ -537,14 +782,16 @@ function getToolDeclarations() {
   if (ENABLED_TOOLS.send_email_to_shubharthak) {
     functionDeclarations.push(addBehavior({
       name: 'send_email_to_shubharthak',
-      description: 'Send an email message to Shubharthak Sangharsha. Can include image attachments.',
+      description: 'Send an email to any recipient with optional file attachment. WORKFLOWS: (1) Screenshot: call take_screenshot, then this with fileBase64="use_last_screenshot". (2) Any file: call read_file with asBase64=true, then this with fileBase64=result.base64Content, filename=result.filename, mimeType=result.mimeType.',
       parameters: {
         type: 'object',
         properties: {
-          message: { type: 'string' },
-          senderInfo: { type: 'string' },
-          imageBase64: { type: 'string' },
-          imageFilename: { type: 'string' }
+          message: { type: 'string', description: 'Email message content' },
+          recipientEmail: { type: 'string', description: 'Email address to send to (defaults to shubharthaksangharsha@gmail.com)' },
+          senderInfo: { type: 'string', description: 'Optional context or sender information' },
+          fileBase64: { type: 'string', description: 'Base64 encoded file content OR "use_last_screenshot". Get this from read_file result.base64Content or take_screenshot.' },
+          filename: { type: 'string', description: 'Filename for attachment (e.g., start.sh, document.pdf). Get from read_file result.filename.' },
+          mimeType: { type: 'string', description: 'MIME type (e.g., text/plain, application/pdf). Get from read_file result.mimeType.' }
         },
         required: ['message']
       }
@@ -557,20 +804,6 @@ function getToolDeclarations() {
       description: 'Take a screenshot of the current screen.',
       parameters: { type: 'object', properties: {} }
     }, 'take_screenshot'));
-  }
-
-  if (ENABLED_TOOLS.screenshot_and_email) {
-    functionDeclarations.push(addBehavior({
-      name: 'screenshot_and_email',
-      description: 'Take a screenshot and immediately email it to Shubharthak.',
-      parameters: {
-        type: 'object',
-        properties: {
-          message: { type: 'string' },
-          senderInfo: { type: 'string' }
-        }
-      }
-    }, 'screenshot_and_email'));
   }
 
   if (ENABLED_TOOLS.copy_to_clipboard) {
@@ -629,6 +862,35 @@ function getToolDeclarations() {
     }, 'clear_memories'));
   }
 
+  if (ENABLED_TOOLS.read_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'read_file',
+      description: 'Read a file from the local filesystem. Returns file content as text OR base64. TO EMAIL A FILE: Use asBase64=true, then pass result.base64Content to send_email_to_shubharthak with result.filename and result.mimeType.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Absolute or relative path to the file (e.g., /home/user/start.sh or ./backend/start.sh)' },
+          asBase64: { type: 'boolean', description: 'REQUIRED for email: true = returns base64Content (for attachments), false = returns text content (for reading). Set to true when emailing files.' }
+        },
+        required: ['filePath']
+      }
+    }, 'read_file'));
+  }
+
+  if (ENABLED_TOOLS.browse_files) {
+    functionDeclarations.push(addBehavior({
+      name: 'browse_files',
+      description: 'Browse and list files and directories in a given path. Shows directories and files with details.',
+      parameters: {
+        type: 'object',
+        properties: {
+          dirPath: { type: 'string', description: 'Directory path to browse (defaults to user home directory)' },
+          includeHidden: { type: 'boolean', description: 'Include hidden files/folders (default: false)' }
+        }
+      }
+    }, 'browse_files'));
+  }
+
   // Add custom function declarations if any exist
   if (functionDeclarations.length > 0) {
     declarations.push({ functionDeclarations });
@@ -657,16 +919,15 @@ async function executeTool(functionName, args) {
       case 'send_email_to_shubharthak':
         return await sendEmailToShubharthak(
           args.message,
+          args.recipientEmail,
           args.senderInfo,
-          args.imageBase64,
-          args.imageFilename
+          args.fileBase64,
+          args.filename,
+          args.mimeType
         );
       
       case 'take_screenshot':
         return await takeScreenshot();
-      
-      case 'screenshot_and_email':
-        return await screenshotAndEmail(args.message, args.senderInfo);
       
       case 'copy_to_clipboard':
         return await copyToClipboard(args.text);
@@ -686,8 +947,11 @@ async function executeTool(functionName, args) {
       case 'clear_memories':
         return await clearMemories(args.category);
       
-      case 'screenshot_and_email':
-        return await screenshotAndEmail(args.message, args.senderInfo);
+      case 'read_file':
+        return await readFile(args.filePath, args.asBase64);
+      
+      case 'browse_files':
+        return await browseFiles(args.dirPath, args.includeHidden);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };
@@ -722,7 +986,8 @@ async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = 
       message,
       senderInfo,
       screenshotResult.image,
-      screenshotResult.filename
+      screenshotResult.filename,
+      screenshotResult.mimeType
     );
     
     if (!emailResult.success) {
@@ -754,6 +1019,8 @@ module.exports = {
   storeMemory,
   retrieveMemories,
   clearMemories,
+  readFile,
+  browseFiles,
   getEnabledTools,
   getAllTools,
   setEnabledTools,

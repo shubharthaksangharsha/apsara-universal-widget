@@ -3,10 +3,10 @@
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.4.0-blue)
+![Version](https://img.shields.io/badge/Version-1.5.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Version 1.4.0** - Advanced Tools Configuration & Persistent Settings
+**Version 1.5.0** - File System Tools & Persistent Memory
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
@@ -30,15 +30,62 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 - **High-Quality Streaming**: Optimized video compression and frame rate for smooth experience
 
 ### What Apsara Can Do
-Apsara is powered by Google's Gemini 2.0 Flash Experimental model with real-time voice capabilities:
+Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time voice and multimodal capabilities:
 
 - **Answer Questions**: Get instant answers about any topic
 - **Have Conversations**: Natural, flowing conversations with context awareness
 - **Real-time Google Search**: Automatic access to current events, news, weather, sports, latest tech updates
-- **Send Email**: Can send messages to Shubharthak via email
+- **Send Email with Attachments**: Send messages with files, screenshots, or documents
+- **File System Operations**: Read files, browse directories, access local documents
+- **Screenshot & Clipboard**: Capture screen, manage clipboard, paste content
+- **Memory Management**: Store and retrieve information across sessions (persistent to disk)
 - **Help with Tasks**: Assistance with planning, problem-solving, and decision-making
 - **Creative Support**: Help with writing, brainstorming, and creative projects
 - **Real-time Interaction**: Ultra-low latency responses (typically 200-400ms)
+
+### 🎯 Use Cases - What You Can Ask Apsara
+
+**File & Document Management:**
+- 📄 "Read the file /home/user/notes.txt and tell me what's in it"
+- 📁 "Browse my Documents folder and list all PDF files"
+- 📧 "Read the file ./backend/start.sh and email it to me"
+- 📝 "Show me what files are in my Downloads directory"
+- 🔍 "Read config.json and explain what each setting does"
+
+**Screenshot & Visual:**
+- 📸 "Take a screenshot of my screen"
+- 📧 "Screenshot this and email it to me"
+- 👀 "What's on my screen right now?" (with screen share)
+- 🎥 "Can you see my camera?" (with camera active)
+
+**Clipboard Operations:**
+- 📋 "Copy this text: Hello World"
+- 📋 "What's in my clipboard?"
+- 📋 "Paste what I copied earlier"
+- 📋 "Get clipboard text and summarize it"
+
+**Memory & Information:**
+- 💾 "Remember that my favorite color is blue"
+- 🔍 "What did I ask you to remember about my project?"
+- 🗑️ "Clear all memories"
+- 📚 "Store this note: Meeting tomorrow at 3pm"
+
+**Research & Information:**
+- 🌐 "What's the latest news about AI?"
+- ⚽ "Who won the last soccer match between Brazil and Argentina?"
+- 🌤️ "What's the weather like today?"
+- 📈 "What's the current stock price of Tesla?"
+
+**Communication:**
+- 📧 "Email Shubharthak saying the project is ready"
+- 📧 "Send me an email with my todo list"
+- 📧 "Email this screenshot to john@example.com"
+
+**Productivity:**
+- 📝 "Help me write a professional email"
+- 💡 "Give me ideas for a birthday party"
+- ✅ "Create a checklist for moving to a new apartment"
+- 🎯 "Help me plan my day"
 
 ### Platform Support
 - ✅ **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
@@ -378,21 +425,34 @@ Apsara can use these tools to help you:
 
 | Tool | Description | Example Usage | Status |
 |------|-------------|---------------|--------|
-| **send_email_to_shubharthak** | Send messages to Shubharthak with optional image attachments | "Email this screenshot to Shubharthak" | ⚠️ Text emails work; screenshot attachments need fixing |
+| **send_email_to_shubharthak** | Send messages with ANY file attachment (images, PDFs, documents, etc.) | "Email this screenshot to me" or "Send start.sh to my email" | ✅ Working |
 | **take_screenshot** | Capture the current screen | "Take a screenshot" | ✅ Working |
+| **read_file** | Read any file from local filesystem (text or base64) | "Read the file ~/notes.txt" or "Read config.json" | ✅ Working |
+| **browse_files** | List files and directories with details | "Show me files in /home/user/Documents" | ✅ Working |
 | **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" | ✅ Working |
 | **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" | ✅ Working |
 | **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" | ✅ Working |
+| **store_memory** | Save information for later (persistent to disk) | "Remember that I prefer Python" | ✅ Working |
+| **retrieve_memories** | Search and recall stored memories | "What did I ask you to remember?" | ✅ Working |
+| **clear_memories** | Delete stored memories | "Clear all memories" | ✅ Working |
 | **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
 
-**Example Workflows:**
-- 📸 "Screenshot this and email it" → Takes screenshot + sends email with image (⚠️ attachment issue)
-- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut ✅
-- 📧 "Send a message to Shubharthak" → Send text email ✅
-- 📄 "Paste what I copied earlier" → Simulates Ctrl+V/Cmd+V ✅
+**How to Send Files via Email:**
+1. **Screenshot**: "Take a screenshot and email it to me"
+   - Apsara: Calls `take_screenshot()` → Calls `send_email_to_shubharthak()` with screenshot
+2. **Any Local File**: "Read the file /path/to/file.txt and email it to me"
+   - Apsara: Calls `read_file()` with asBase64=true → Calls `send_email_to_shubharthak()` with file content
+3. **Browse & Email**: "Browse my Documents folder, then email me the list"
+   - Apsara: Calls `browse_files()` → Sends results in email
 
-**Known Issues:**
-- ⚠️ **Email with Screenshot Attachment**: Text emails work perfectly, but attaching screenshots to emails needs debugging. The screenshot is captured successfully, but the attachment mechanism requires fixing.
+**Example Workflows:**
+- 📸 "Screenshot this and email it to me" → Takes screenshot + sends email with image ✅
+- 📄 "Read start.sh and email it to me" → Reads file as base64 + sends email with attachment ✅
+- 📁 "Show me files in ~/Documents" → Lists all files with sizes and dates ✅
+- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut ✅
+- 💾 "Remember my API key is xyz123" → Saves to persistent memory ✅
+- 🔍 "What API key did I give you?" → Retrieves from persistent memory ✅
+- 📧 "Send a message to john@example.com saying hello" → Send text email ✅
 
 ### Environment Variables
 
@@ -669,13 +729,63 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.4.0** - December 2024
+**Version 1.5.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Configurable Tools & Persistent Settings*
+*Talk to Apsara - Your Intelligent Voice Assistant with File System Access & Persistent Memory*
 
 ---
 
 ## 📋 Changelog
+
+### Version 1.5.0 (December 24, 2024)
+**🗂️ File System Tools & Memory Persistence:**
+- ✨ **Read File Tool**: Read any local file (text or base64) for viewing or emailing
+  - 📄 Reads text files directly for viewing content
+  - 📦 Converts to base64 for email attachments
+  - 🎯 Returns filename, file size, MIME type, and content
+  - 🔧 Proper workflow for "read file and email it" use case
+- 🗂️ **Browse Files Tool**: List files and directories with full details
+  - 📁 Shows directories and files separately (sorted)
+  - 📊 Displays file sizes, modification dates, and types
+  - 🔍 Optional hidden files display
+  - 🏠 Defaults to user's home directory
+- 💾 **Persistent Memory Storage**: Memories now saved to JSON file
+  - 💽 Survives backend restarts and system reboots
+  - 📁 Stored in `backend/apsara-memory.json`
+  - 🔄 Auto-loads on backend startup
+  - 💪 No more lost memories!
+- 🐛 **Fixed Select All/Clear All**: Parameter mismatch resolved
+  - Frontend was sending `{ enabled }`, backend expected `{ tools }`
+  - UI checkmarks now update correctly
+  - Backend properly receives and applies changes
+- 📝 **Enhanced System Prompt**: Added file tools to capabilities
+  - Read file and browse files now shown in available tools
+  - Clear workflow examples for "read and email" use cases
+  - Better tool descriptions for Gemini
+- 🎯 **Improved Tool Descriptions**: Crystal-clear instructions
+  - `read_file`: Explains asBase64 parameter for email workflows
+  - `send_email_to_shubharthak`: Shows how to pass file content from read_file
+  - Example workflows added to system prompt
+
+**New Capabilities:**
+- "Read the file /path/to/file.txt and email it to me"
+- "Browse my Documents folder and show me all PDF files"
+- "Remember my project details" → Saved to disk, survives restarts
+- "Show me what files are in ~/Downloads"
+
+**Technical Improvements:**
+- Fixed parameter naming in Select All/Clear All handlers
+- Added `loadMemories()` and `saveMemories()` functions
+- Memory persistence to `apsara-memory.json`
+- System prompt includes file tools and workflows
+- Better tool descriptions for Gemini API
+- OS-compatible file operations (Linux, macOS, Windows)
+
+**Files Modified:**
+- `backend/tools.js` - Persistent memory, improved descriptions
+- `backend/server.js` - File tools in system prompt, workflow examples
+- `apsara-widget-app/src/components/ApsaraWidget.js` - Fixed parameter names
+- `README.md` - Version 1.5.0, comprehensive use cases
 
 ### Version 1.4.0 (December 24, 2024)
 **🔧 Advanced Tools Configuration System & Enhanced UX:**
@@ -828,3 +938,26 @@ Each theme includes custom colors for:
 ---
 
 🌐 [Production Demo](https://apsara-devshubh.devshubh.me) | 📧 [Contact](mailto:shubharthaksangharsha@gmail.com)
+
+---
+
+## 💡 What Else Can We Add to Apsara?
+
+**Potential Future Features:**
+- 🎵 **Music Control**: Play/pause/skip music, adjust volume
+- 🌐 **Web Automation**: Open URLs, fill forms, click buttons
+- 📁 **File Operations**: Create, edit, delete, move, rename files
+- 🔔 **Reminders & Alarms**: Set reminders and alarms with voice
+- 📊 **System Monitoring**: CPU usage, memory, disk space, network stats
+- 🎮 **Application Control**: Launch apps, switch windows, close programs
+- 📸 **Webcam Photos**: Take photos (not just video streaming)
+- 🗣️ **Multi-Language Support**: Speak in any language
+- 🤖 **Custom Integrations**: Slack, Discord, Telegram, Twitter APIs
+- 📝 **Note Taking**: Create/edit notes in various formats
+- 🔐 **Password Manager**: Securely store and retrieve passwords
+- 🌡️ **Smart Home**: Control smart lights, thermostats, devices
+- 📱 **Phone Integration**: Send SMS, make calls (with proper hardware)
+- 🎨 **Image Generation**: Generate images with DALL-E or Stable Diffusion
+- 🔊 **Text-to-Speech**: Save Apsara's responses as audio files
+
+**Which features would you like to see next? Let us know!**
