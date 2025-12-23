@@ -1,0 +1,614 @@
+/* Apsara Widget - Compact Inline Style */
+
+.apsara-widget {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10000;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Close button - top right corner (only in Electron) */
+.close-button {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ff4b4b;
+    border: 2px solid white;
+    display: flex; /* Always show by default */
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    -webkit-app-region: no-drag;
+}
+
+/* Hide close button in browser (only show in Electron or small windows) */
+@media (min-width: 768px) {
+    body:not(.electron) .close-button {
+        display: none;
+    }
+}
+
+.close-button svg {
+    width: 12px;
+    height: 12px;
+    stroke: white;
+    stroke-width: 3;
+}
+
+.close-button:hover {
+    background: #ff0000;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+}
+
+/* Make buttons clickable (not draggable) */
+.apsara-widget .mute-button,
+.apsara-widget .screen-share-button,
+.apsara-widget .video-button,
+.apsara-widget .settings-button,
+.apsara-widget .end-button {
+    -webkit-app-region: no-drag;
+}
+
+/* Widget panel is draggable */
+.apsara-widget .widget-panel {
+    -webkit-app-region: drag;
+    cursor: move;
+}
+
+/* Widget Panel - Only Circular Visualizer */
+.widget-panel {
+    background: white;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 8px 16px 8px 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.widget-panel:hover {
+    transform: translateY(-2px);
+}
+
+/* Visualizer Container - Only the circle */
+.visualizer-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+#miniVisualizer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+}
+
+.visualizer-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #32CD32 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.visualizer-orb.listening {
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 20px rgba(50, 205, 50, 0.5);
+}
+
+.visualizer-orb.speaking {
+    animation: pulse-fast 0.8s infinite;
+    background: linear-gradient(135deg, #e8832a 0%, #f5a54a 50%, #d46e1a 100%);
+    box-shadow: 0 0 25px rgba(232, 131, 42, 0.7);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes pulse-fast {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.orb-inner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Widget Content - Text and Button */
+.widget-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.widget-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    flex: 1;
+}
+
+/* Mute Button - Icon Only */
+.mute-button {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+.mute-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.mute-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.mute-button:hover svg {
+    stroke: #333;
+}
+
+.mute-button.muted svg {
+    stroke: #ff4b4b;
+}
+
+.mute-button.muted:hover {
+    background: rgba(255, 75, 75, 0.1);
+}
+
+/* Screen Share Button */
+.screen-share-button {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.screen-share-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.screen-share-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 0.7;
+}
+
+.screen-share-button:hover svg {
+    stroke: #333;
+}
+
+/* Screen share active state */
+.screen-share-button.sharing {
+    opacity: 1;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.screen-share-button.sharing svg {
+    stroke: #4CAF50;
+}
+
+/* Screen share indicator light (green pulsing dot) */
+.screen-share-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: pulse-green 2s ease-in-out infinite;
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.8);
+}
+
+@keyframes pulse-share {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Red border indicator when screen sharing */
+body.screen-sharing-active::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 4px solid #ff4b4b;
+    pointer-events: none;
+    z-index: 999999;
+    animation: border-pulse 2s infinite;
+    box-shadow: inset 0 0 20px rgba(255, 75, 75, 0.3),
+                0 0 20px rgba(255, 75, 75, 0.3);
+}
+
+@keyframes border-pulse {
+    0%, 100% { 
+        border-color: #ff4b4b;
+        box-shadow: inset 0 0 20px rgba(255, 75, 75, 0.3),
+                    0 0 20px rgba(255, 75, 75, 0.3);
+    }
+    50% { 
+        border-color: #ff0000;
+        box-shadow: inset 0 0 30px rgba(255, 0, 0, 0.5),
+                    0 0 30px rgba(255, 0, 0, 0.5);
+    }
+}
+
+/* Video Button */
+.video-button {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.video-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.video-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    opacity: 0.7;
+}
+
+.video-button:hover svg {
+    stroke: #333;
+}
+
+/* Settings Button - For theme switching */
+.settings-button {
+    background: white;
+    color: #9b59b6;
+    border: 2px solid #9b59b6;
+    padding: 6px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.settings-button svg {
+    width: 16px;
+    height: 16px;
+    stroke: #9b59b6;
+    transition: all 0.3s ease;
+}
+
+.settings-button:hover {
+    background: #9b59b6;
+    border-color: #9b59b6;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.settings-button:hover svg {
+    stroke: white;
+}
+
+/* End Button - Inline */
+.end-button {
+    background: white;
+    color: #ff4b4b;
+    border: 2px solid #ff4b4b;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.end-button svg {
+    width: 12px;
+    height: 12px;
+    stroke: #ff4b4b;
+}
+
+.end-button:hover {
+    background: #ff4b4b;
+    color: white;
+    transform: scale(1.05);
+}
+
+.end-button:hover svg {
+    stroke: white;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 480px) {
+    .apsara-widget {
+        right: 15px;
+        bottom: 15px;
+    }
+
+    .widget-panel {
+        padding: 10px 16px 10px 10px;
+        gap: 12px;
+    }
+
+    .visualizer-container {
+        width: 50px;
+        height: 50px;
+    }
+
+    #miniVisualizer {
+        width: 50px;
+        height: 50px;
+    }
+
+    .visualizer-orb {
+        width: 42px;
+        height: 42px;
+    }
+
+    .orb-inner {
+        width: 32px;
+        height: 32px;
+    }
+
+    .widget-text {
+        font-size: 14px;
+    }
+
+    .end-button {
+        padding: 6px 16px;
+        font-size: 13px;
+    }
+}
+
+/* Screen share container with resolution selector */
+.screen-share-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.resolution-selector-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    opacity: 0.5;
+    width: 20px;
+    height: 20px;
+    -webkit-app-region: no-drag !important;
+}
+
+.resolution-selector-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.resolution-selector-btn:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.resolution-selector-btn:hover svg {
+    stroke: #333;
+}
+
+/* Resolution dropdown menu */
+.resolution-menu {
+    position: fixed !important; /* Use fixed positioning to prevent cutoff */
+    background: white;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 8px 0;
+    min-width: 200px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 999999 !important; /* Very high z-index to appear above everything */
+    -webkit-app-region: no-drag !important; /* Make sure it's not draggable */
+    pointer-events: auto !important; /* Ensure it's clickable */
+}
+
+/* Different animations for showing above vs below */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.resolution-option {
+    padding: 10px 16px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    -webkit-app-region: no-drag !important; /* Make sure options are clickable */
+}
+
+.resolution-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #000;
+}
+
+.resolution-option.selected {
+    background: rgba(232, 131, 42, 0.1);
+    color: #e8832a;
+    font-weight: 600;
+}
+
+.resolution-option .checkmark {
+    font-size: 14px;
+    font-weight: bold;
+    color: #e8832a;
+}
+
+/* Camera Container */
+.camera-container {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+}
+
+/* Camera button active state */
+.video-button.active {
+    opacity: 1;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.video-button.active svg {
+    stroke: #4CAF50;
+}
+
+/* Camera indicator light (green pulsing dot) */
+.camera-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: pulse-green 2s ease-in-out infinite;
+    box-shadow: 0 0 4px rgba(76, 175, 80, 0.8);
+}
+
+@keyframes pulse-green {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.2);
+    }
+}
+
+/* Camera resolution selector button */
+.camera-resolution-selector-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+    opacity: 0.5;
+    width: 20px;
+    height: 20px;
+    -webkit-app-region: no-drag !important;
+}
+
+.camera-resolution-selector-btn svg {
+    width: 12px;
+    height: 12px;
+    stroke: #666;
+    transition: all 0.3s ease;
+}
+
+.camera-resolution-selector-btn:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.camera-resolution-selector-btn:hover svg {
+    stroke: #333;
+}

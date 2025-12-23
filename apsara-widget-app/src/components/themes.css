@@ -1,0 +1,855 @@
+/**
+ * Apsara Widget - Theme System
+ * Minimalist color themes for the widget
+ */
+
+/* Default (Light) Theme - Already defined in ApsaraWidget.css */
+
+/* Dark Theme */
+.apsara-widget.theme-dark .widget-panel {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+}
+
+.apsara-widget.theme-dark .widget-text {
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark button {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.apsara-widget.theme-dark .end-button {
+    background: #c62828;
+    color: #fff;
+}
+
+.apsara-widget.theme-dark .end-button:hover {
+    background: #d32f2f;
+}
+
+/* Nightly (Blue-Dark) Theme */
+.apsara-widget.theme-nightly .widget-panel {
+    background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+    box-shadow: 0 8px 32px rgba(0, 76, 153, 0.4);
+}
+
+.apsara-widget.theme-nightly .widget-text {
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly button {
+    background: rgba(144, 202, 249, 0.1);
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly button:hover {
+    background: rgba(144, 202, 249, 0.2);
+}
+
+.apsara-widget.theme-nightly .end-button {
+    background: #1976d2;
+    color: #fff;
+}
+
+.apsara-widget.theme-nightly .end-button:hover {
+    background: #2196f3;
+}
+
+/* Dracula (Purple-Dark) Theme */
+.apsara-widget.theme-dracula .widget-panel {
+    background: linear-gradient(135deg, #282a36 0%, #44475a 100%);
+    box-shadow: 0 8px 32px rgba(189, 147, 249, 0.3);
+}
+
+.apsara-widget.theme-dracula .widget-text {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-dracula button {
+    background: rgba(189, 147, 249, 0.1);
+    color: #bd93f9;
+}
+
+.apsara-widget.theme-dracula button:hover {
+    background: rgba(189, 147, 249, 0.2);
+}
+
+.apsara-widget.theme-dracula .end-button {
+    background: #ff79c6;
+    color: #fff;
+}
+
+.apsara-widget.theme-dracula .end-button:hover {
+    background: #ff92d0;
+}
+
+/* Monokai (Orange-Dark) Theme */
+.apsara-widget.theme-monokai .widget-panel {
+    background: linear-gradient(135deg, #272822 0%, #3e3d32 100%);
+    box-shadow: 0 8px 32px rgba(249, 38, 114, 0.3);
+}
+
+.apsara-widget.theme-monokai .widget-text {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-monokai button {
+    background: rgba(249, 38, 114, 0.1);
+    color: #f92672;
+}
+
+.apsara-widget.theme-monokai button:hover {
+    background: rgba(249, 38, 114, 0.2);
+}
+
+.apsara-widget.theme-monokai .end-button {
+    background: #fd971f;
+    color: #fff;
+}
+
+.apsara-widget.theme-monokai .end-button:hover {
+    background: #fda92d;
+}
+
+/* Nord (Cool Blue) Theme */
+.apsara-widget.theme-nord .widget-panel {
+    background: linear-gradient(135deg, #2e3440 0%, #3b4252 100%);
+    box-shadow: 0 8px 32px rgba(136, 192, 208, 0.3);
+}
+
+.apsara-widget.theme-nord .widget-text {
+    color: #eceff4;
+}
+
+.apsara-widget.theme-nord button {
+    background: rgba(136, 192, 208, 0.1);
+    color: #88c0d0;
+}
+
+.apsara-widget.theme-nord button:hover {
+    background: rgba(136, 192, 208, 0.2);
+}
+
+.apsara-widget.theme-nord .end-button {
+    background: #81a1c1;
+    color: #fff;
+}
+
+.apsara-widget.theme-nord .end-button:hover {
+    background: #8fbcbb;
+}
+
+/* Solarized Light Theme */
+.apsara-widget.theme-solarized-light .widget-panel {
+    background: linear-gradient(135deg, #fdf6e3 0%, #eee8d5 100%);
+    box-shadow: 0 8px 32px rgba(101, 123, 131, 0.2);
+}
+
+.apsara-widget.theme-solarized-light .widget-text {
+    color: #657b83;
+}
+
+.apsara-widget.theme-solarized-light button {
+    background: rgba(101, 123, 131, 0.05);
+    color: #586e75;
+}
+
+.apsara-widget.theme-solarized-light button:hover {
+    background: rgba(101, 123, 131, 0.1);
+}
+
+.apsara-widget.theme-solarized-light .end-button {
+    background: #dc322f;
+    color: #fff;
+}
+
+.apsara-widget.theme-solarized-light .end-button:hover {
+    background: #cb4b16;
+}
+
+/* Solarized Dark Theme */
+.apsara-widget.theme-solarized-dark .widget-panel {
+    background: linear-gradient(135deg, #002b36 0%, #073642 100%);
+    box-shadow: 0 8px 32px rgba(38, 139, 210, 0.3);
+}
+
+.apsara-widget.theme-solarized-dark .widget-text {
+    color: #839496;
+}
+
+.apsara-widget.theme-solarized-dark button {
+    background: rgba(131, 148, 150, 0.1);
+    color: #93a1a1;
+}
+
+.apsara-widget.theme-solarized-dark button:hover {
+    background: rgba(131, 148, 150, 0.2);
+}
+
+.apsara-widget.theme-solarized-dark .end-button {
+    background: #268bd2;
+    color: #fff;
+}
+
+.apsara-widget.theme-solarized-dark .end-button:hover {
+    background: #2aa198;
+}
+
+/* Theme Selector (Minimalist color swatches) */
+.theme-selector {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.theme-selector.hidden {
+    display: none;
+}
+
+.theme-swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.theme-swatch:hover {
+    transform: scale(1.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.theme-swatch.active {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+/* Individual theme swatches */
+.theme-swatch.light {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+.theme-swatch.dark {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+.theme-swatch.nightly {
+    background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+}
+
+.theme-swatch.dracula {
+    background: linear-gradient(135deg, #282a36 0%, #44475a 100%);
+}
+
+.theme-swatch.monokai {
+    background: linear-gradient(135deg, #272822 0%, #3e3d32 100%);
+}
+
+.theme-swatch.nord {
+    background: linear-gradient(135deg, #2e3440 0%, #3b4252 100%);
+}
+
+.theme-swatch.solarized-light {
+    background: linear-gradient(135deg, #fdf6e3 0%, #eee8d5 100%);
+}
+
+.theme-swatch.solarized-dark {
+    background: linear-gradient(135deg, #002b36 0%, #073642 100%);
+}
+
+.theme-swatch.custom {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+}
+
+.theme-swatch.custom::after {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Theme-specific settings button colors */
+.apsara-widget.theme-dark .settings-button {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #9b59b6;
+}
+
+.apsara-widget.theme-dark .settings-button svg {
+    stroke: #bd93f9;
+}
+
+.apsara-widget.theme-dark .settings-button:hover {
+    background: #9b59b6;
+}
+
+/* Theme selector panel styling */
+.theme-selector-panel {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    min-width: 200px;
+}
+
+/* Light theme selector panel (default) */
+.apsara-widget.theme-light .theme-selector-panel {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.apsara-widget.theme-light .theme-selector-panel .panel-title {
+    color: #333;
+}
+
+.apsara-widget.theme-light .theme-selector-panel button {
+    border: 1px solid #e0e0e0;
+    background: #f5f5f5;
+    color: #333;
+}
+
+.apsara-widget.theme-light .theme-selector-panel button.active {
+    background: #9b59b6;
+    border-color: #9b59b6;
+    color: #fff;
+}
+
+/* Dark theme selector panel */
+.apsara-widget.theme-dark .theme-selector-panel {
+    background: #1a1a1a;
+    border: 1px solid #444;
+}
+
+.apsara-widget.theme-dark .theme-selector-panel .panel-title {
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark .theme-selector-panel button {
+    border: 1px solid #444;
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark .theme-selector-panel button.active {
+    background: #bd93f9;
+    border-color: #bd93f9;
+    color: #fff;
+}
+
+/* Nightly theme selector panel */
+.apsara-widget.theme-nightly .theme-selector-panel {
+    background: #0a1929;
+    border: 1px solid #1a2332;
+}
+
+.apsara-widget.theme-nightly .theme-selector-panel .panel-title {
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly .theme-selector-panel button {
+    border: 1px solid #1a2332;
+    background: #1a2332;
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly .theme-selector-panel button.active {
+    background: #1976d2;
+    border-color: #1976d2;
+    color: #fff;
+}
+
+/* Dracula theme selector panel */
+.apsara-widget.theme-dracula .theme-selector-panel {
+    background: #282a36;
+    border: 1px solid #44475a;
+}
+
+.apsara-widget.theme-dracula .theme-selector-panel .panel-title {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-dracula .theme-selector-panel button {
+    border: 1px solid #44475a;
+    background: #44475a;
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-dracula .theme-selector-panel button.active {
+    background: #ff79c6;
+    border-color: #ff79c6;
+    color: #fff;
+}
+
+/* Monokai theme selector panel */
+.apsara-widget.theme-monokai .theme-selector-panel {
+    background: #272822;
+    border: 1px solid #3e3d32;
+}
+
+.apsara-widget.theme-monokai .theme-selector-panel .panel-title {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-monokai .theme-selector-panel button {
+    border: 1px solid #3e3d32;
+    background: #3e3d32;
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-monokai .theme-selector-panel button.active {
+    background: #fd971f;
+    border-color: #fd971f;
+    color: #fff;
+}
+
+/* Nord theme selector panel */
+.apsara-widget.theme-nord .theme-selector-panel {
+    background: #2e3440;
+    border: 1px solid #3b4252;
+}
+
+.apsara-widget.theme-nord .theme-selector-panel .panel-title {
+    color: #eceff4;
+}
+
+.apsara-widget.theme-nord .theme-selector-panel button {
+    border: 1px solid #3b4252;
+    background: #3b4252;
+    color: #eceff4;
+}
+
+.apsara-widget.theme-nord .theme-selector-panel button.active {
+    background: #81a1c1;
+    border-color: #81a1c1;
+    color: #fff;
+}
+
+/* Solarized Light theme selector panel */
+.apsara-widget.theme-solarized-light .theme-selector-panel {
+    background: #fdf6e3;
+    border: 1px solid #eee8d5;
+}
+
+.apsara-widget.theme-solarized-light .theme-selector-panel .panel-title {
+    color: #657b83;
+}
+
+.apsara-widget.theme-solarized-light .theme-selector-panel button {
+    border: 1px solid #eee8d5;
+    background: #eee8d5;
+    color: #657b83;
+}
+
+.apsara-widget.theme-solarized-light .theme-selector-panel button.active {
+    background: #dc322f;
+    border-color: #dc322f;
+    color: #fff;
+}
+
+/* Solarized Dark theme selector panel */
+.apsara-widget.theme-solarized-dark .theme-selector-panel {
+    background: #002b36;
+    border: 1px solid #073642;
+}
+
+.apsara-widget.theme-solarized-dark .theme-selector-panel .panel-title {
+    color: #839496;
+}
+
+.apsara-widget.theme-solarized-dark .theme-selector-panel button {
+    border: 1px solid #073642;
+    background: #073642;
+    color: #839496;
+}
+
+.apsara-widget.theme-solarized-dark .theme-selector-panel button.active {
+    background: #268bd2;
+    border-color: #268bd2;
+    color: #fff;
+}
+
+/* Common panel button styles */
+.theme-selector-panel button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-weight: 400;
+}
+
+.theme-selector-panel button.active {
+    font-weight: 600;
+}
+
+.theme-selector-panel button:hover {
+    opacity: 0.8;
+    transform: translateX(2px);
+}
+
+.theme-selector-panel .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.theme-selector-panel .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Resolution menu styling (screen and camera) */
+.resolution-menu {
+    position: fixed;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    min-width: 220px;
+}
+
+.resolution-option {
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.resolution-option .checkmark {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.resolution-option.selected {
+    font-weight: 600;
+}
+
+.resolution-option:hover {
+    opacity: 0.8;
+    transform: translateX(2px);
+}
+
+/* Light theme resolution menu (default) */
+.apsara-widget.theme-light .resolution-menu {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.apsara-widget.theme-light .resolution-option {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-light .resolution-option.selected {
+    background: #9b59b6;
+    border-color: #9b59b6;
+    color: #fff;
+}
+
+.apsara-widget.theme-light .resolution-option:hover {
+    background: #e8e8e8;
+}
+
+.apsara-widget.theme-light .resolution-option.selected:hover {
+    background: #8e44ad;
+}
+
+/* Dark theme resolution menu */
+.apsara-widget.theme-dark .resolution-menu {
+    background: #1a1a1a;
+    border: 1px solid #444;
+}
+
+.apsara-widget.theme-dark .resolution-option {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-dark .resolution-option.selected {
+    background: #bd93f9;
+    border-color: #bd93f9;
+    color: #fff;
+}
+
+.apsara-widget.theme-dark .resolution-option:hover {
+    background: #3a3a3a;
+}
+
+.apsara-widget.theme-dark .resolution-option.selected:hover {
+    background: #a67ee8;
+}
+
+/* Nightly theme resolution menu */
+.apsara-widget.theme-nightly .resolution-menu {
+    background: #0a1929;
+    border: 1px solid #1a2332;
+}
+
+.apsara-widget.theme-nightly .resolution-option {
+    background: #1a2332;
+    color: #90caf9;
+    border: 1px solid #1a2332;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-nightly .resolution-option.selected {
+    background: #1976d2;
+    border-color: #1976d2;
+    color: #fff;
+}
+
+.apsara-widget.theme-nightly .resolution-option:hover {
+    background: #253645;
+}
+
+.apsara-widget.theme-nightly .resolution-option.selected:hover {
+    background: #1565c0;
+}
+
+/* Dracula theme resolution menu */
+.apsara-widget.theme-dracula .resolution-menu {
+    background: #282a36;
+    border: 1px solid #44475a;
+}
+
+.apsara-widget.theme-dracula .resolution-option {
+    background: #44475a;
+    color: #f8f8f2;
+    border: 1px solid #44475a;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-dracula .resolution-option.selected {
+    background: #ff79c6;
+    border-color: #ff79c6;
+    color: #fff;
+}
+
+.apsara-widget.theme-dracula .resolution-option:hover {
+    background: #565869;
+}
+
+.apsara-widget.theme-dracula .resolution-option.selected:hover {
+    background: #ff65b5;
+}
+
+/* Monokai theme resolution menu */
+.apsara-widget.theme-monokai .resolution-menu {
+    background: #272822;
+    border: 1px solid #3e3d32;
+}
+
+.apsara-widget.theme-monokai .resolution-option {
+    background: #3e3d32;
+    color: #f8f8f2;
+    border: 1px solid #3e3d32;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-monokai .resolution-option.selected {
+    background: #fd971f;
+    border-color: #fd971f;
+    color: #fff;
+}
+
+.apsara-widget.theme-monokai .resolution-option:hover {
+    background: #4e4d42;
+}
+
+.apsara-widget.theme-monokai .resolution-option.selected:hover {
+    background: #e88710;
+}
+
+/* Nord theme resolution menu */
+.apsara-widget.theme-nord .resolution-menu {
+    background: #2e3440;
+    border: 1px solid #3b4252;
+}
+
+.apsara-widget.theme-nord .resolution-option {
+    background: #3b4252;
+    color: #eceff4;
+    border: 1px solid #3b4252;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-nord .resolution-option.selected {
+    background: #81a1c1;
+    border-color: #81a1c1;
+    color: #fff;
+}
+
+.apsara-widget.theme-nord .resolution-option:hover {
+    background: #4c566a;
+}
+
+.apsara-widget.theme-nord .resolution-option.selected:hover {
+    background: #5e81ac;
+}
+
+/* Solarized Light theme resolution menu */
+.apsara-widget.theme-solarized-light .resolution-menu {
+    background: #fdf6e3;
+    border: 1px solid #eee8d5;
+}
+
+.apsara-widget.theme-solarized-light .resolution-option {
+    background: #eee8d5;
+    color: #657b83;
+    border: 1px solid #eee8d5;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-solarized-light .resolution-option.selected {
+    background: #dc322f;
+    border-color: #dc322f;
+    color: #fff;
+}
+
+.apsara-widget.theme-solarized-light .resolution-option:hover {
+    background: #e4dec8;
+}
+
+.apsara-widget.theme-solarized-light .resolution-option.selected:hover {
+    background: #cb4b16;
+}
+
+/* Solarized Dark theme resolution menu */
+.apsara-widget.theme-solarized-dark .resolution-menu {
+    background: #002b36;
+    border: 1px solid #073642;
+}
+
+.apsara-widget.theme-solarized-dark .resolution-option {
+    background: #073642;
+    color: #839496;
+    border: 1px solid #073642;
+    margin-bottom: 6px;
+}
+
+.apsara-widget.theme-solarized-dark .resolution-option.selected {
+    background: #268bd2;
+    border-color: #268bd2;
+    color: #fff;
+}
+
+.apsara-widget.theme-solarized-dark .resolution-option:hover {
+    background: #0f4656;
+}
+
+.apsara-widget.theme-solarized-dark .resolution-option.selected:hover {
+    background: #2aa198;
+}
+
+.apsara-widget.theme-nightly .settings-button {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #90caf9;
+}
+
+.apsara-widget.theme-nightly .settings-button svg {
+    stroke: #90caf9;
+}
+
+.apsara-widget.theme-nightly .settings-button:hover {
+    background: #90caf9;
+}
+
+.apsara-widget.theme-dracula .settings-button {
+    background: rgba(189, 147, 249, 0.1);
+    border-color: #ff79c6;
+}
+
+.apsara-widget.theme-dracula .settings-button svg {
+    stroke: #ff79c6;
+}
+
+.apsara-widget.theme-dracula .settings-button:hover {
+    background: #ff79c6;
+}
+
+.apsara-widget.theme-monokai .settings-button {
+    background: rgba(249, 38, 114, 0.1);
+    border-color: #fd971f;
+}
+
+.apsara-widget.theme-monokai .settings-button svg {
+    stroke: #fd971f;
+}
+
+.apsara-widget.theme-monokai .settings-button:hover {
+    background: #fd971f;
+}
+
+.apsara-widget.theme-nord .settings-button {
+    background: rgba(136, 192, 208, 0.1);
+    border-color: #81a1c1;
+}
+
+.apsara-widget.theme-nord .settings-button svg {
+    stroke: #81a1c1;
+}
+
+.apsara-widget.theme-nord .settings-button:hover {
+    background: #81a1c1;
+}
+
+.apsara-widget.theme-solarized-light .settings-button {
+    background: rgba(101, 123, 131, 0.05);
+    border-color: #dc322f;
+}
+
+.apsara-widget.theme-solarized-light .settings-button svg {
+    stroke: #dc322f;
+}
+
+.apsara-widget.theme-solarized-light .settings-button:hover {
+    background: #dc322f;
+}
+
+.apsara-widget.theme-solarized-dark .settings-button {
+    background: rgba(131, 148, 150, 0.1);
+    border-color: #268bd2;
+}
+
+.apsara-widget.theme-solarized-dark .settings-button svg {
+    stroke: #268bd2;
+}
+
+.apsara-widget.theme-solarized-dark .settings-button:hover {
+    background: #268bd2;
+}
