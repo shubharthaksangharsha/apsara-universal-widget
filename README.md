@@ -126,152 +126,100 @@ apsara_ai/
 - Node.js 16+ and npm
 - Google Gemini API key ([Get it here](https://aistudio.google.com/app/apikey))
 
+This project includes cross-platform helper scripts (see `install.md`) to install and start both backend and frontend. On Windows we provide `run-all.ps1` and `run-all.bat` (wrapper) to run the full stack from PowerShell or Explorer/Git Bash.
+
 ### Option 1: Web Browser (Easiest - Frontend Only)
 
-1. **Navigate to Widget App**
-   ```bash
-   cd apsara-widget-app
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start Development Server**
-   ```bash
-   npm start
-   ```
-
-4. **Open in Browser**
-   - Automatically opens at `http://localhost:3001`
-   - Click the widget to start talking to Apsara
-   - Allow microphone access when prompted
-
-### Option 2: Full Stack (Frontend + Backend)
-
-#### Backend Setup
-
-1. **Navigate to Backend**
-   ```bash
-   cd backend
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Create .env File**
-   ```bash
-   cp env-template.txt .env
-   ```
-
-4. **Configure Environment Variables**
-   
-   Edit `.env` file:
-   ```env
-   # Required
-   GEMINI_API_KEY=your_gemini_api_key_here
-   PORT=3000
-   
-   # Optional (for email functionality)
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_APP_PASSWORD=your_app_password
-   ```
-
-5. **Start Backend Server**
-   ```bash
-   npm start
-   ```
-   
-   Or for development with auto-reload:
-   ```bash
-   npm run dev
-   ```
-
-   You should see:
-   ```
-   🚀 Apsara Live Backend running on port 3000
-   📧 Email service configured
-   ```
-
-#### Frontend Setup
-
-1. **Open New Terminal and Navigate to Widget App**
-   ```bash
-   cd apsara-widget-app
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start Frontend**
-   ```bash
-   npm start
-   ```
-
-Now the widget will connect to your local backend at `ws://localhost:3000`!
-
-### Option 3: Desktop Widget (Linux - Production Ready!)
-
-**Prerequisites:**
-- Completed Backend Setup (from Option 2) OR use production backend
-- Node.js 16+ and npm
-
-**Steps:**
-
-1. **Navigate to Widget App**
-   ```bash
-   cd apsara-widget-app
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start Electron Widget (Development Mode)**
-   ```bash
-   npm run electron
-   ```
-   
-   This will:
-   - Start the React dev server on port 3001
-   - Launch Electron desktop widget
-   - Auto-connect to backend (local or production)
-   - Show widget in bottom-right corner
-
-4. **Using the Widget**
-   - The widget appears as a floating, always-on-top window
-   - Drag the widget panel to move it anywhere on screen
-   - Click to start talking to Apsara
-   - Use the close button (X) to exit completely
-
-**Note:** For production build:
+1. Navigate to the widget app
 ```bash
-npm run build        # Build React app
-npm run electron-build  # Package as desktop app
+cd apsara-widget-app
 ```
 
-#### Linux Desktop Integration (Optional)
-
+2. Install dependencies
 ```bash
-# Create desktop launcher
-cat > ~/.local/share/applications/apsara-widget.desktop << 'EOF'
-[Desktop Entry]
-Name=Apsara AI Widget
-Comment=Voice Assistant Widget
-Exec=/path/to/apsara_ai/apsara-widget-app/node_modules/.bin/electron /path/to/apsara_ai/apsara-widget-app/public/electron.js
-Icon=/path/to/apsara_ai/apsara-widget-app/public/logo192.png
-Type=Application
-Categories=Utility;
-EOF
+npm install
+```
 
-# Update desktop database
-update-desktop-database ~/.local/share/applications/
+3. Start development server
+```bash
+npm start
+```
+
+4. Open in Browser
+- Opens at `http://localhost:3001` by default
+- Click the widget to start; allow microphone access when prompted
+
+### Option 2: Full Stack (Frontend + Backend) — cross-platform helpers
+
+We provide helper scripts to install dependencies and run the full stack. They will:
+- prefer a `backend/` subfolder if present
+- ensure `backend/.env` exists (copy from `.env.example` or `env-template.txt` if missing)
+- install backend deps and start the backend (background)
+- install frontend deps and run the Electron app (or `npm start`)
+
+Run the helper for your platform:
+
+Linux / macOS / WSL / Git Bash:
+```bash
+cd /path/to/apsara-universal-widget
+./run-all.sh
+```
+
+macOS alternative:
+```bash
+./run-all.darwin.sh
+```
+
+Windows (PowerShell - recommended):
+```powershell
+cd 'C:\path\to\apsara-universal-widget'
+.\run-all.ps1
+```
+
+Windows (Git Bash or Explorer double-click):
+```bash
+./run-all.bat
+```
+
+Manual steps (if you prefer to do things yourself)
+
+Backend (manual):
+```bash
+cd backend
+npm install
+# copy env-template.txt or .env.example to .env if needed
+cp env-template.txt .env
+# edit .env and add GEMINI_API_KEY and other variables
+npm start
+```
+
+Frontend (manual):
+```bash
+cd apsara-widget-app
+npm install
+npm start  # or `npm run electron` to start electron if available
+```
+
+Now the widget should connect to `ws://localhost:3000` (or the port you configured in `.env`).
+
+### Option 3: Desktop Widget (Electron)
+
+Prerequisites: Completed Backend Setup or use a production backend, Node.js 16+ and npm.
+
+1. Navigate to widget app
+```bash
+cd apsara-widget-app
+```
+2. Install and run
+```bash
+npm install
+npm run electron
+```
+
+For production builds:
+```bash
+npm run build
+npm run electron-build
 ```
 
 ## 🎨 How to Use
@@ -802,4 +750,3 @@ Each theme includes custom colors for:
 ---
 
 🌐 [Production Demo](https://apsara-devshubh.devshubh.me) | 📧 [Contact](mailto:shubharthaksangharsha@gmail.com)
-
