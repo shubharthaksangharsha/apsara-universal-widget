@@ -19,6 +19,42 @@ echo "Running install+start helper"
 echo "Backend dir: $BACK_DIR"
 echo "Widget dir:  $WIDGET_DIR"
 
+# Check for required system dependencies on Linux
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  echo "\n🔍 Checking Linux system dependencies..."
+  MISSING_DEPS=()
+  
+  # Check for screenshot tools
+  if ! command -v gnome-screenshot &> /dev/null && ! command -v scrot &> /dev/null; then
+    MISSING_DEPS+=("gnome-screenshot or scrot (for screenshots)")
+  fi
+  
+  # Check for clipboard tools
+  if ! command -v xclip &> /dev/null && ! command -v xsel &> /dev/null; then
+    MISSING_DEPS+=("xclip or xsel (for clipboard)")
+  fi
+  
+  # Check for keyboard automation
+  if ! command -v xdotool &> /dev/null; then
+    MISSING_DEPS+=("xdotool (for paste automation)")
+  fi
+  
+  if [ ${#MISSING_DEPS[@]} -ne 0 ]; then
+    echo "\n⚠️  WARNING: Missing system dependencies for Apsara tools:"
+    for dep in "${MISSING_DEPS[@]}"; do
+      echo "   - $dep"
+    done
+    echo "\n📦 Install them with:"
+    echo "   Ubuntu/Debian: sudo apt install gnome-screenshot xclip xdotool"
+    echo "   Fedora/RHEL:   sudo dnf install gnome-screenshot xclip xdotool"
+    echo "   Arch:          sudo pacman -S gnome-screenshot xclip xdotool"
+    echo "\nContinuing anyway... (tools will fail if dependencies are missing)\n"
+    sleep 3
+  else
+    echo "✅ All system dependencies found!"
+  fi
+fi
+
 # Check .env presence
 if [ ! -f "$BACK_DIR/.env" ]; then
   if [ -f "$BACK_DIR/.env.example" ]; then

@@ -46,6 +46,32 @@ Write-Host "Running install+start helper (PowerShell)"
 Write-Host "Backend dir: $BackDir"
 Write-Host "Widget dir:  $WidgetDir"
 
+# Check for required system dependencies on Windows
+Write-Host "`n🔍 Checking Windows system dependencies..."
+# Windows uses built-in PowerShell cmdlets:
+# - Screenshot: Add-Type System.Windows.Forms + SendKeys
+# - Clipboard: Set-Clipboard, Get-Clipboard (built-in PowerShell 5.1+)
+# - Paste: SendKeys (System.Windows.Forms)
+
+$psVersion = $PSVersionTable.PSVersion.Major
+if ($psVersion -ge 5) {
+    Write-Host "✅ PowerShell $psVersion detected (clipboard cmdlets available)"
+} else {
+    Write-Host "⚠️  WARNING: PowerShell version $psVersion is old. Upgrade to PowerShell 5.1+ for full clipboard support." -ForegroundColor Yellow
+    Write-Host "Download from: https://aka.ms/powershell" -ForegroundColor Yellow
+    Start-Sleep -Seconds 3
+}
+
+# Check if .NET Framework is available (for System.Windows.Forms)
+try {
+    Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
+    Write-Host "✅ .NET Framework available (screenshot & paste automation supported)"
+} catch {
+    Write-Host "⚠️  WARNING: .NET Framework System.Windows.Forms not available" -ForegroundColor Yellow
+    Write-Host "Screenshot and paste automation may not work properly." -ForegroundColor Yellow
+    Start-Sleep -Seconds 3
+}
+
 try {
     Ensure-EnvFile -Dir $BackDir
 } catch {

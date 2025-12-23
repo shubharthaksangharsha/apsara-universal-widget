@@ -18,6 +18,18 @@ fi
 
 echo "macOS helper: installing and running backend + widget"
 
+# Check for required system dependencies on macOS
+echo "\n🔍 Checking macOS system dependencies..."
+# macOS has built-in tools: screencapture, pbcopy, pbpaste, osascript
+# These are all part of macOS by default, so just verify they exist
+if command -v screencapture &> /dev/null && command -v pbcopy &> /dev/null && command -v osascript &> /dev/null; then
+  echo "✅ All macOS system tools found (screencapture, pbcopy, osascript)!"
+else
+  echo "⚠️  WARNING: Some macOS system tools are missing. This is unusual."
+  echo "Make sure you're running on a standard macOS installation."
+  sleep 3
+fi
+
 if [ ! -f "$BACK_DIR/.env" ]; then
   if [ -f "$BACK_DIR/.env.example" ]; then
     echo "'.env' not found in $BACK_DIR. Copying from .env.example..."

@@ -1,6 +1,25 @@
 /**
  * Apsara AI - Tool Functions
  * This module contains all the tool/function implementations that Apsara can use
+ * 
+ * SYSTEM DEPENDENCIES (for clipboard and screenshot tools):
+ * 
+ * Linux:
+ *   - Screenshot: gnome-screenshot OR scrot
+ *   - Clipboard: xclip OR xsel
+ *   - Paste automation: xdotool
+ *   Install: sudo apt install gnome-screenshot xclip xdotool (Ubuntu/Debian)
+ *            sudo dnf install gnome-screenshot xclip xdotool (Fedora/RHEL)
+ *            sudo pacman -S gnome-screenshot xclip xdotool (Arch)
+ * 
+ * macOS:
+ *   - All tools are built-in (screencapture, pbcopy, pbpaste, osascript)
+ *   - No additional installation required
+ * 
+ * Windows:
+ *   - All tools use built-in PowerShell cmdlets
+ *   - Requires PowerShell 5.1+ and .NET Framework
+ *   - No additional installation required
  */
 
 const nodemailer = require('nodemailer');
@@ -242,8 +261,18 @@ async function takeScreenshot(returnImage = false) {
       // macOS
       command = `screencapture -x ${screenshotPath}`;
     } else if (platform === 'win32') {
-      // Windows - using PowerShell
-      command = `powershell -command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('%{PRTSC}'); Start-Sleep -Milliseconds 500"`;
+      // Windows - using PowerShell to capture screen to file
+      const psCommand = `
+        Add-Type -AssemblyName System.Windows.Forms,System.Drawing;
+        $screen = [System.Windows.Forms.Screen]::PrimaryScreen.Bounds;
+        $bitmap = New-Object System.Drawing.Bitmap $screen.Width, $screen.Height;
+        $graphics = [System.Drawing.Graphics]::FromImage($bitmap);
+        $graphics.CopyFromScreen($screen.Location, [System.Drawing.Point]::Empty, $screen.Size);
+        $bitmap.Save('${screenshotPath.replace(/\\/g, '\\\\')}', [System.Drawing.Imaging.ImageFormat]::Png);
+        $graphics.Dispose();
+        $bitmap.Dispose();
+      `.replace(/\n/g, ' ');
+      command = `powershell -command "${psCommand}"`;
     } else {
       return { success: false, error: 'Unsupported platform' };
     }

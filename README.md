@@ -123,8 +123,32 @@ apsara_ai/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
+**Required for all platforms:**
 - Node.js 16+ and npm
 - Google Gemini API key ([Get it here](https://aistudio.google.com/app/apikey))
+
+**Platform-specific tools (for clipboard & screenshot features):**
+
+**Linux** - Install these system tools:
+```bash
+# Ubuntu/Debian
+sudo apt install gnome-screenshot xclip xdotool
+
+# Fedora/RHEL
+sudo dnf install gnome-screenshot xclip xdotool
+
+# Arch Linux
+sudo pacman -S gnome-screenshot xclip xdotool
+```
+
+**macOS** - No additional tools needed (all built-in)
+- `screencapture`, `pbcopy`, `pbpaste`, `osascript` come with macOS
+
+**Windows** - No additional tools needed (uses PowerShell)
+- Requires PowerShell 5.1+ and .NET Framework (included in Windows 10/11)
+
+> **Note:** The run helper scripts (`run-all.sh`, `run-all.ps1`, etc.) automatically check for these dependencies on startup.
 
 This project includes cross-platform helper scripts (see `install.md`) to install and start both backend and frontend. On Windows we provide `run-all.ps1` and `run-all.bat` (wrapper) to run the full stack from PowerShell or Explorer/Git Bash.
 
@@ -662,19 +686,21 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
   - 🎯 **Visual Badges**: Each tool shows ASYNC or SYNC badge with color coding
 - 🛠️ **Dynamic Tool Declarations**: Backend generates tool list based on enabled tools only
 - 🎨 **Backend Not Running Message**: Shows helpful error when backend is offline
-- 💾 **Persistent Settings**: All preferences saved to localStorage
-  - Theme selection (Nightly ❤️)
-  - Screen resolution preference
-  - Camera resolution preference
-  - Tool configurations (enabled/disabled, async/sync)
+- 💾 **Persistent Settings**: All preferences saved to localStorage and restored on restart
+  - ✨ **Theme Persistence**: Theme selection now properly saves and loads (no more white flash!)
+  - 📺 Screen resolution preference
+  - 📹 Camera resolution preference
+  - 🔧 Tool configurations (enabled/disabled, async/sync)
+  - 🚀 **Zero White Flash**: Intelligent preload system ensures your theme loads instantly
 - 🖱️ **Improved Click-Outside**: All dropdown menus close when clicking anywhere outside
-- 🎯 **Smaller Visualizer Orb**: Reduced from 60px to 50px for cleaner, more balanced look
+- 🎯 **Smaller Visualizer Orb**: Reduced from 60px to 42px for cleaner, more balanced look
 - 🐛 **Fixed Screenshot Tool**: No longer crashes with "Request contains invalid argument"
   - Returns lightweight metadata to Gemini instead of large base64 images
   - Screenshot data stored internally for email workflows
 - 📏 **Electron Window Height**: Increased to 600px to fit all tools without cutting off
 - 🔌 **Better Disconnect Handling**: Status properly resets to "Talk to Apsara" on disconnect
 - 📊 **Tool Metadata**: Each tool includes name, description, and default async behavior
+- 🪟 **Platform-Specific Optimizations**: Windows shows immediately, Linux/Mac use smart preload (no flashing)
 
 **New Capabilities:**
 - Configure tools before starting conversation
@@ -691,15 +717,19 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Backend `/api/tools/update` endpoint - Update tool configuration
 - Tool behavior automatically applied to Gemini function declarations
 - localStorage integration for persistent metadata
+- **Theme Preload System**: Inline script loads theme before React renders
+- **React State Initialization**: useState reads localStorage immediately on component creation
+- **Platform Detection**: Electron window shows differently on Windows vs Linux/Mac
 - Improved click-outside detection logic for all menus
 
 **Files Modified:**
 - `backend/tools.js` - Tool metadata, async settings, dynamic declarations
 - `backend/server.js` - API endpoints, dynamic system prompt generation
-- `apsara-widget-app/src/components/ApsaraWidget.js` - Tools UI, persistent settings, orb size
-- `apsara-widget-app/src/components/ApsaraWidget.css` - Tools panel styling, orb size, badges
+- `apsara-widget-app/src/components/ApsaraWidget.js` - Tools UI, persistent settings, orb size, theme persistence
+- `apsara-widget-app/src/components/ApsaraWidget.css` - Tools panel styling, orb size (42px), badges
 - `apsara-widget-app/src/components/themes.css` - Tools panel theme support
-- `apsara-widget-app/public/electron.js` - Window height adjustment (600px)
+- `apsara-widget-app/public/electron.js` - Window height (600px), platform-specific visibility
+- `apsara-widget-app/public/index.html` - Theme preload system, zero white flash
 
 ### Version 1.3.0 (December 23, 2024)
 **🎨 Advanced Theme System & Adaptive UI:**
