@@ -3,10 +3,10 @@
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.3.0-blue)
+![Version](https://img.shields.io/badge/Version-1.4.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Version 1.3.0** - Advanced Theme System & Adaptive UI
+**Version 1.4.0** - Advanced Tools Configuration & Persistent Settings
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
@@ -645,13 +645,61 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.3.0** - December 2024
+**Version 1.4.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Beautiful Themes*
+*Talk to Apsara - Your Intelligent Voice Assistant with Configurable Tools & Persistent Settings*
 
 ---
 
 ## 📋 Changelog
+
+### Version 1.4.0 (December 24, 2024)
+**🔧 Advanced Tools Configuration System & Enhanced UX:**
+- ✨ **Tools Selector Panel**: Configure which tools Apsara can use before starting a session
+- 🔄 **Async/Sync Function Calling**: Toggle between blocking and non-blocking tool execution
+  - 🟢 **ASYNC (Non-blocking)**: Apsara continues talking while tool executes in background
+  - 🔵 **SYNC (Blocking)**: Apsara waits for tool completion before responding
+  - 🎯 **Visual Badges**: Each tool shows ASYNC or SYNC badge with color coding
+- 🛠️ **Dynamic Tool Declarations**: Backend generates tool list based on enabled tools only
+- 🎨 **Backend Not Running Message**: Shows helpful error when backend is offline
+- 💾 **Persistent Settings**: All preferences saved to localStorage
+  - Theme selection (Nightly ❤️)
+  - Screen resolution preference
+  - Camera resolution preference
+  - Tool configurations (enabled/disabled, async/sync)
+- 🖱️ **Improved Click-Outside**: All dropdown menus close when clicking anywhere outside
+- 🎯 **Smaller Visualizer Orb**: Reduced from 60px to 50px for cleaner, more balanced look
+- 🐛 **Fixed Screenshot Tool**: No longer crashes with "Request contains invalid argument"
+  - Returns lightweight metadata to Gemini instead of large base64 images
+  - Screenshot data stored internally for email workflows
+- 📏 **Electron Window Height**: Increased to 600px to fit all tools without cutting off
+- 🔌 **Better Disconnect Handling**: Status properly resets to "Talk to Apsara" on disconnect
+- 📊 **Tool Metadata**: Each tool includes name, description, and default async behavior
+
+**New Capabilities:**
+- Configure tools before starting conversation
+- Toggle any tool between async/sync execution
+- See which tools are available in real-time
+- Settings persist across app restarts
+- Backend dynamically generates system prompt based on enabled tools
+
+**Technical Improvements:**
+- `getToolDeclarations()` - Dynamic tool declaration generation
+- `setToolAsyncSettings()` - Update async behavior at runtime
+- `getAllTools()` - Fetch tools with metadata (name, description, async, enabled)
+- Backend `/api/tools` endpoint - Get all available tools
+- Backend `/api/tools/update` endpoint - Update tool configuration
+- Tool behavior automatically applied to Gemini function declarations
+- localStorage integration for persistent metadata
+- Improved click-outside detection logic for all menus
+
+**Files Modified:**
+- `backend/tools.js` - Tool metadata, async settings, dynamic declarations
+- `backend/server.js` - API endpoints, dynamic system prompt generation
+- `apsara-widget-app/src/components/ApsaraWidget.js` - Tools UI, persistent settings, orb size
+- `apsara-widget-app/src/components/ApsaraWidget.css` - Tools panel styling, orb size, badges
+- `apsara-widget-app/src/components/themes.css` - Tools panel theme support
+- `apsara-widget-app/public/electron.js` - Window height adjustment (600px)
 
 ### Version 1.3.0 (December 23, 2024)
 **🎨 Advanced Theme System & Adaptive UI:**

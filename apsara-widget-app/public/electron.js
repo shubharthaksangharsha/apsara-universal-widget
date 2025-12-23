@@ -42,6 +42,7 @@ function createWindow() {
     y,
     frame: false,
     focusable: true,
+    show: isWindows, // ✅ WINDOWS: show immediately; LINUX/MAC: hide until ready
     // Make transparent on all platforms for borderless look
     transparent: true,
     backgroundColor: '#00000000',
@@ -80,6 +81,28 @@ function createWindow() {
       ? 'http://localhost:3001'
       : `file://${path.join(__dirname, '../build/index.html')}`
   );
+
+  // ✅ LINUX/MAC ONLY: Show window when ready to prevent white flash
+  if (!isWindows) {
+    mainWindow.once('ready-to-show', () => {
+      mainWindow.show();
+      console.log('✅ Window shown after content loaded (no white flash)');
+    });
+
+    // Backup: Show window after 500ms if ready-to-show hasn't fired
+    setTimeout(() => {
+      if (mainWindow && !mainWindow.isVisible()) {
+        mainWindow.show();
+        console.log('✅ Window shown via timeout fallback');
+      }
+    }, 500);
+  } else {
+    // ✅ WINDOWS: Already visible, just ensure focus
+    mainWindow.once('ready-to-show', () => {
+      mainWindow.focus();
+      console.log('✅ Windows - Window focused after ready');
+    });
+  }
 
   // Accept an optional payload { forceQuit: true } to force close/quit
   ipcMain.on('close-window', (event, args) => {
@@ -128,11 +151,7 @@ if (isWindows) {
 
 
 
-  // 🪟 WINDOWS ONLY: ensure window is visible after show
- if (isWindows) {
-  mainWindow.show();
-  mainWindow.focus();
-  }
+  // Window will be shown via 'ready-to-show' event (no white flash)
 }
 
 
@@ -277,7 +296,7 @@ ipcMain.on('resize-for-dropdown', (event, { show }) => {
 
   const windowWidth = 580;
   const normalHeight = 120;
-  const expandedHeight = 450;
+  const expandedHeight = 600; // Increased for tools panel (was 450, then 550)
 
   const display = screen.getPrimaryDisplay().workAreaSize;
   const maxY = display.height - normalHeight - 20;

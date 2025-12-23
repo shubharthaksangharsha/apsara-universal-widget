@@ -26,7 +26,7 @@ const debugLog = (scope, ...args) => {
 };
 
 // Tool enable/disable allowlist. Disable everything except googleSearch by default.
-const ENABLED_TOOLS = {
+let ENABLED_TOOLS = {
   googleSearch: true,
 
   // Disabled by default for Gemini stability
@@ -40,6 +40,114 @@ const ENABLED_TOOLS = {
   retrieve_memories: false,
   clear_memories: false
 };
+
+// Tool metadata for UI display (with async behavior support)
+const TOOL_METADATA = {
+  googleSearch: { name: 'Google Search', description: 'Real-time web search', async: false },
+  send_email_to_shubharthak: { name: 'Send Email', description: 'Send messages to Shubharthak', async: true },
+  take_screenshot: { name: 'Take Screenshot', description: 'Capture screen', async: true },
+  screenshot_and_email: { name: 'Screenshot & Email', description: 'Capture and send screenshot', async: true },
+  copy_to_clipboard: { name: 'Copy to Clipboard', description: 'Copy text', async: true },
+  get_clipboard_text: { name: 'Get Clipboard', description: 'Read clipboard text', async: false },
+  paste_from_clipboard: { name: 'Paste Clipboard', description: 'Paste clipboard content', async: true },
+  store_memory: { name: 'Store Memory', description: 'Save information', async: true },
+  retrieve_memories: { name: 'Retrieve Memories', description: 'Recall stored info', async: false },
+  clear_memories: { name: 'Clear Memories', description: 'Delete stored info', async: true }
+};
+
+// Tool order and async settings (can be customized by user)
+let toolOrder = Object.keys(ENABLED_TOOLS);
+let toolAsyncSettings = {};
+// Initialize async settings from metadata
+Object.keys(TOOL_METADATA).forEach(key => {
+  toolAsyncSettings[key] = TOOL_METADATA[key].async;
+});
+
+/**
+ * Get current enabled tools configuration
+ * @returns {Object} Current ENABLED_TOOLS configuration
+ */
+function getEnabledTools() {
+  return { ...ENABLED_TOOLS };
+}
+
+/**
+ * Get all available tools with metadata
+ * @returns {Array} Array of tool objects with metadata (sorted by toolOrder)
+ */
+function getAllTools() {
+  // Sort tools by custom order
+  const orderedKeys = toolOrder.filter(key => key in ENABLED_TOOLS);
+  const unorderedKeys = Object.keys(ENABLED_TOOLS).filter(key => !toolOrder.includes(key));
+  const allKeys = [...orderedKeys, ...unorderedKeys];
+  
+  return allKeys.map((key, index) => ({
+    id: key,
+    name: TOOL_METADATA[key]?.name || key,
+    description: TOOL_METADATA[key]?.description || '',
+    enabled: ENABLED_TOOLS[key],
+    async: toolAsyncSettings[key] !== undefined ? toolAsyncSettings[key] : false,
+    order: index
+  }));
+}
+
+/**
+ * Update tool order
+ * @param {Array} newOrder - New order of tool IDs
+ * @returns {Object} Updated tools
+ */
+function setToolOrder(newOrder) {
+  // Validate that all keys exist
+  for (const key of newOrder) {
+    if (!(key in ENABLED_TOOLS)) {
+      throw new Error(`Unknown tool: ${key}`);
+    }
+  }
+  
+  toolOrder = newOrder;
+  debugLog('tools', '🔧 Updated tool order:', toolOrder);
+  
+  return getAllTools();
+}
+
+/**
+ * Update tool async settings
+ * @param {Object} asyncSettings - Object mapping tool IDs to async boolean
+ * @returns {Object} Updated tools
+ */
+function setToolAsyncSettings(asyncSettings) {
+  // Validate that all keys exist
+  for (const key in asyncSettings) {
+    if (!(key in ENABLED_TOOLS)) {
+      throw new Error(`Unknown tool: ${key}`);
+    }
+  }
+  
+  toolAsyncSettings = { ...toolAsyncSettings, ...asyncSettings };
+  debugLog('tools', '🔧 Updated tool async settings:', toolAsyncSettings);
+  
+  return getAllTools();
+}
+
+/**
+ * Update enabled tools configuration
+ * @param {Object} newConfig - New enabled tools configuration
+ * @returns {Object} Updated configuration
+ */
+function setEnabledTools(newConfig) {
+  // Validate that all keys exist
+  for (const key in newConfig) {
+    if (!(key in ENABLED_TOOLS)) {
+      throw new Error(`Unknown tool: ${key}`);
+    }
+  }
+  
+  // Update configuration
+  ENABLED_TOOLS = { ...ENABLED_TOOLS, ...newConfig };
+  debugLog('tools', '🔧 Updated ENABLED_TOOLS:', ENABLED_TOOLS);
+  
+  return { ...ENABLED_TOOLS };
+}
 
 // Email configuration
 let emailTransporter = null;
@@ -113,11 +221,15 @@ async function sendEmailToShubharthak(message, senderInfo = '', imageBase64 = nu
   }
 }
 
+// Store last screenshot for email use
+let lastScreenshotData = null;
+
 /**
  * Take a screenshot of the current screen
+ * @param {boolean} returnImage - If true, returns image data (for internal use)
  * @returns {Promise<Object>} Result with base64 encoded screenshot
  */
-async function takeScreenshot() {
+async function takeScreenshot(returnImage = false) {
   try {
     const platform = process.platform;
     const screenshotPath = path.join(__dirname, 'temp_screenshot.png');
@@ -146,12 +258,28 @@ async function takeScreenshot() {
       // Clean up temp file
       fs.unlinkSync(screenshotPath);
       
-        debugLog('tools', '✅ Screenshot captured successfully');
+      debugLog('tools', '✅ Screenshot captured successfully');
+      
+      // Store image temporarily for potential email use
+      const filename = `screenshot_${new Date().toISOString().replace(/:/g, '-')}.png`;
+      lastScreenshotData = { image: base64Image, filename, mimeType: 'image/png' };
+      
+      // If called internally (for email), return full data
+      if (returnImage) {
+        return { 
+          success: true, 
+          image: base64Image,
+          mimeType: 'image/png',
+          filename: filename
+        };
+      }
+      
+      // For Gemini response, return lightweight metadata only
       return { 
-        success: true, 
-        image: base64Image,
-        mimeType: 'image/png',
-        filename: `screenshot_${new Date().toISOString().replace(/:/g, '-')}.png`
+        success: true,
+        message: `Screenshot captured successfully: ${filename}`,
+        filename: filename,
+        size: `${Math.round(base64Image.length / 1024)}KB`
       };
     } else {
       return { success: false, error: 'Screenshot file not created' };
@@ -353,94 +481,132 @@ async function clearMemories(category = null) {
 }
 
 /**
- * Tool function declarations for Gemini API (filtered by ENABLED_TOOLS)
+ * Helper to add behavior to function declaration
  */
-const toolDeclarations = [
-  // Google Search - always expose
-  { googleSearch: {} },
-
-  // Conditionally expose custom tools based on ENABLED_TOOLS
-  {
-    functionDeclarations: [
-      ENABLED_TOOLS.send_email_to_shubharthak && {
-        name: 'send_email_to_shubharthak',
-        description: 'Send an email message to Shubharthak Sangharsha. Can include image attachments.',
-        parameters: {
-          type: 'object',
-          properties: {
-            message: { type: 'string' },
-            senderInfo: { type: 'string' },
-            imageBase64: { type: 'string' },
-            imageFilename: { type: 'string' }
-          },
-          required: ['message']
-        }
-      },
-
-      ENABLED_TOOLS.take_screenshot && {
-        name: 'take_screenshot',
-        description: 'Take a screenshot of the current screen.',
-        parameters: { type: 'object', properties: {} }
-      },
-
-      ENABLED_TOOLS.screenshot_and_email && {
-        name: 'screenshot_and_email',
-        description: 'Take a screenshot and immediately email it to Shubharthak.',
-        parameters: {
-          type: 'object',
-          properties: {
-            message: { type: 'string' },
-            senderInfo: { type: 'string' }
-          }
-        }
-      },
-
-      ENABLED_TOOLS.copy_to_clipboard && {
-        name: 'copy_to_clipboard',
-        description: 'Copy text to the system clipboard.',
-        parameters: {
-          type: 'object',
-          properties: { text: { type: 'string' } },
-          required: ['text']
-        }
-      },
-
-      ENABLED_TOOLS.get_clipboard_text && {
-        name: 'get_clipboard_text',
-        description: 'Get the current text from system clipboard.',
-        parameters: { type: 'object', properties: {} }
-      },
-
-      ENABLED_TOOLS.paste_from_clipboard && {
-        name: 'paste_from_clipboard',
-        description: 'Simulate keyboard paste (Ctrl+V/Cmd+V).',
-        parameters: { type: 'object', properties: {} }
-      },
-
-      ENABLED_TOOLS.store_memory && {
-        name: 'store_memory',
-        description: 'Store a memory/note for later retrieval.',
-        parameters: {
-          type: 'object',
-          properties: { content: { type: 'string' }, category: { type: 'string' } },
-          required: ['content']
-        }
-      },
-
-      ENABLED_TOOLS.retrieve_memories && {
-        name: 'retrieve_memories',
-        description: 'Retrieve stored memories/notes.',
-        parameters: { type: 'object', properties: { query: { type: 'string' } } }
-      },
-
-      ENABLED_TOOLS.clear_memories && {
-        name: 'clear_memories',
-        description: 'Clear memories (all or by category).',
-        parameters: { type: 'object', properties: { category: { type: 'string' } } }
-      }
-    ].filter(Boolean)
+function addBehavior(declaration, toolId) {
+  if (toolAsyncSettings[toolId]) {
+    declaration.behavior = 'NON_BLOCKING';
   }
-];
+  return declaration;
+}
+
+/**
+ * Generate tool function declarations for Gemini API (filtered by ENABLED_TOOLS)
+ * This must be called dynamically to reflect current enabled tools
+ */
+function getToolDeclarations() {
+  const declarations = [];
+  
+  // Google Search - add if enabled
+  if (ENABLED_TOOLS.googleSearch) {
+    declarations.push({ googleSearch: {} });
+  }
+
+  // Custom tools - build function declarations array
+  const functionDeclarations = [];
+
+  if (ENABLED_TOOLS.send_email_to_shubharthak) {
+    functionDeclarations.push(addBehavior({
+      name: 'send_email_to_shubharthak',
+      description: 'Send an email message to Shubharthak Sangharsha. Can include image attachments.',
+      parameters: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          senderInfo: { type: 'string' },
+          imageBase64: { type: 'string' },
+          imageFilename: { type: 'string' }
+        },
+        required: ['message']
+      }
+    }, 'send_email_to_shubharthak'));
+  }
+
+  if (ENABLED_TOOLS.take_screenshot) {
+    functionDeclarations.push(addBehavior({
+      name: 'take_screenshot',
+      description: 'Take a screenshot of the current screen.',
+      parameters: { type: 'object', properties: {} }
+    }, 'take_screenshot'));
+  }
+
+  if (ENABLED_TOOLS.screenshot_and_email) {
+    functionDeclarations.push(addBehavior({
+      name: 'screenshot_and_email',
+      description: 'Take a screenshot and immediately email it to Shubharthak.',
+      parameters: {
+        type: 'object',
+        properties: {
+          message: { type: 'string' },
+          senderInfo: { type: 'string' }
+        }
+      }
+    }, 'screenshot_and_email'));
+  }
+
+  if (ENABLED_TOOLS.copy_to_clipboard) {
+    functionDeclarations.push(addBehavior({
+      name: 'copy_to_clipboard',
+      description: 'Copy text to the system clipboard.',
+      parameters: {
+        type: 'object',
+        properties: { text: { type: 'string' } },
+        required: ['text']
+      }
+    }, 'copy_to_clipboard'));
+  }
+
+  if (ENABLED_TOOLS.get_clipboard_text) {
+    functionDeclarations.push(addBehavior({
+      name: 'get_clipboard_text',
+      description: 'Get the current text from system clipboard.',
+      parameters: { type: 'object', properties: {} }
+    }, 'get_clipboard_text'));
+  }
+
+  if (ENABLED_TOOLS.paste_from_clipboard) {
+    functionDeclarations.push(addBehavior({
+      name: 'paste_from_clipboard',
+      description: 'Simulate keyboard paste (Ctrl+V/Cmd+V).',
+      parameters: { type: 'object', properties: {} }
+    }, 'paste_from_clipboard'));
+  }
+
+  if (ENABLED_TOOLS.store_memory) {
+    functionDeclarations.push(addBehavior({
+      name: 'store_memory',
+      description: 'Store a memory/note for later retrieval.',
+      parameters: {
+        type: 'object',
+        properties: { content: { type: 'string' }, category: { type: 'string' } },
+        required: ['content']
+      }
+    }, 'store_memory'));
+  }
+
+  if (ENABLED_TOOLS.retrieve_memories) {
+    functionDeclarations.push(addBehavior({
+      name: 'retrieve_memories',
+      description: 'Retrieve stored memories/notes.',
+      parameters: { type: 'object', properties: { query: { type: 'string' } } }
+    }, 'retrieve_memories'));
+  }
+
+  if (ENABLED_TOOLS.clear_memories) {
+    functionDeclarations.push(addBehavior({
+      name: 'clear_memories',
+      description: 'Clear memories (all or by category).',
+      parameters: { type: 'object', properties: { category: { type: 'string' } } }
+    }, 'clear_memories'));
+  }
+
+  // Add custom function declarations if any exist
+  if (functionDeclarations.length > 0) {
+    declarations.push({ functionDeclarations });
+  }
+
+  return declarations;
+}
 
 /**
  * Execute a tool function
@@ -513,8 +679,8 @@ async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = 
   try {
   debugLog('tools', '📸 Taking screenshot for email...');
     
-    // Step 1: Take screenshot
-    const screenshotResult = await takeScreenshot();
+    // Step 1: Take screenshot (with returnImage=true for internal use)
+    const screenshotResult = await takeScreenshot(true);
     
     if (!screenshotResult.success) {
       return { success: false, error: `Screenshot failed: ${screenshotResult.error}` };
@@ -548,7 +714,7 @@ async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = 
 }
 
 module.exports = {
-  toolDeclarations,
+  getToolDeclarations,
   executeTool,
   sendEmailToShubharthak,
   takeScreenshot,
@@ -558,5 +724,11 @@ module.exports = {
   pasteFromClipboard,
   storeMemory,
   retrieveMemories,
-  clearMemories
+  clearMemories,
+  getEnabledTools,
+  getAllTools,
+  setEnabledTools,
+  setToolOrder,
+  setToolAsyncSettings,
+  TOOL_METADATA
 };

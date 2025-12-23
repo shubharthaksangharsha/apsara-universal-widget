@@ -24,12 +24,31 @@ const ApsaraWidget = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [selectedResolution, setSelectedResolution] = useState('3072x1920'); // Default screen resolution
-  const [selectedCameraResolution, setSelectedCameraResolution] = useState('1280x720'); // Default camera resolution
+  const [selectedResolution, setSelectedResolution] = useState(() => {
+    return localStorage.getItem('apsara-screen-resolution') || '3072x1920';
+  }); // Default screen resolution
+  const [selectedCameraResolution, setSelectedCameraResolution] = useState(() => {
+    return localStorage.getItem('apsara-camera-resolution') || '1280x720';
+  }); // Default camera resolution
   const [showResolutionMenu, setShowResolutionMenu] = useState(false); // Screen resolution dropdown
   const [showCameraResolutionMenu, setShowCameraResolutionMenu] = useState(false); // Camera resolution dropdown
-  const [currentTheme, setCurrentTheme] = useState('light'); // Theme state
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem('apsara-theme');
+      console.log('🔍 React initialization - localStorage available:', typeof localStorage !== 'undefined');
+      console.log('🔍 React initialization - Theme from localStorage:', saved);
+      console.log('🔍 React initialization - All localStorage keys:', Object.keys(localStorage));
+      const theme = saved || 'light';
+      console.log('🎨 React - Initializing theme state:', theme);
+      return theme;
+    } catch (e) {
+      console.error('❌ React - Failed to read theme from localStorage:', e);
+      return 'light';
+    }
+  }); // Theme state
   const [showThemeSelector, setShowThemeSelector] = useState(false); // Theme selector visibility
+  const [availableTools, setAvailableTools] = useState([]); // Available tools from backend
+  const [showToolsSelector, setShowToolsSelector] = useState(false); // Tools selector visibility
 
   // Refs
   const wsRef = useRef(null);
@@ -95,35 +114,82 @@ const ApsaraWidget = () => {
     debugLog(`🎨 Theme changed to: ${themeName}`);
   };
 
-  // Initialize visualizer
+  // Initialize visualizer (extra small for minimal look)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = 45;
-      canvas.height = 45;
+      canvas.width = 42;
+      canvas.height = 42;
     }
   }, []);
 
-  // Load saved theme from localStorage on mount
+  // Remove preload theme class from body on mount (added in index.html to prevent white flash)
   useEffect(() => {
-    const savedTheme = localStorage.getItem('apsara-theme');
-    if (savedTheme) {
-      setCurrentTheme(savedTheme);
-    }
-  }, []);
+    document.body.className = '';
+    debugLog('🎨 Theme state initialized:', currentTheme);
+    debugLog('📺 Screen resolution initialized:', selectedResolution);
+    debugLog('📹 Camera resolution initialized:', selectedCameraResolution);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount to log initial values
 
   // Save theme to localStorage when changed
   useEffect(() => {
-    localStorage.setItem('apsara-theme', currentTheme);
+    try {
+      localStorage.setItem('apsara-theme', currentTheme);
+      const verification = localStorage.getItem('apsara-theme');
+      console.log('💾 Saved theme:', currentTheme);
+      console.log('✅ Verified saved theme:', verification);
+      console.log('🔍 All localStorage after save:', Object.keys(localStorage));
+    } catch (e) {
+      console.error('❌ Failed to save theme:', e);
+    }
   }, [currentTheme]);
+
+  // Save screen resolution to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('apsara-screen-resolution', selectedResolution);
+    debugLog('💾 Saved screen resolution:', selectedResolution);
+  }, [selectedResolution]);
+
+  // Save camera resolution to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('apsara-camera-resolution', selectedCameraResolution);
+    debugLog('💾 Saved camera resolution:', selectedCameraResolution);
+  }, [selectedCameraResolution]);
+
+  // Fetch available tools from backend on mount
+  useEffect(() => {
+    const fetchTools = async () => {
+      try {
+        const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools`);
+        const data = await response.json();
+        if (data.success) {
+          setAvailableTools(data.tools);
+          debugLog('🔧 Loaded available tools:', data.tools);
+        } else {
+          // Backend responded but with error
+          setAvailableTools([]);
+          console.error('❌ Backend returned error:', data.error);
+        }
+      } catch (error) {
+        // Backend is not running or not reachable
+        console.error('❌ Error fetching tools:', error);
+        setAvailableTools([]); // Set empty array to show error message in UI
+      }
+    };
+    
+    fetchTools();
+  }, []);
 
   // Close resolution menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (showResolutionMenu && resolutionSelectorRef.current && !resolutionSelectorRef.current.contains(e.target)) {
-        // Check if click is on the menu itself
+      if (showResolutionMenu) {
         const menu = document.querySelector('.resolution-menu');
-        if (!menu || !menu.contains(e.target)) {
+        const button = resolutionSelectorRef.current;
+        
+        // Close if clicking outside both menu and button
+        if ((!menu || !menu.contains(e.target)) && (!button || !button.contains(e.target))) {
           setShowResolutionMenu(false);
         }
       }
@@ -138,10 +204,12 @@ const ApsaraWidget = () => {
   // Close camera resolution menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (showCameraResolutionMenu && cameraResolutionSelectorRef.current && !cameraResolutionSelectorRef.current.contains(e.target)) {
-        // Check if click is on the menu itself
+      if (showCameraResolutionMenu) {
         const menu = document.querySelector('.camera-resolution-menu');
-        if (!menu || !menu.contains(e.target)) {
+        const button = cameraResolutionSelectorRef.current;
+        
+        // Close if clicking outside both menu and button
+        if ((!menu || !menu.contains(e.target)) && (!button || !button.contains(e.target))) {
           setShowCameraResolutionMenu(false);
         }
       }
@@ -157,13 +225,12 @@ const ApsaraWidget = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showThemeSelector) {
-        // Check if click is on the theme selector panel
         const panel = document.querySelector('.theme-selector-panel');
-        if (!panel || !panel.contains(e.target)) {
-          const settingsButton = document.querySelector('.settings-button');
-          if (!settingsButton || !settingsButton.contains(e.target)) {
-            setShowThemeSelector(false);
-          }
+        const button = document.querySelector('.settings-button');
+        
+        // Close if clicking outside both panel and button
+        if ((!panel || !panel.contains(e.target)) && (!button || !button.contains(e.target))) {
+          setShowThemeSelector(false);
         }
       }
     };
@@ -174,6 +241,26 @@ const ApsaraWidget = () => {
     }
   }, [showThemeSelector]);
 
+  // Close tools selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showToolsSelector) {
+        const panel = document.querySelector('.tools-selector-panel');
+        const button = document.querySelector('.tools-button');
+        
+        // Close if clicking outside both panel and button
+        if ((!panel || !panel.contains(e.target)) && (!button || !button.contains(e.target))) {
+          setShowToolsSelector(false);
+        }
+      }
+    };
+
+    if (showToolsSelector) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showToolsSelector]);
+
   // Resize Electron window when dropdown opens/closes
   useEffect(() => {
     const isElectron = typeof window !== 'undefined' && window.process && window.process.type === 'renderer';
@@ -183,7 +270,7 @@ const ApsaraWidget = () => {
         const { ipcRenderer } = window.require('electron');
         
         // Check if ANY dropdown is open
-        const anyDropdownOpen = showResolutionMenu || showCameraResolutionMenu || showThemeSelector;
+        const anyDropdownOpen = showResolutionMenu || showCameraResolutionMenu || showThemeSelector || showToolsSelector;
         
         if (anyDropdownOpen) {
           // Opening: resize immediately, but keep window at bottom
@@ -200,7 +287,7 @@ const ApsaraWidget = () => {
         debugLog('Error resizing window:', err);
       }
     }
-  }, [showResolutionMenu, showCameraResolutionMenu, showThemeSelector]);
+  }, [showResolutionMenu, showCameraResolutionMenu, showThemeSelector, showToolsSelector]);
 
   // Connect to backend
   const connectToBackend = async () => {
@@ -235,8 +322,11 @@ const ApsaraWidget = () => {
           setIsPlaying(false); // Reset playing state
           isPlayingRef.current = false; // Reset playing ref
           isListeningRef.current = false; // Reset listening ref
-          setStatusText('Talk to Apsara');
+          setIsMicMuted(false); // Reset mute state
+          isMutedRef.current = false; // Reset mute ref
+          setStatusText('Talk to Apsara'); // Reset status immediately
           stopMicrophone();
+          stopAudioPlayback(); // Stop any audio playback
           
           // Clear the visualizer canvas
           const canvas = canvasRef.current;
@@ -568,7 +658,7 @@ const ApsaraWidget = () => {
       if (!isListeningRef.current) {
         const ctx = canvasRef.current?.getContext('2d');
         if (ctx) {
-          ctx.clearRect(0, 0, 45, 45);
+          ctx.clearRect(0, 0, 42, 42);
         }
         return;
       }
@@ -580,7 +670,7 @@ const ApsaraWidget = () => {
       if (!ctx) return;
 
       // Clear canvas
-      ctx.clearRect(0, 0, 45, 45);
+      ctx.clearRect(0, 0, 42, 42);
 
       // Choose which analyser to use based on who's speaking
       const isSpeaking = isPlayingRef.current; // Use ref to get real-time value
@@ -604,9 +694,9 @@ const ApsaraWidget = () => {
         debugLog(`🎵 Visualizer: ${isSpeaking ? 'Apsara' : 'User'} - Max amplitude: ${maxVal}, BufferLength: ${bufferLength}`);
       }
 
-      const centerX = 45 / 2;
-      const centerY = 45 / 2;
-      const radius = 20;
+      const centerX = 42 / 2;
+      const centerY = 42 / 2;
+      const radius = 15;
       const bars = 20;
 
       // Different colors and height multiplier based on who's speaking
@@ -1153,6 +1243,105 @@ const ApsaraWidget = () => {
     }
   };
 
+  // Handle tool toggle
+  const handleToolToggle = async (toolId) => {
+    // Prevent changing tools when connected
+    if (isConnected) {
+      setStatusText('Stop session first!');
+      setTimeout(() => {
+        setStatusText('Talk to Apsara');
+      }, 2000);
+      debugLog('🚫 Cannot change tools while connected');
+      return;
+    }
+
+    try {
+      // Update local state optimistically
+      const updatedTools = availableTools.map(tool => 
+        tool.id === toolId ? { ...tool, enabled: !tool.enabled } : tool
+      );
+      setAvailableTools(updatedTools);
+
+      // Prepare tools config for backend
+      const toolsConfig = {};
+      updatedTools.forEach(tool => {
+        toolsConfig[tool.id] = tool.enabled;
+      });
+
+      // Send update to backend
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ tools: toolsConfig })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        debugLog('✅ Tools configuration updated:', data.tools);
+      } else {
+        console.error('❌ Failed to update tools:', data.error);
+        // Revert on error - refetch tools
+        const fetchResponse = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools`);
+        const fetchData = await fetchResponse.json();
+        if (fetchData.success) {
+          setAvailableTools(fetchData.tools);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error toggling tool:', error);
+    }
+  };
+
+  // Handle async toggle
+  const handleAsyncToggle = async (toolId, e) => {
+    e.stopPropagation(); // Prevent tool toggle
+    
+    if (isConnected) {
+      setStatusText('Stop session first!');
+      setTimeout(() => {
+        setStatusText('Talk to Apsara');
+      }, 2000);
+      debugLog('🚫 Cannot change async settings while connected');
+      return;
+    }
+
+    try {
+      // Update local state optimistically
+      const updatedTools = availableTools.map(tool => 
+        tool.id === toolId ? { ...tool, async: !tool.async } : tool
+      );
+      setAvailableTools(updatedTools);
+
+      // Prepare async settings for backend
+      const asyncSettings = {};
+      updatedTools.forEach(tool => {
+        asyncSettings[tool.id] = tool.async;
+      });
+
+      // Send update to backend
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ asyncSettings })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        debugLog('✅ Async settings updated');
+      } else {
+        console.error('❌ Failed to update async settings:', data.error);
+      }
+    } catch (error) {
+      console.error('❌ Error toggling async:', error);
+    }
+  };
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -1167,7 +1356,8 @@ const ApsaraWidget = () => {
         playbackContextRef.current.close();
       }
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps intentional - cleanup only on unmount
 
   return (
     <div className={`apsara-widget theme-${currentTheme}`}>
@@ -1354,6 +1544,17 @@ const ApsaraWidget = () => {
           )}
         </div>
 
+        {/* Tools selector button */}
+        <button
+          className="tools-button"
+          onClick={(e) => { e.stopPropagation(); setShowToolsSelector(!showToolsSelector); }}
+          title="Configure tools"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+          </svg>
+        </button>
+
         {/* Settings/Theme button */}
         <button
           className="settings-button"
@@ -1387,6 +1588,66 @@ const ApsaraWidget = () => {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
+        {/* Tools selector panel - Opens upward */}
+        {showToolsSelector && ReactDOM.createPortal(
+          <div className={`apsara-widget theme-${currentTheme}`}>
+            <div 
+              className="tools-selector-panel"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="panel-title">
+                Configure Tools {isConnected && <span className="warning-text">(Stop session first)</span>}
+              </div>
+              {availableTools.length === 0 ? (
+                <div className="tools-error">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <div className="error-text">Backend not running</div>
+                  <div className="error-hint">Start the backend server to configure tools</div>
+                </div>
+              ) : (
+                <>
+                  <div className="tools-list">
+                    {availableTools.map((tool) => (
+                      <div
+                        key={tool.id}
+                        className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
+                        onClick={() => handleToolToggle(tool.id)}
+                      >
+                        <div className="tool-checkbox">
+                          {tool.enabled ? '✓' : ''}
+                        </div>
+                        <div className="tool-info">
+                          <div className="tool-name">
+                            {tool.name}
+                            <span 
+                              className={`async-badge ${tool.async ? 'async' : 'sync'} ${isConnected ? 'locked' : ''}`}
+                              onClick={(e) => handleAsyncToggle(tool.id, e)}
+                              title={tool.async ? 'Non-blocking (click to make blocking)' : 'Blocking (click to make non-blocking)'}
+                            >
+                              {tool.async ? 'ASYNC' : 'SYNC'}
+                            </span>
+                          </div>
+                          <div className="tool-description">{tool.description}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {!isConnected && (
+                    <div className="tools-hint">
+                      Select tools before starting a session
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>,
           document.body

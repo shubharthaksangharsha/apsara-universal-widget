@@ -11,7 +11,7 @@ const path = require('path');
 require('dotenv').config();
 
 // Import tools module
-const { toolDeclarations, executeTool } = require('./tools');
+const { getToolDeclarations, executeTool, getEnabledTools, getAllTools, setEnabledTools, setToolOrder, setToolAsyncSettings, TOOL_METADATA } = require('./tools');
 
 // Debug logging toggle
 const DEBUG_LOG = true; // Set to false to disable debug logging
@@ -100,58 +100,99 @@ app.use(cors({
 
 app.use(express.json());
 
-// System prompt with all your data
-const SYSTEM_PROMPT = `You are Apsara, an advanced AI voice assistant created by Shubharthak Sangharasha. You are friendly, helpful, and conversational. When greeting users or introducing yourself, be warm and professional.
+/**
+ * Generate dynamic system prompt based on enabled tools
+ */
+function generateSystemPrompt() {
+  const enabledTools = getEnabledTools();
+  
+  // Build capabilities list based on enabled tools
+  const capabilities = [
+    'Real-time voice conversations with natural interruption handling',
+    'Viewing camera and screen share - you can see what users show you',
+    'Answering questions about Shubharthak\'s work, projects, and experience',
+    'Providing information about his skills, education, and background',
+    'Discussing his freelance work and client projects',
+    'Explaining his technical expertise in detail'
+  ];
+  
+  // Add tool-specific capabilities
+  if (enabledTools.googleSearch) {
+    capabilities.push('Searching Google for real-time information (current events, news, weather, sports, latest tech updates, etc.)');
+  }
+  if (enabledTools.send_email_to_shubharthak) {
+    capabilities.push('Sending messages to Shubharthak via email (with image attachments)');
+  }
+  if (enabledTools.take_screenshot) {
+    capabilities.push('Taking screenshots of the current screen');
+  }
+  if (enabledTools.screenshot_and_email) {
+    capabilities.push('Capturing and emailing screenshots to Shubharthak');
+  }
+  if (enabledTools.copy_to_clipboard) {
+    capabilities.push('Copying text to the system clipboard');
+  }
+  if (enabledTools.get_clipboard_text) {
+    capabilities.push('Reading text from the system clipboard');
+  }
+  if (enabledTools.paste_from_clipboard) {
+    capabilities.push('Pasting clipboard content into active applications');
+  }
+  if (enabledTools.store_memory || enabledTools.retrieve_memories) {
+    capabilities.push('Storing and retrieving memories/notes for later use');
+  }
+  
+  // Build tool usage section
+  const toolUsageLines = [];
+  if (enabledTools.send_email_to_shubharthak) {
+    toolUsageLines.push('- send_email_to_shubharthak: Send messages to Shubharthak, can include image attachments');
+  }
+  if (enabledTools.take_screenshot) {
+    toolUsageLines.push('- take_screenshot: Capture the current screen (returns {success, image, filename})');
+  }
+  if (enabledTools.screenshot_and_email) {
+    toolUsageLines.push('- screenshot_and_email: **COMBINED** operation - takes screenshot AND emails it in one step');
+  }
+  if (enabledTools.copy_to_clipboard) {
+    toolUsageLines.push('- copy_to_clipboard: Copy text for easy pasting');
+  }
+  if (enabledTools.get_clipboard_text) {
+    toolUsageLines.push('- get_clipboard_text: Read what\'s currently in clipboard');
+  }
+  if (enabledTools.paste_from_clipboard) {
+    toolUsageLines.push('- paste_from_clipboard: Simulate keyboard paste (Ctrl+V/Cmd+V) to insert clipboard content');
+  }
+  if (enabledTools.store_memory) {
+    toolUsageLines.push('- store_memory: Save important information, notes, or user preferences');
+  }
+  if (enabledTools.retrieve_memories) {
+    toolUsageLines.push('- retrieve_memories: Search and recall stored memories/notes');
+  }
+  if (enabledTools.clear_memories) {
+    toolUsageLines.push('- clear_memories: Delete memories (use with caution)');
+  }
+  if (enabledTools.googleSearch) {
+    toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
+  }
+  
+  const toolUsageSection = toolUsageLines.length > 0 
+    ? `\n**Available Tools:**\n${toolUsageLines.join('\n')}` 
+    : '';
+  
+  return `You are Apsara, an advanced AI voice assistant created by Shubharthak Sangharasha. You are friendly, helpful, and conversational. When greeting users or introducing yourself, be warm and professional.
 
 **Your Capabilities:**
-- Real-time voice conversations with natural interruption handling
-- Viewing camera and screen share - you can see what users show you
-- Sending messages and screenshots to Shubharthak via email (with image attachments)
-- Taking screenshots of the current screen
-- Copying text to the system clipboard
-- Reading text from the system clipboard
-- Pasting clipboard content into active applications
-- Storing and retrieving memories/notes for later use
-- Searching Google for real-time information (current events, news, weather, sports, latest tech updates, etc.)
-- Answering questions about Shubharthak's work, projects, and experience
-- Providing information about his skills, education, and background
-- Discussing his freelance work and client projects
-- Explaining his technical expertise in detail
+${capabilities.map(c => `- ${c}`).join('\n')}
 
 **How to interact with users:**
 - Be conversational and friendly
 - Respond only in English until user dont want to speak in other language
 - Answer questions naturally about Shubharthak's experience and projects
-- If someone wants to contact Shubharthak, offer to send a message via email
 - When users show you something via camera or screen share, you can see and analyze it
-- If users ask you to copy text, use copy_to_clipboard function
-- If users want to take a screenshot, use take_screenshot function
-- You can email screenshots to Shubharthak by combining take_screenshot and send_email_to_shubharthak
 - Provide detailed but concise information
-- Show enthusiasm about the projects and work
-- For questions about current events, news, weather, sports scores, latest tech updates, or anything requiring real-time information, Google Search will automatically provide accurate, up-to-date answers
-- Always cite sources when sharing information from Google Search
+- Show enthusiasm about the projects and work${enabledTools.send_email_to_shubharthak ? '\n- If someone wants to contact Shubharthak, offer to send a message via email' : ''}${enabledTools.googleSearch ? '\n- For questions about current events, news, weather, sports scores, latest tech updates, or anything requiring real-time information, Google Search will automatically provide accurate, up-to-date answers\n- Always cite sources when sharing information from Google Search' : ''}${toolUsageSection}
 
-**Important Tool Usage:**
-- send_email_to_shubharthak: Send messages to Shubharthak, can include image attachments
-- take_screenshot: Capture the current screen (returns {success, image, filename})
-- screenshot_and_email: **COMBINED** operation - takes screenshot AND emails it in one step
-- copy_to_clipboard: Copy text for easy pasting
-- get_clipboard_text: Read what's currently in clipboard
-- paste_from_clipboard: Simulate keyboard paste (Ctrl+V/Cmd+V) to insert clipboard content
-- store_memory: Save important information, notes, or user preferences
-- retrieve_memories: Search and recall stored memories/notes
-- clear_memories: Delete memories (use with caution)
-- Google Search: Automatic real-time information retrieval
-
-**Example workflows:**
-- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)
-- "Take a screenshot" → Use take_screenshot (just capture, don't email)
-- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard
-- "Remember this for later" → Use store_memory with the content
-- "What did I ask you to remember?" → Use retrieve_memories
-- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don't just read it back)
-- "Paste what I copied earlier" → Use paste_from_clipboard
+**Example workflows:**${enabledTools.screenshot_and_email ? '\n- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)' : ''}${enabledTools.take_screenshot ? '\n- "Take a screenshot" → Use take_screenshot (just capture, don\'t email)' : ''}${enabledTools.copy_to_clipboard && enabledTools.paste_from_clipboard ? '\n- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard' : ''}${enabledTools.store_memory ? '\n- "Remember this for later" → Use store_memory with the content' : ''}${enabledTools.retrieve_memories ? '\n- "What did I ask you to remember?" → Use retrieve_memories' : ''}${enabledTools.get_clipboard_text ? '\n- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don\'t just read it back)' : ''}${enabledTools.paste_from_clipboard ? '\n- "Paste what I copied earlier" → Use paste_from_clipboard' : ''}
 
 **About Shubharthak Sangharasha:**
 
@@ -308,6 +349,10 @@ Software Engineer and AI/ML Specialist with expertise in Full-Stack Development,
 - W13 Projects (w13projects.com) - Premium construction website
 - Auz Finance (auzfinance.com) - Finance broker platform
 - BAAZ Electrical Group (baazelectrical.github.io) - Electrical services site`;
+}
+
+// Generate initial system prompt
+let SYSTEM_PROMPT = generateSystemPrompt();
 
 // WebSocket server
 const wss = new WebSocket.Server({ noServer: true });
@@ -346,12 +391,15 @@ wss.on('connection', (clientWs) => {
             ? [Modality.AUDIO] 
             : [Modality.TEXT];
 
+        // Get current tool declarations (dynamically generated based on enabled tools)
+        const currentToolDeclarations = getToolDeclarations();
+        
         // Build config differently for AUDIO vs TEXT to avoid audio-related fields in TEXT mode
         const config = modality === 'AUDIO' ? {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: toolDeclarations,  // Use imported tool declarations
+            tools: currentToolDeclarations,  // Use dynamically generated tool declarations
             speechConfig: {
                 voiceConfig: {
                     prebuiltVoiceConfig: {
@@ -364,15 +412,21 @@ wss.on('connection', (clientWs) => {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: toolDeclarations  // Use imported tool declarations
+            tools: currentToolDeclarations  // Use dynamically generated tool declarations
         };
 
         debugLog('🔧 Session config:', { 
             modality, 
             responseModalities: responseModalities.map(m => m === Modality.AUDIO ? 'AUDIO' : 'TEXT'),
             hasSpeechConfig: !!config.speechConfig,
-            configKeys: Object.keys(config)
+            configKeys: Object.keys(config),
+            toolsCount: currentToolDeclarations.length
         });
+        
+        // Log enabled tools for debugging
+        debugLog('🔧 Enabled tools:', currentToolDeclarations.map(t => 
+            t.googleSearch ? 'googleSearch' : (t.functionDeclarations?.map(f => f.name).join(', ') || 'none')
+        ).join(', '));
 
         const session = await ai.live.connect({
             model: model,
@@ -616,6 +670,59 @@ server.on('upgrade', (request, socket, head) => {
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'Apsara Live Backend' });
+});
+
+// Get all available tools with their status
+app.get('/api/tools', (req, res) => {
+    try {
+        const tools = getAllTools();
+        res.json({ success: true, tools });
+    } catch (error) {
+        console.error('❌ Error getting tools:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update enabled tools configuration
+app.post('/api/tools/update', (req, res) => {
+    try {
+        const { tools, order, asyncSettings } = req.body;
+        
+        let updatedTools;
+        
+        // Update enabled/disabled state
+        if (tools && typeof tools === 'object') {
+            setEnabledTools(tools);
+        }
+        
+        // Update tool order
+        if (order && Array.isArray(order)) {
+            setToolOrder(order);
+        }
+        
+        // Update async settings
+        if (asyncSettings && typeof asyncSettings === 'object') {
+            setToolAsyncSettings(asyncSettings);
+        }
+        
+        // Get updated tools list
+        updatedTools = getAllTools();
+        
+        // Regenerate system prompt with new configuration
+        SYSTEM_PROMPT = generateSystemPrompt();
+        
+        debugLog('✅ Tools configuration updated');
+        debugLog('🔄 System prompt regenerated');
+        
+        res.json({ 
+            success: true, 
+            tools: updatedTools,
+            message: 'Tools configuration updated successfully. Restart your session to apply changes.' 
+        });
+    } catch (error) {
+        console.error('❌ Error updating tools:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 // Test email endpoint (for debugging)

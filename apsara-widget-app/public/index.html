@@ -24,7 +24,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>React App</title>
+    <title>Apsara AI - Universal Assistant</title>
     <style>
       html, body, #root {
         background: transparent !important;
@@ -32,7 +32,34 @@
         padding: 0;
         overflow: hidden;
       }
+      
+      /* Preload theme colors to prevent white flash */
+      body.theme-preload-light { background: transparent; }
+      body.theme-preload-dark { background: #1a1a1a; }
+      body.theme-preload-nightly { background: #0a1929; }
+      body.theme-preload-dracula { background: #282a36; }
+      body.theme-preload-monokai { background: #272822; }
+      body.theme-preload-nord { background: #2e3440; }
+      body.theme-preload-solarized-light { background: #fdf6e3; }
+      body.theme-preload-solarized-dark { background: #002b36; }
     </style>
+    <script>
+      // Preload theme before React renders to prevent white flash
+      (function() {
+        try {
+          console.log('🔍 localStorage available:', typeof localStorage !== 'undefined');
+          console.log('🔍 Current localStorage keys:', Object.keys(localStorage));
+          const savedTheme = localStorage.getItem('apsara-theme');
+          console.log('🔍 Retrieved theme from localStorage:', savedTheme);
+          const themeToUse = savedTheme || 'light';
+          document.body.className = 'theme-preload-' + themeToUse;
+          console.log('🎨 Preloaded theme:', themeToUse);
+        } catch (e) {
+          console.error('❌ Failed to load theme:', e);
+          document.body.className = 'theme-preload-light';
+        }
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

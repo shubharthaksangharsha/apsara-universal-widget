@@ -853,3 +853,323 @@
 .apsara-widget.theme-solarized-dark .settings-button:hover {
     background: #268bd2;
 }
+
+/* ============================================
+   TOOLS SELECTOR PANEL STYLING (All Themes)
+   ============================================ */
+
+/* Light theme tools selector panel (default) */
+.apsara-widget.theme-light .tools-selector-panel {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+}
+
+.apsara-widget.theme-light .tools-selector-panel .panel-title {
+    color: #333;
+}
+
+.apsara-widget.theme-light .tool-item {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #e0e0e0;
+}
+
+.apsara-widget.theme-light .tool-item:not(.locked):hover {
+    background: #e8e8e8;
+}
+
+.apsara-widget.theme-light .tool-name {
+    color: #333;
+}
+
+.apsara-widget.theme-light .tool-description {
+    color: #666;
+}
+
+/* Dark theme tools selector panel */
+.apsara-widget.theme-dark .tools-selector-panel {
+    background: #1a1a1a;
+    border: 1px solid #444;
+}
+
+.apsara-widget.theme-dark .tools-selector-panel .panel-title {
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark .tool-item {
+    background: #2d2d2d;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+.apsara-widget.theme-dark .tool-item:not(.locked):hover {
+    background: #3a3a3a;
+}
+
+.apsara-widget.theme-dark .tool-name {
+    color: #e0e0e0;
+}
+
+.apsara-widget.theme-dark .tool-description {
+    color: #999;
+}
+
+/* Nightly theme tools selector panel */
+.apsara-widget.theme-nightly .tools-selector-panel {
+    background: #0a1929;
+    border: 1px solid #1a2332;
+}
+
+.apsara-widget.theme-nightly .tools-selector-panel .panel-title {
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly .tool-item {
+    background: #1a2332;
+    color: #90caf9;
+    border-color: #1a2332;
+}
+
+.apsara-widget.theme-nightly .tool-item:not(.locked):hover {
+    background: #253645;
+}
+
+.apsara-widget.theme-nightly .tool-name {
+    color: #90caf9;
+}
+
+.apsara-widget.theme-nightly .tool-description {
+    color: #5d8aa8;
+}
+
+/* Dracula theme tools selector panel */
+.apsara-widget.theme-dracula .tools-selector-panel {
+    background: #282a36;
+    border: 1px solid #44475a;
+}
+
+.apsara-widget.theme-dracula .tools-selector-panel .panel-title {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-dracula .tool-item {
+    background: #44475a;
+    color: #f8f8f2;
+    border-color: #44475a;
+}
+
+.apsara-widget.theme-dracula .tool-item:not(.locked):hover {
+    background: #565869;
+}
+
+.apsara-widget.theme-dracula .tool-name {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-dracula .tool-description {
+    color: #a0a0a0;
+}
+
+/* Monokai theme tools selector panel */
+.apsara-widget.theme-monokai .tools-selector-panel {
+    background: #272822;
+    border: 1px solid #3e3d32;
+}
+
+.apsara-widget.theme-monokai .tools-selector-panel .panel-title {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-monokai .tool-item {
+    background: #3e3d32;
+    color: #f8f8f2;
+    border-color: #3e3d32;
+}
+
+.apsara-widget.theme-monokai .tool-item:not(.locked):hover {
+    background: #4e4d42;
+}
+
+.apsara-widget.theme-monokai .tool-name {
+    color: #f8f8f2;
+}
+
+.apsara-widget.theme-monokai .tool-description {
+    color: #a59f85;
+}
+
+/* Nord theme tools selector panel */
+.apsara-widget.theme-nord .tools-selector-panel {
+    background: #2e3440;
+    border: 1px solid #3b4252;
+}
+
+.apsara-widget.theme-nord .tools-selector-panel .panel-title {
+    color: #eceff4;
+}
+
+.apsara-widget.theme-nord .tool-item {
+    background: #3b4252;
+    color: #eceff4;
+    border-color: #3b4252;
+}
+
+.apsara-widget.theme-nord .tool-item:not(.locked):hover {
+    background: #4c566a;
+}
+
+.apsara-widget.theme-nord .tool-name {
+    color: #eceff4;
+}
+
+.apsara-widget.theme-nord .tool-description {
+    color: #8fbcbb;
+}
+
+/* Solarized Light theme tools selector panel */
+.apsara-widget.theme-solarized-light .tools-selector-panel {
+    background: #fdf6e3;
+    border: 1px solid #eee8d5;
+}
+
+.apsara-widget.theme-solarized-light .tools-selector-panel .panel-title {
+    color: #657b83;
+}
+
+.apsara-widget.theme-solarized-light .tool-item {
+    background: #eee8d5;
+    color: #657b83;
+    border-color: #eee8d5;
+}
+
+.apsara-widget.theme-solarized-light .tool-item:not(.locked):hover {
+    background: #e4dec8;
+}
+
+.apsara-widget.theme-solarized-light .tool-name {
+    color: #657b83;
+}
+
+.apsara-widget.theme-solarized-light .tool-description {
+    color: #839496;
+}
+
+/* Solarized Dark theme tools selector panel */
+.apsara-widget.theme-solarized-dark .tools-selector-panel {
+    background: #002b36;
+    border: 1px solid #073642;
+}
+
+.apsara-widget.theme-solarized-dark .tools-selector-panel .panel-title {
+    color: #839496;
+}
+
+.apsara-widget.theme-solarized-dark .tool-item {
+    background: #073642;
+    color: #839496;
+    border-color: #073642;
+}
+
+.apsara-widget.theme-solarized-dark .tool-item:not(.locked):hover {
+    background: #0f4656;
+}
+
+.apsara-widget.theme-solarized-dark .tool-name {
+    color: #839496;
+}
+
+.apsara-widget.theme-solarized-dark .tool-description {
+    color: #586e75;
+}
+
+/* Theme-specific tools button colors */
+.apsara-widget.theme-dark .tools-button {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #3498db;
+}
+
+.apsara-widget.theme-dark .tools-button svg {
+    stroke: #5dade2;
+}
+
+.apsara-widget.theme-dark .tools-button:hover {
+    background: #3498db;
+}
+
+.apsara-widget.theme-nightly .tools-button {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #64b5f6;
+}
+
+.apsara-widget.theme-nightly .tools-button svg {
+    stroke: #64b5f6;
+}
+
+.apsara-widget.theme-nightly .tools-button:hover {
+    background: #64b5f6;
+}
+
+.apsara-widget.theme-dracula .tools-button {
+    background: rgba(189, 147, 249, 0.1);
+    border-color: #50fa7b;
+}
+
+.apsara-widget.theme-dracula .tools-button svg {
+    stroke: #50fa7b;
+}
+
+.apsara-widget.theme-dracula .tools-button:hover {
+    background: #50fa7b;
+}
+
+.apsara-widget.theme-monokai .tools-button {
+    background: rgba(249, 38, 114, 0.1);
+    border-color: #66d9ef;
+}
+
+.apsara-widget.theme-monokai .tools-button svg {
+    stroke: #66d9ef;
+}
+
+.apsara-widget.theme-monokai .tools-button:hover {
+    background: #66d9ef;
+}
+
+.apsara-widget.theme-nord .tools-button {
+    background: rgba(136, 192, 208, 0.1);
+    border-color: #88c0d0;
+}
+
+.apsara-widget.theme-nord .tools-button svg {
+    stroke: #88c0d0;
+}
+
+.apsara-widget.theme-nord .tools-button:hover {
+    background: #88c0d0;
+}
+
+.apsara-widget.theme-solarized-light .tools-button {
+    background: rgba(101, 123, 131, 0.05);
+    border-color: #268bd2;
+}
+
+.apsara-widget.theme-solarized-light .tools-button svg {
+    stroke: #268bd2;
+}
+
+.apsara-widget.theme-solarized-light .tools-button:hover {
+    background: #268bd2;
+}
+
+.apsara-widget.theme-solarized-dark .tools-button {
+    background: rgba(131, 148, 150, 0.1);
+    border-color: #2aa198;
+}
+
+.apsara-widget.theme-solarized-dark .tools-button svg {
+    stroke: #2aa198;
+}
+
+.apsara-widget.theme-solarized-dark .tools-button:hover {
+    background: #2aa198;
+}
