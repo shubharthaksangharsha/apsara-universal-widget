@@ -378,6 +378,12 @@ const ApsaraWidget = () => {
         handleGeminiMessage(message.data);
         break;
 
+      case 'generated_image':
+        // Display generated image in viewer
+        debugLog('🎨 Received generated image from backend');
+        setGeneratedImage(message.data);
+        break;
+
       case 'error':
         console.error('Backend error:', message.error);
         setStatusText('Error: ' + message.error);
@@ -1382,6 +1388,38 @@ const ApsaraWidget = () => {
     }
   };
 
+  // Handle image model change
+  const handleImageModelChange = async (newModel) => {
+    try {
+      debugLog(`🎨 Changing image generation model to: ${newModel}`);
+      
+      // Update local state
+      const updatedTools = availableTools.map(tool => 
+        tool.id === 'generate_image' ? { ...tool, model: newModel } : tool
+      );
+      setAvailableTools(updatedTools);
+
+      // Send update to backend
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/tools/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ imageModel: newModel })
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        debugLog('✅ Image model updated:', newModel);
+      } else {
+        console.error('❌ Failed to update image model:', data.error);
+      }
+    } catch (error) {
+      console.error('❌ Error changing image model:', error);
+    }
+  };
+
   // Handle Select All
   const handleSelectAll = async () => {
     if (isConnected) {
@@ -1514,6 +1552,83 @@ const ApsaraWidget = () => {
     } catch (error) {
       console.error('❌ Error clearing all tools:', error);
     }
+  };
+
+  // Handle image viewer actions
+  const handleEmailImage = async (imageData) => {
+    try {
+      debugLog('📧 Emailing generated image...');
+      const response = await fetch(`${BACKEND_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://')}/api/email-image`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          base64Image: imageData.base64Image,
+          filename: imageData.filename,
+          mimeType: imageData.mimeType
+        })
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to send email');
+      }
+      
+      debugLog('✅ Image emailed successfully');
+    } catch (error) {
+      console.error('❌ Error emailing image:', error);
+      throw error;
+    }
+  };
+
+  const handleSaveImage = async (imageData) => {
+    try {
+      debugLog('💾 Saving generated image...');
+      // Create download link
+      const link = document.createElement('a');
+      link.href = `data:${imageData.mimeType};base64,${imageData.base64Image}`;
+      link.download = imageData.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      debugLog('✅ Image saved successfully');
+    } catch (error) {
+      console.error('❌ Error saving image:', error);
+      throw error;
+    }
+  };
+
+  const handleCopyImage = async (imageData) => {
+    try {
+      debugLog('📋 Copying generated image to clipboard...');
+      
+      // Convert base64 to blob
+      const byteString = atob(imageData.base64Image);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: imageData.mimeType });
+      
+      // Copy to clipboard using Clipboard API
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [imageData.mimeType]: blob
+        })
+      ]);
+      
+      debugLog('✅ Image copied to clipboard');
+    } catch (error) {
+      console.error('❌ Error copying image:', error);
+      throw error;
+    }
+  };
+
+  const handleCloseImageViewer = () => {
+    setGeneratedImage(null);
   };
 
   // Cleanup on unmount
@@ -1813,27 +1928,45 @@ const ApsaraWidget = () => {
                 <>
                   <div className="tools-list">
                     {availableTools.map((tool) => (
-                      <div
-                        key={`${tool.id}-${tool.enabled}-${tool.async}`}
-                        className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
-                        onClick={() => handleToolToggle(tool.id)}
-                      >
-                        <div className="tool-checkbox">
-                          {tool.enabled ? '✓' : ''}
-                        </div>
-                        <div className="tool-info">
-                          <div className="tool-name">
-                            {tool.name}
-                            <span 
-                              className={`async-badge ${tool.async ? 'async' : 'sync'} ${isConnected ? 'locked' : ''}`}
-                              onClick={(e) => handleAsyncToggle(tool.id, e)}
-                              title={tool.async ? 'Non-blocking (click to make blocking)' : 'Blocking (click to make non-blocking)'}
-                            >
-                              {tool.async ? 'ASYNC' : 'SYNC'}
-                            </span>
+                      <div key={`${tool.id}-${tool.enabled}-${tool.async}-${tool.model || ''}`}>
+                        <div
+                          className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
+                          onClick={() => handleToolToggle(tool.id)}
+                        >
+                          <div className="tool-checkbox">
+                            {tool.enabled ? '✓' : ''}
                           </div>
-                          <div className="tool-description">{tool.description}</div>
+                          <div className="tool-info">
+                            <div className="tool-name">
+                              {tool.name}
+                              <span 
+                                className={`async-badge ${tool.async ? 'async' : 'sync'} ${isConnected ? 'locked' : ''}`}
+                                onClick={(e) => handleAsyncToggle(tool.id, e)}
+                                title={tool.async ? 'Non-blocking (click to make blocking)' : 'Blocking (click to make non-blocking)'}
+                              >
+                                {tool.async ? 'ASYNC' : 'SYNC'}
+                              </span>
+                            </div>
+                            <div className="tool-description">{tool.description}</div>
+                          </div>
                         </div>
+                        {tool.id === 'generate_image' && tool.enabled && (
+                          <div className="tool-config" onClick={(e) => e.stopPropagation()}>
+                            <label className="model-selector-label">
+                              <span className="model-icon">🎨</span>
+                              Model:
+                              <select 
+                                className="model-selector"
+                                value={tool.model || 'flash'}
+                                onChange={(e) => handleImageModelChange(e.target.value)}
+                                disabled={isConnected}
+                              >
+                                <option value="flash">2.5 Flash (Fast)</option>
+                                <option value="pro">3.0 Pro (Best Quality, 4K)</option>
+                              </select>
+                            </label>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1857,6 +1990,17 @@ const ApsaraWidget = () => {
           {isConnected ? 'End' : 'Start'}
         </button>
       </div>
+
+      {/* Generated Image Viewer */}
+      {generatedImage && (
+        <GeneratedImageViewer
+          imageData={generatedImage}
+          onClose={handleCloseImageViewer}
+          onEmailImage={handleEmailImage}
+          onSaveImage={handleSaveImage}
+          onCopyImage={handleCopyImage}
+        />
+      )}
     </div>
   );
 };

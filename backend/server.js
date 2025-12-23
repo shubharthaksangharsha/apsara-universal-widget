@@ -11,7 +11,7 @@ const path = require('path');
 require('dotenv').config();
 
 // Import tools module
-const { getToolDeclarations, executeTool, getEnabledTools, getAllTools, setEnabledTools, setToolOrder, setToolAsyncSettings, TOOL_METADATA } = require('./tools');
+const { getToolDeclarations, executeTool, getEnabledTools, getAllTools, setEnabledTools, setToolOrder, setToolAsyncSettings, getImageGenerationModel, setImageGenerationModel, TOOL_METADATA } = require('./tools');
 
 // Debug logging toggle
 const DEBUG_LOG = true; // Set to false to disable debug logging
@@ -520,6 +520,24 @@ wss.on('connection', (clientWs) => {
                                     response: result
                                 }]
                             });
+                            
+                            // If image generation, broadcast to frontend for display
+                            if (fc.name === 'generate_image' && result.success && result.base64Image) {
+                                debugLog('🎨 Broadcasting generated image to frontend...');
+                                ws.send(JSON.stringify({
+                                    type: 'generated_image',
+                                    data: {
+                                        base64Image: result.base64Image,
+                                        filename: result.filename,
+                                        filepath: result.filepath,
+                                        model: result.model,
+                                        aspectRatio: result.aspectRatio,
+                                        imageSize: result.imageSize,
+                                        fileSize: result.fileSize,
+                                        mimeType: result.mimeType
+                                    }
+                                }));
+                            }
                         }
                     }
                     
@@ -731,7 +749,7 @@ app.get('/api/tools', (req, res) => {
 // Update enabled tools configuration
 app.post('/api/tools/update', (req, res) => {
     try {
-        const { tools, order, asyncSettings } = req.body;
+        const { tools, order, asyncSettings, imageModel } = req.body;
         
         let updatedTools;
         
@@ -748,6 +766,12 @@ app.post('/api/tools/update', (req, res) => {
         // Update async settings
         if (asyncSettings && typeof asyncSettings === 'object') {
             setToolAsyncSettings(asyncSettings);
+        }
+        
+        // Update image generation model
+        if (imageModel && typeof imageModel === 'string') {
+            setImageGenerationModel(imageModel);
+            debugLog('🎨 Image generation model updated to:', imageModel);
         }
         
         // Get updated tools list
@@ -776,5 +800,33 @@ app.post('/test-email', async (req, res) => {
     const { sendEmailToShubharthak } = require('./tools');
     const result = await sendEmailToShubharthak(message || 'Test message from Apsara Live');
     res.json(result);
+});
+
+// Email generated image endpoint
+app.post('/api/email-image', async (req, res) => {
+    try {
+        const { base64Image, filename, mimeType } = req.body;
+        
+        if (!base64Image || !filename) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Missing required fields: base64Image, filename' 
+            });
+        }
+        
+        const { sendEmailToShubharthak } = require('./tools');
+        const result = await sendEmailToShubharthak(
+            '🎨 Apsara Generated Image\n\nHere is the AI-generated image you requested.',
+            'Apsara AI Assistant',
+            base64Image,
+            filename,
+            mimeType || 'image/png'
+        );
+        
+        res.json(result);
+    } catch (error) {
+        console.error('❌ Error emailing image:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 

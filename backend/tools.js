@@ -103,6 +103,9 @@ Object.keys(TOOL_METADATA).forEach(key => {
   toolAsyncSettings[key] = TOOL_METADATA[key].async;
 });
 
+// Image generation model preference (flash or pro)
+let imageGenerationModel = 'flash'; // default to fast model
+
 /**
  * Get current enabled tools configuration
  * @returns {Object} Current ENABLED_TOOLS configuration
@@ -121,14 +124,23 @@ function getAllTools() {
   const unorderedKeys = Object.keys(ENABLED_TOOLS).filter(key => !toolOrder.includes(key));
   const allKeys = [...orderedKeys, ...unorderedKeys];
   
-  return allKeys.map((key, index) => ({
-    id: key,
-    name: TOOL_METADATA[key]?.name || key,
-    description: TOOL_METADATA[key]?.description || '',
-    enabled: ENABLED_TOOLS[key],
-    async: toolAsyncSettings[key] !== undefined ? toolAsyncSettings[key] : false,
-    order: index
-  }));
+  return allKeys.map((key, index) => {
+    const tool = {
+      id: key,
+      name: TOOL_METADATA[key]?.name || key,
+      description: TOOL_METADATA[key]?.description || '',
+      enabled: ENABLED_TOOLS[key],
+      async: toolAsyncSettings[key] !== undefined ? toolAsyncSettings[key] : false,
+      order: index
+    };
+    
+    // Add model info for generate_image tool
+    if (key === 'generate_image') {
+      tool.model = imageGenerationModel;
+    }
+    
+    return tool;
+  });
 }
 
 /**
@@ -167,6 +179,30 @@ function setToolAsyncSettings(asyncSettings) {
   debugLog('tools', '🔧 Updated tool async settings:', toolAsyncSettings);
   
   return getAllTools();
+}
+
+/**
+ * Get current image generation model
+ * @returns {string} Current model ('flash' or 'pro')
+ */
+function getImageGenerationModel() {
+  return imageGenerationModel;
+}
+
+/**
+ * Set image generation model
+ * @param {string} model - Model to use ('flash' or 'pro')
+ * @returns {string} Updated model
+ */
+function setImageGenerationModel(model) {
+  if (model !== 'flash' && model !== 'pro') {
+    throw new Error('Invalid model. Must be "flash" or "pro"');
+  }
+  
+  imageGenerationModel = model;
+  debugLog('tools', `🎨 Image generation model set to: ${model}`);
+  
+  return imageGenerationModel;
 }
 
 /**
@@ -1109,10 +1145,15 @@ async function clickElement(url, selector) {
  * @param {string} imageSize - Image resolution: '1K', '2K', or '4K' (pro only, flash uses default)
  * @returns {Promise<Object>} Result with base64 image data
  */
-async function generateImage(prompt, model = 'flash', aspectRatio = '1:1', imageSize = '1K') {
+async function generateImage(prompt, model, aspectRatio = '1:1', imageSize = '1K') {
   try {
     if (!prompt || prompt.trim() === '') {
       return { success: false, error: 'Prompt is required for image generation' };
+    }
+    
+    // Use configured model if not specified
+    if (!model) {
+      model = imageGenerationModel;
     }
     
     // Validate model
@@ -1121,13 +1162,15 @@ async function generateImage(prompt, model = 'flash', aspectRatio = '1:1', image
       'pro': 'gemini-3-pro-image-preview'
     };
     
-    const selectedModel = modelMap[model] || 'gemini-2.5-flash-image';
+    const selectedModel = modelMap[model] || modelMap[imageGenerationModel];
     
-    // Initialize Google GenAI
-    const apiKey = process.env.GEMINI_API_KEY;
+    // Initialize Google GenAI with IMAGE_API_KEY (falls back to GEMINI_API_KEY)
+    const apiKey = process.env.IMAGE_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return { success: false, error: 'GEMINI_API_KEY not found in environment' };
+      return { success: false, error: 'IMAGE_API_KEY or GEMINI_API_KEY not found in environment' };
     }
+    
+    debugLog('tools', `🔑 Using ${process.env.IMAGE_API_KEY ? 'IMAGE_API_KEY' : 'GEMINI_API_KEY (fallback)'} for image generation`);
     
     const ai = new GoogleGenAI({ apiKey });
     
@@ -1710,5 +1753,7 @@ module.exports = {
   setEnabledTools,
   setToolOrder,
   setToolAsyncSettings,
+  getImageGenerationModel,
+  setImageGenerationModel,
   TOOL_METADATA
 };
