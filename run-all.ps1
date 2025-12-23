@@ -65,7 +65,7 @@ if ($psVersion -ge 5) {
 # Check if .NET Framework is available (for System.Windows.Forms)
 try {
     Add-Type -AssemblyName System.Windows.Forms -ErrorAction Stop
-    Write-Host "✅ .NET Framework available (screenshot & paste automation supported)"
+    Write-Host "✅ .NET Framework available (screenshot and paste automation supported)"
 } catch {
     Write-Host "⚠️  WARNING: .NET Framework System.Windows.Forms not available" -ForegroundColor Yellow
     Write-Host "Screenshot and paste automation may not work properly." -ForegroundColor Yellow
@@ -79,7 +79,7 @@ try {
     exit 2
 }
 
-# --- Backend: install & run ---
+# --- Backend: install and run ---
 if (Test-Path (Join-Path $BackDir 'package.json')) {
     Write-Host "Detected Node backend (package.json). Installing..."
     Push-Location $BackDir
@@ -116,7 +116,7 @@ if (Test-Path (Join-Path $BackDir 'package.json')) {
     Write-Host "No package.json or requirements.txt found in $BackDir. Skipping backend install/start." -ForegroundColor Yellow
 }
 
-# --- Widget (frontend / electron) install & run ---
+# --- Widget (frontend / electron) install and run ---
 if (Test-Path (Join-Path $WidgetDir 'package.json')) {
     Write-Host "Installing widget (frontend) modules..."
     Push-Location $WidgetDir
