@@ -1170,7 +1170,12 @@ async function generateImage(prompt, model, aspectRatio = '1:1', imageSize = '1K
       return { success: false, error: 'IMAGE_API_KEY or GEMINI_API_KEY not found in environment' };
     }
     
-    debugLog('tools', `🔑 Using ${process.env.IMAGE_API_KEY ? 'IMAGE_API_KEY' : 'GEMINI_API_KEY (fallback)'} for image generation`);
+    // Always log which API key is being used (not just debug mode)
+    const keySource = process.env.IMAGE_API_KEY ? 'IMAGE_API_KEY' : 'GEMINI_API_KEY (fallback)';
+    const keyPreview = apiKey ? `${apiKey.substring(0, 8)}...` : 'none';
+    console.log(`🔑 Image Generation API Key Source: ${keySource}`);
+    console.log(`🔑 API Key Preview: ${keyPreview}`);
+    debugLog('tools', `🎨 Generating image with model: ${selectedModel}`);
     
     const ai = new GoogleGenAI({ apiKey });
     

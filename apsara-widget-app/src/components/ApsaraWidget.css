@@ -822,57 +822,37 @@ body.screen-sharing-active::before {
     opacity: 0.7;
 }
 
-.tool-config {
-    margin-top: 8px;
-    padding: 10px 10px 10px 38px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 6px;
-    border-left: 3px solid #9b59b6;
-}
-
-.model-selector-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #555;
-    cursor: pointer;
-}
-
-.model-icon {
-    font-size: 14px;
-}
-
-.model-selector {
-    flex: 1;
-    padding: 6px 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 500;
-    background: white;
+.model-badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
-    outline: none;
+    letter-spacing: 0.5px;
+    margin-left: 6px;
 }
 
-.model-selector:hover:not(:disabled) {
-    border-color: #9b59b6;
+.model-badge.flash {
+    background: rgba(52, 152, 219, 0.2);
+    color: #2980b9;
+    border: 1px solid #2980b9;
 }
 
-.model-selector:focus {
-    border-color: #9b59b6;
-    box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.1);
+.model-badge.pro {
+    background: rgba(155, 89, 182, 0.2);
+    color: #8e44ad;
+    border: 1px solid #8e44ad;
 }
 
-.model-selector:disabled {
-    opacity: 0.5;
+.model-badge:hover:not(.locked) {
+    transform: scale(1.05);
+    opacity: 0.8;
+}
+
+.model-badge.locked {
     cursor: not-allowed;
-}
-
-.model-selector option {
-    padding: 8px;
+    opacity: 0.5;
 }
 
 .tools-hint {

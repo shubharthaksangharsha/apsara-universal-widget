@@ -1388,10 +1388,21 @@ const ApsaraWidget = () => {
     }
   };
 
-  // Handle image model change
-  const handleImageModelChange = async (newModel) => {
+  // Handle image model toggle
+  const handleImageModelToggle = async (e) => {
+    e.stopPropagation();
+    
+    if (isConnected) {
+      return; // Don't allow changes during session
+    }
+    
     try {
-      debugLog(`🎨 Changing image generation model to: ${newModel}`);
+      // Get current model
+      const currentTool = availableTools.find(t => t.id === 'generate_image');
+      const currentModel = currentTool?.model || 'flash';
+      const newModel = currentModel === 'flash' ? 'pro' : 'flash';
+      
+      debugLog(`🎨 Toggling image generation model: ${currentModel} → ${newModel}`);
       
       // Update local state
       const updatedTools = availableTools.map(tool => 
@@ -1411,12 +1422,12 @@ const ApsaraWidget = () => {
       const data = await response.json();
       
       if (data.success) {
-        debugLog('✅ Image model updated:', newModel);
+        debugLog('✅ Image model toggled:', newModel);
       } else {
-        console.error('❌ Failed to update image model:', data.error);
+        console.error('❌ Failed to toggle image model:', data.error);
       }
     } catch (error) {
-      console.error('❌ Error changing image model:', error);
+      console.error('❌ Error toggling image model:', error);
     }
   };
 
@@ -1928,45 +1939,36 @@ const ApsaraWidget = () => {
                 <>
                   <div className="tools-list">
                     {availableTools.map((tool) => (
-                      <div key={`${tool.id}-${tool.enabled}-${tool.async}-${tool.model || ''}`}>
-                        <div
-                          className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
-                          onClick={() => handleToolToggle(tool.id)}
-                        >
-                          <div className="tool-checkbox">
-                            {tool.enabled ? '✓' : ''}
-                          </div>
-                          <div className="tool-info">
-                            <div className="tool-name">
-                              {tool.name}
-                              <span 
-                                className={`async-badge ${tool.async ? 'async' : 'sync'} ${isConnected ? 'locked' : ''}`}
-                                onClick={(e) => handleAsyncToggle(tool.id, e)}
-                                title={tool.async ? 'Non-blocking (click to make blocking)' : 'Blocking (click to make non-blocking)'}
-                              >
-                                {tool.async ? 'ASYNC' : 'SYNC'}
-                              </span>
-                            </div>
-                            <div className="tool-description">{tool.description}</div>
-                          </div>
+                      <div
+                        key={`${tool.id}-${tool.enabled}-${tool.async}-${tool.model || ''}`}
+                        className={`tool-item ${tool.enabled ? 'enabled' : 'disabled'} ${isConnected ? 'locked' : ''}`}
+                        onClick={() => handleToolToggle(tool.id)}
+                      >
+                        <div className="tool-checkbox">
+                          {tool.enabled ? '✓' : ''}
                         </div>
-                        {tool.id === 'generate_image' && tool.enabled && (
-                          <div className="tool-config" onClick={(e) => e.stopPropagation()}>
-                            <label className="model-selector-label">
-                              <span className="model-icon">🎨</span>
-                              Model:
-                              <select 
-                                className="model-selector"
-                                value={tool.model || 'flash'}
-                                onChange={(e) => handleImageModelChange(e.target.value)}
-                                disabled={isConnected}
+                        <div className="tool-info">
+                          <div className="tool-name">
+                            {tool.name}
+                            <span 
+                              className={`async-badge ${tool.async ? 'async' : 'sync'} ${isConnected ? 'locked' : ''}`}
+                              onClick={(e) => handleAsyncToggle(tool.id, e)}
+                              title={tool.async ? 'Non-blocking (click to make blocking)' : 'Blocking (click to make non-blocking)'}
+                            >
+                              {tool.async ? 'ASYNC' : 'SYNC'}
+                            </span>
+                            {tool.id === 'generate_image' && tool.enabled && (
+                              <span 
+                                className={`model-badge ${tool.model === 'pro' ? 'pro' : 'flash'} ${isConnected ? 'locked' : ''}`}
+                                onClick={handleImageModelToggle}
+                                title={tool.model === 'pro' ? '3.0 Pro (click for 2.5 Flash)' : '2.5 Flash (click for 3.0 Pro)'}
                               >
-                                <option value="flash">2.5 Flash (Fast)</option>
-                                <option value="pro">3.0 Pro (Best Quality, 4K)</option>
-                              </select>
-                            </label>
+                                {tool.model === 'pro' ? '3.0 PRO' : '2.5 FLASH'}
+                              </span>
+                            )}
                           </div>
-                        )}
+                          <div className="tool-description">{tool.description}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
