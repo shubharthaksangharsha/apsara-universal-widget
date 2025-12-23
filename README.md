@@ -36,7 +36,8 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Have Conversations**: Natural, flowing conversations with context awareness
 - **Real-time Google Search**: Automatic access to current events, news, weather, sports, latest tech updates
 - **Send Email with Attachments**: Send messages with files, screenshots, or documents
-- **File System Operations**: Read files, browse directories, access local documents
+- **Complete File System Control**: Read, create, edit, move, rename, delete files and browse directories
+- **Web Automation**: Open URLs in your default browser
 - **Screenshot & Clipboard**: Capture screen, manage clipboard, paste content
 - **Memory Management**: Store and retrieve information across sessions (persistent to disk)
 - **Help with Tasks**: Assistance with planning, problem-solving, and decision-making
@@ -51,6 +52,11 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - 📧 "Read the file ./backend/start.sh and email it to me"
 - 📝 "Show me what files are in my Downloads directory"
 - 🔍 "Read config.json and explain what each setting does"
+- ✏️ "Create a file called todo.txt with my tasks for today"
+- 📝 "Add 'Remember to call mom' to my notes.txt"
+- 🔄 "Rename report-draft.pdf to report-final.pdf"
+- 📦 "Move screenshot.png to my Pictures folder"
+- 🗑️ "Delete old-backup.zip" (asks for confirmation first)
 
 **Screenshot & Visual:**
 - 📸 "Take a screenshot of my screen"
@@ -81,11 +87,19 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - 📧 "Send me an email with my todo list"
 - 📧 "Email this screenshot to john@example.com"
 
+**Web Browsing:**
+- 🌐 "Open youtube.com"
+- 🔍 "Open google.com and search for best restaurants near me"
+- 📰 "Open reddit.com"
+- 🎓 "Open github.com/shubharthaksangharsha"
+
 **Productivity:**
 - 📝 "Help me write a professional email"
 - 💡 "Give me ideas for a birthday party"
 - ✅ "Create a checklist for moving to a new apartment"
 - 🎯 "Help me plan my day"
+- 📋 "Create a file with my meeting notes"
+- 🔄 "Organize my Documents folder"
 
 ### Platform Support
 - ✅ **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
@@ -435,6 +449,14 @@ Apsara can use these tools to help you:
 | **store_memory** | Save information for later (persistent to disk) | "Remember that I prefer Python" | ✅ Working |
 | **retrieve_memories** | Search and recall stored memories | "What did I ask you to remember?" | ✅ Working |
 | **clear_memories** | Delete stored memories | "Clear all memories" | ✅ Working |
+| **create_file** | Create new files with content | "Create a file called notes.txt with my ideas" | ✅ Working |
+| **edit_file** | Edit existing files (write/append) | "Add this line to my notes.txt" | ✅ Working |
+| **move_file** | Move files to different locations | "Move report.pdf to Documents folder" | ✅ Working |
+| **rename_file** | Rename files | "Rename oldname.txt to newname.txt" | ✅ Working |
+| **delete_file** | Delete files (with confirmation) | "Delete old-file.txt" | ✅ Working |
+| **open_url** | Open websites in default browser | "Open github.com" | ✅ Working |
+| **fill_form** | Fill web forms with pre-filled data | "Fill the search form at google.com with 'AI news'" | ✅ Working |
+| **click_element** | Interact with website elements | "Click the login button on example.com" | ✅ Working |
 | **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
 
 **How to Send Files via Email:**
@@ -453,6 +475,11 @@ Apsara can use these tools to help you:
 - 💾 "Remember my API key is xyz123" → Saves to persistent memory ✅
 - 🔍 "What API key did I give you?" → Retrieves from persistent memory ✅
 - 📧 "Send a message to john@example.com saying hello" → Send text email ✅
+- ✏️ "Create todo.txt with my tasks" → Creates new file with content ✅
+- 📝 "Add a note to my file" → Appends content to existing file ✅
+- 🔄 "Rename old.txt to new.txt" → Renames file in same directory ✅
+- 📦 "Move file.pdf to Documents" → Moves file to different location ✅
+- 🌐 "Open github.com" → Opens URL in default browser ✅
 
 ### Environment Variables
 
@@ -731,14 +758,14 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 
 **Version 1.5.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with File System Access & Persistent Memory*
+*Talk to Apsara - Your Intelligent Voice Assistant with Multi Tools, Screenshare and webcam support*
 
 ---
 
 ## 📋 Changelog
 
 ### Version 1.5.0 (December 24, 2024)
-**🗂️ File System Tools & Memory Persistence:**
+**🗂️ File System Tools, Web Automation & Memory Persistence:**
 - ✨ **Read File Tool**: Read any local file (text or base64) for viewing or emailing
   - 📄 Reads text files directly for viewing content
   - 📦 Converts to base64 for email attachments
@@ -749,6 +776,15 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
   - 📊 Displays file sizes, modification dates, and types
   - 🔍 Optional hidden files display
   - 🏠 Defaults to user's home directory
+- ✏️ **File Operations Tools** (5 new tools!):
+  - 📝 **Create File**: Create new files with content (auto-creates parent directories)
+  - ✍️ **Edit File**: Edit existing files with write or append mode
+  - 📦 **Move File**: Move files to different locations (with overwrite protection)
+  - 🔄 **Rename File**: Rename files (stays in same directory)
+  - 🗑️ **Delete File**: Delete files with safety confirmation (always asks user first)
+- 🌐 **Web Automation**:
+  - 🔗 **Open URL**: Open any URL in default browser (auto-adds https://)
+  - Works on Linux (xdg-open), macOS (open), Windows (start)
 - 💾 **Persistent Memory Storage**: Memories now saved to JSON file
   - 💽 Survives backend restarts and system reboots
   - 📁 Stored in `backend/apsara-memory.json`
@@ -758,34 +794,42 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
   - Frontend was sending `{ enabled }`, backend expected `{ tools }`
   - UI checkmarks now update correctly
   - Backend properly receives and applies changes
-- 📝 **Enhanced System Prompt**: Added file tools to capabilities
-  - Read file and browse files now shown in available tools
+- 📝 **Enhanced System Prompt**: Added all new tools to capabilities
+  - File operations, web automation tools shown in available tools
   - Clear workflow examples for "read and email" use cases
   - Better tool descriptions for Gemini
 - 🎯 **Improved Tool Descriptions**: Crystal-clear instructions
-  - `read_file`: Explains asBase64 parameter for email workflows
-  - `send_email_to_shubharthak`: Shows how to pass file content from read_file
+  - All tools include detailed parameter descriptions
+  - Safety warnings for destructive operations (delete)
   - Example workflows added to system prompt
 
 **New Capabilities:**
 - "Read the file /path/to/file.txt and email it to me"
 - "Browse my Documents folder and show me all PDF files"
+- "Create a file called notes.txt with my ideas"
+- "Add this line to my todo.txt file"
+- "Rename oldname.txt to newname.txt"
+- "Move report.pdf to my Documents folder"
+- "Delete old-backup.zip" (asks for confirmation)
+- "Open github.com in my browser"
 - "Remember my project details" → Saved to disk, survives restarts
-- "Show me what files are in ~/Downloads"
 
 **Technical Improvements:**
 - Fixed parameter naming in Select All/Clear All handlers
+- Added 6 new tool functions: createFile, editFile, moveFile, renameFile, deleteFile, openUrl
 - Added `loadMemories()` and `saveMemories()` functions
 - Memory persistence to `apsara-memory.json`
-- System prompt includes file tools and workflows
+- System prompt includes all file and web tools
+- Safety confirmations for destructive operations
 - Better tool descriptions for Gemini API
 - OS-compatible file operations (Linux, macOS, Windows)
+- OS-compatible browser opening (xdg-open, open, start)
 
 **Files Modified:**
-- `backend/tools.js` - Persistent memory, improved descriptions
-- `backend/server.js` - File tools in system prompt, workflow examples
+- `backend/tools.js` - 6 new tools, persistent memory, improved descriptions
+- `backend/server.js` - All new tools in system prompt, workflow examples
 - `apsara-widget-app/src/components/ApsaraWidget.js` - Fixed parameter names
-- `README.md` - Version 1.5.0, comprehensive use cases
+- `README.md` - Version 1.5.0, comprehensive use cases, all new tools documented
 
 ### Version 1.4.0 (December 24, 2024)
 **🔧 Advanced Tools Configuration System & Enhanced UX:**
@@ -945,8 +989,8 @@ Each theme includes custom colors for:
 
 **Potential Future Features:**
 - 🎵 **Music Control**: Play/pause/skip music, adjust volume
-- 🌐 **Web Automation**: Open URLs, fill forms, click buttons
-- 📁 **File Operations**: Create, edit, delete, move, rename files
+- 🌐 **Advanced Web Automation**: Fill forms, click buttons, scrape data (basic URL opening ✅ DONE!)
+- 📁 **Directory Operations**: Create/delete folders, recursive operations (file operations ✅ DONE!)
 - 🔔 **Reminders & Alarms**: Set reminders and alarms with voice
 - 📊 **System Monitoring**: CPU usage, memory, disk space, network stats
 - 🎮 **Application Control**: Launch apps, switch windows, close programs

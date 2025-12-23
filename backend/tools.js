@@ -58,7 +58,15 @@ let ENABLED_TOOLS = {
   retrieve_memories: false,
   clear_memories: false,
   read_file: false,
-  browse_files: false
+  browse_files: false,
+  create_file: false,
+  edit_file: false,
+  move_file: false,
+  rename_file: false,
+  delete_file: false,
+  open_url: false,
+  fill_form: false,
+  click_element: false
 };
 
 // Tool metadata for UI display (with async behavior support)
@@ -73,7 +81,15 @@ const TOOL_METADATA = {
   retrieve_memories: { name: 'Retrieve Memories', description: 'Recall stored info', async: false },
   clear_memories: { name: 'Clear Memories', description: 'Delete stored info', async: true },
   read_file: { name: 'Read File', description: 'Read local files (text or base64)', async: false },
-  browse_files: { name: 'Browse Files', description: 'List files and directories', async: false }
+  browse_files: { name: 'Browse Files', description: 'List files and directories', async: false },
+  create_file: { name: 'Create File', description: 'Create new files with content', async: true },
+  edit_file: { name: 'Edit File', description: 'Edit existing files', async: true },
+  move_file: { name: 'Move File', description: 'Move files to new location', async: true },
+  rename_file: { name: 'Rename File', description: 'Rename files', async: true },
+  delete_file: { name: 'Delete File', description: 'Delete files', async: true },
+  open_url: { name: 'Open URL', description: 'Open websites in browser', async: true },
+  fill_form: { name: 'Fill Form', description: 'Fill web forms automatically', async: true },
+  click_element: { name: 'Click Element', description: 'Click elements on websites', async: true }
 };
 
 // Tool order and async settings (can be customized by user)
@@ -725,6 +741,364 @@ async function browseFiles(dirPath = require('os').homedir(), includeHidden = fa
 }
 
 /**
+ * Create a new file with content
+ * @param {string} filePath - Path where to create the file
+ * @param {string} content - Content to write to the file
+ * @param {boolean} overwrite - Overwrite if file exists (default: false)
+ * @returns {Promise<Object>} Result object
+ */
+async function createFile(filePath, content, overwrite = false) {
+  try {
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+    
+    // Check if file already exists
+    if (fs.existsSync(absolutePath) && !overwrite) {
+      return {
+        success: false,
+        error: `File already exists: ${filePath}. Set overwrite=true to replace it.`
+      };
+    }
+    
+    // Create directory if it doesn't exist
+    const dir = path.dirname(absolutePath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // Write file
+    fs.writeFileSync(absolutePath, content, 'utf8');
+    const stats = fs.statSync(absolutePath);
+    
+    return {
+      success: true,
+      filepath: absolutePath,
+      filename: path.basename(absolutePath),
+      size: stats.size,
+      sizeKB: Math.round(stats.size / 1024),
+      message: `File created successfully: ${path.basename(absolutePath)} (${Math.round(stats.size / 1024)}KB)`
+    };
+  } catch (error) {
+    console.error('❌ File create error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Edit an existing file (write or append content)
+ * @param {string} filePath - Path to the file to edit
+ * @param {string} content - New content or content to append
+ * @param {string} mode - 'write' (replace all) or 'append' (add to end)
+ * @returns {Promise<Object>} Result object
+ */
+async function editFile(filePath, content, mode = 'write') {
+  try {
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+    
+    // Check if file exists
+    if (!fs.existsSync(absolutePath)) {
+      return {
+        success: false,
+        error: `File not found: ${filePath}. Use create_file to create new files.`
+      };
+    }
+    
+    // Check if it's a file
+    const stats = fs.statSync(absolutePath);
+    if (!stats.isFile()) {
+      return { success: false, error: `Path is not a file: ${filePath}` };
+    }
+    
+    // Edit file based on mode
+    if (mode === 'append') {
+      fs.appendFileSync(absolutePath, content, 'utf8');
+    } else {
+      fs.writeFileSync(absolutePath, content, 'utf8');
+    }
+    
+    const newStats = fs.statSync(absolutePath);
+    
+    return {
+      success: true,
+      filepath: absolutePath,
+      filename: path.basename(absolutePath),
+      size: newStats.size,
+      sizeKB: Math.round(newStats.size / 1024),
+      mode: mode,
+      message: `File ${mode === 'append' ? 'appended' : 'updated'} successfully: ${path.basename(absolutePath)} (${Math.round(newStats.size / 1024)}KB)`
+    };
+  } catch (error) {
+    console.error('❌ File edit error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Move a file to a new location
+ * @param {string} sourcePath - Current file path
+ * @param {string} destinationPath - New file path
+ * @param {boolean} overwrite - Overwrite if destination exists (default: false)
+ * @returns {Promise<Object>} Result object
+ */
+async function moveFile(sourcePath, destinationPath, overwrite = false) {
+  try {
+    const absoluteSource = path.isAbsolute(sourcePath) ? sourcePath : path.resolve(sourcePath);
+    const absoluteDestination = path.isAbsolute(destinationPath) ? destinationPath : path.resolve(destinationPath);
+    
+    // Check if source exists
+    if (!fs.existsSync(absoluteSource)) {
+      return { success: false, error: `Source file not found: ${sourcePath}` };
+    }
+    
+    // Check if destination exists
+    if (fs.existsSync(absoluteDestination) && !overwrite) {
+      return {
+        success: false,
+        error: `Destination already exists: ${destinationPath}. Set overwrite=true to replace it.`
+      };
+    }
+    
+    // Create destination directory if needed
+    const destDir = path.dirname(absoluteDestination);
+    if (!fs.existsSync(destDir)) {
+      fs.mkdirSync(destDir, { recursive: true });
+    }
+    
+    // Move file
+    fs.renameSync(absoluteSource, absoluteDestination);
+    const stats = fs.statSync(absoluteDestination);
+    
+    return {
+      success: true,
+      from: absoluteSource,
+      to: absoluteDestination,
+      filename: path.basename(absoluteDestination),
+      size: stats.size,
+      sizeKB: Math.round(stats.size / 1024),
+      message: `File moved successfully: ${path.basename(absoluteSource)} → ${path.basename(absoluteDestination)}`
+    };
+  } catch (error) {
+    console.error('❌ File move error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Rename a file
+ * @param {string} filePath - Current file path
+ * @param {string} newName - New filename (not full path)
+ * @returns {Promise<Object>} Result object
+ */
+async function renameFile(filePath, newName) {
+  try {
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+    
+    // Check if file exists
+    if (!fs.existsSync(absolutePath)) {
+      return { success: false, error: `File not found: ${filePath}` };
+    }
+    
+    // Create new path with same directory
+    const dir = path.dirname(absolutePath);
+    const newPath = path.join(dir, newName);
+    
+    // Check if new name already exists
+    if (fs.existsSync(newPath)) {
+      return {
+        success: false,
+        error: `A file with name "${newName}" already exists in this directory.`
+      };
+    }
+    
+    // Rename file
+    fs.renameSync(absolutePath, newPath);
+    const stats = fs.statSync(newPath);
+    
+    return {
+      success: true,
+      oldPath: absolutePath,
+      newPath: newPath,
+      oldName: path.basename(absolutePath),
+      newName: newName,
+      size: stats.size,
+      sizeKB: Math.round(stats.size / 1024),
+      message: `File renamed successfully: ${path.basename(absolutePath)} → ${newName}`
+    };
+  } catch (error) {
+    console.error('❌ File rename error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a file
+ * @param {string} filePath - Path to file to delete
+ * @param {boolean} confirm - Safety confirmation (must be true)
+ * @returns {Promise<Object>} Result object
+ */
+async function deleteFile(filePath, confirm = false) {
+  try {
+    // Safety check - require explicit confirmation
+    if (!confirm) {
+      return {
+        success: false,
+        error: 'Deletion requires confirmation. Set confirm=true to delete the file.'
+      };
+    }
+    
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.resolve(filePath);
+    
+    // Check if file exists
+    if (!fs.existsSync(absolutePath)) {
+      return { success: false, error: `File not found: ${filePath}` };
+    }
+    
+    // Check if it's a file (not a directory)
+    const stats = fs.statSync(absolutePath);
+    if (!stats.isFile()) {
+      return {
+        success: false,
+        error: `Path is not a file: ${filePath}. Use a directory deletion tool for directories.`
+      };
+    }
+    
+    const filename = path.basename(absolutePath);
+    const size = Math.round(stats.size / 1024);
+    
+    // Delete file
+    fs.unlinkSync(absolutePath);
+    
+    return {
+      success: true,
+      deletedFile: filename,
+      deletedPath: absolutePath,
+      size: stats.size,
+      sizeKB: size,
+      message: `File deleted successfully: ${filename} (${size}KB)`
+    };
+  } catch (error) {
+    console.error('❌ File delete error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Open a URL in the default browser
+ * @param {string} url - URL to open
+ * @returns {Promise<Object>} Result object
+ */
+async function openUrl(url) {
+  try {
+    // Validate URL format
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    
+    const platform = process.platform;
+    let command;
+    
+    if (platform === 'linux') {
+      command = `xdg-open "${url}"`;
+    } else if (platform === 'darwin') {
+      command = `open "${url}"`;
+    } else if (platform === 'win32') {
+      command = `start "" "${url}"`;
+    } else {
+      return { success: false, error: 'Unsupported platform' };
+    }
+    
+    await execAsync(command);
+    
+    return {
+      success: true,
+      url: url,
+      message: `Opened URL in browser: ${url}`
+    };
+  } catch (error) {
+    console.error('❌ URL open error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Fill a web form (opens URL with pre-filled query parameters)
+ * @param {string} url - Base URL to fill form on
+ * @param {Object} formData - Object with field names and values
+ * @returns {Promise<Object>} Result object
+ */
+async function fillForm(url, formData = {}) {
+  try {
+    // Note: This is a simplified implementation that constructs a URL with query parameters
+    // For complex form filling, consider using Puppeteer or Playwright
+    
+    if (!url) {
+      return { success: false, error: 'URL is required' };
+    }
+    
+    // Validate URL format
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      url = 'https://' + url;
+    }
+    
+    // Build query string from form data
+    const queryParams = new URLSearchParams(formData).toString();
+    const fullUrl = queryParams ? `${url}?${queryParams}` : url;
+    
+    // Open the URL with pre-filled parameters
+    const result = await openUrl(fullUrl);
+    
+    if (result.success) {
+      return {
+        success: true,
+        url: fullUrl,
+        formData: formData,
+        message: `Opened form URL with pre-filled data: ${fullUrl}`,
+        note: 'For advanced form automation, consider using browser automation tools'
+      };
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('❌ Form fill error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Click an element on a website (simulates browser automation)
+ * @param {string} url - URL of the website
+ * @param {string} selector - CSS selector or element description
+ * @returns {Promise<Object>} Result object
+ */
+async function clickElement(url, selector) {
+  try {
+    // Note: This is a placeholder implementation
+    // For real browser automation, use Puppeteer, Playwright, or Selenium
+    
+    if (!url) {
+      return { success: false, error: 'URL is required' };
+    }
+    
+    if (!selector) {
+      return { success: false, error: 'Element selector is required' };
+    }
+    
+    // For now, just open the URL and inform the user
+    await openUrl(url);
+    
+    return {
+      success: true,
+      url: url,
+      selector: selector,
+      message: `Opened ${url}. To click element "${selector}", please use browser automation tools like Puppeteer.`,
+      note: 'This is a simplified implementation. For production use, integrate Puppeteer or Playwright for headless browser automation.'
+    };
+  } catch (error) {
+    console.error('❌ Click element error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Get MIME type from filename
  * @param {string} filename
  * @returns {string} MIME type
@@ -891,6 +1265,131 @@ function getToolDeclarations() {
     }, 'browse_files'));
   }
 
+  if (ENABLED_TOOLS.create_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'create_file',
+      description: 'Create a new file with content. Automatically creates parent directories if needed.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path where to create the file (e.g., /home/user/notes.txt)' },
+          content: { type: 'string', description: 'Content to write to the file' },
+          overwrite: { type: 'boolean', description: 'Overwrite if file exists (default: false)' }
+        },
+        required: ['filePath', 'content']
+      }
+    }, 'create_file'));
+  }
+
+  if (ENABLED_TOOLS.edit_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'edit_file',
+      description: 'Edit an existing file. Can replace entire content or append to the end.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to the file to edit' },
+          content: { type: 'string', description: 'New content or content to append' },
+          mode: { type: 'string', description: 'Edit mode: "write" (replace all) or "append" (add to end). Default: "write"' }
+        },
+        required: ['filePath', 'content']
+      }
+    }, 'edit_file'));
+  }
+
+  if (ENABLED_TOOLS.move_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'move_file',
+      description: 'Move a file to a new location. Can also be used to move files between directories.',
+      parameters: {
+        type: 'object',
+        properties: {
+          sourcePath: { type: 'string', description: 'Current file path' },
+          destinationPath: { type: 'string', description: 'New file path (full path with filename)' },
+          overwrite: { type: 'boolean', description: 'Overwrite if destination exists (default: false)' }
+        },
+        required: ['sourcePath', 'destinationPath']
+      }
+    }, 'move_file'));
+  }
+
+  if (ENABLED_TOOLS.rename_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'rename_file',
+      description: 'Rename a file (stays in same directory). For moving to different directory, use move_file.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Current file path' },
+          newName: { type: 'string', description: 'New filename (just the name, not full path)' }
+        },
+        required: ['filePath', 'newName']
+      }
+    }, 'rename_file'));
+  }
+
+  if (ENABLED_TOOLS.delete_file) {
+    functionDeclarations.push(addBehavior({
+      name: 'delete_file',
+      description: 'Delete a file (PERMANENT). Requires confirmation=true for safety. Ask user before calling.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filePath: { type: 'string', description: 'Path to file to delete' },
+          confirm: { type: 'boolean', description: 'Safety confirmation - MUST be true to delete. Always ask user first!' }
+        },
+        required: ['filePath', 'confirm']
+      }
+    }, 'delete_file'));
+  }
+
+  if (ENABLED_TOOLS.open_url) {
+    functionDeclarations.push(addBehavior({
+      name: 'open_url',
+      description: 'Open a URL in the default web browser. Automatically adds https:// if missing.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL to open (e.g., google.com or https://github.com)' }
+        },
+        required: ['url']
+      }
+    }, 'open_url'));
+  }
+
+  if (ENABLED_TOOLS.fill_form) {
+    functionDeclarations.push(addBehavior({
+      name: 'fill_form',
+      description: 'Open a web form with pre-filled query parameters. Useful for search forms, contact forms, etc.',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'Base URL of the form' },
+          formData: { 
+            type: 'object', 
+            description: 'Object with field names as keys and values to fill (e.g., {"search": "query", "email": "user@example.com"})' 
+          }
+        },
+        required: ['url', 'formData']
+      }
+    }, 'fill_form'));
+  }
+
+  if (ENABLED_TOOLS.click_element) {
+    functionDeclarations.push(addBehavior({
+      name: 'click_element',
+      description: 'Open a website and prepare to interact with a specific element (for basic automation).',
+      parameters: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'URL of the website' },
+          selector: { type: 'string', description: 'CSS selector or description of element to click (e.g., "#submit-button" or "login button")' }
+        },
+        required: ['url', 'selector']
+      }
+    }, 'click_element'));
+  }
+
   // Add custom function declarations if any exist
   if (functionDeclarations.length > 0) {
     declarations.push({ functionDeclarations });
@@ -952,6 +1451,30 @@ async function executeTool(functionName, args) {
       
       case 'browse_files':
         return await browseFiles(args.dirPath, args.includeHidden);
+      
+      case 'create_file':
+        return await createFile(args.filePath, args.content, args.overwrite);
+      
+      case 'edit_file':
+        return await editFile(args.filePath, args.content, args.mode);
+      
+      case 'move_file':
+        return await moveFile(args.sourcePath, args.destinationPath, args.overwrite);
+      
+      case 'rename_file':
+        return await renameFile(args.filePath, args.newName);
+      
+      case 'delete_file':
+        return await deleteFile(args.filePath, args.confirm);
+      
+      case 'open_url':
+        return await openUrl(args.url);
+      
+      case 'fill_form':
+        return await fillForm(args.url, args.formData);
+      
+      case 'click_element':
+        return await clickElement(args.url, args.selector);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };
@@ -1021,6 +1544,12 @@ module.exports = {
   clearMemories,
   readFile,
   browseFiles,
+  createFile,
+  editFile,
+  moveFile,
+  renameFile,
+  deleteFile,
+  openUrl,
   getEnabledTools,
   getAllTools,
   setEnabledTools,

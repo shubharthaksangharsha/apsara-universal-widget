@@ -141,6 +141,15 @@ function generateSystemPrompt() {
   if (enabledTools.store_memory || enabledTools.retrieve_memories) {
     capabilities.push('Storing and retrieving memories/notes for later use');
   }
+  if (enabledTools.read_file || enabledTools.browse_files) {
+    capabilities.push('Reading local files and browsing directories');
+  }
+  if (enabledTools.create_file || enabledTools.edit_file || enabledTools.move_file || enabledTools.rename_file || enabledTools.delete_file) {
+    capabilities.push('Creating, editing, moving, renaming, and deleting files');
+  }
+  if (enabledTools.open_url || enabledTools.fill_form || enabledTools.click_element) {
+    capabilities.push('Opening websites, filling forms, and basic web automation');
+  }
   
   // Build tool usage section
   const toolUsageLines = [];
@@ -177,6 +186,30 @@ function generateSystemPrompt() {
   if (enabledTools.browse_files) {
     toolUsageLines.push('- browse_files: List files and directories with details');
   }
+  if (enabledTools.create_file) {
+    toolUsageLines.push('- create_file: Create new files with content');
+  }
+  if (enabledTools.edit_file) {
+    toolUsageLines.push('- edit_file: Edit existing files (write or append mode)');
+  }
+  if (enabledTools.move_file) {
+    toolUsageLines.push('- move_file: Move files to new locations');
+  }
+  if (enabledTools.rename_file) {
+    toolUsageLines.push('- rename_file: Rename files in same directory');
+  }
+  if (enabledTools.delete_file) {
+    toolUsageLines.push('- delete_file: Delete files (requires confirmation - ALWAYS ask user first!)');
+  }
+  if (enabledTools.open_url) {
+    toolUsageLines.push('- open_url: Open URLs in default browser');
+  }
+  if (enabledTools.fill_form) {
+    toolUsageLines.push('- fill_form: Open web forms with pre-filled query parameters');
+  }
+  if (enabledTools.click_element) {
+    toolUsageLines.push('- click_element: Open websites and interact with specific elements');
+  }
   if (enabledTools.googleSearch) {
     toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
   }
@@ -198,7 +231,7 @@ ${capabilities.map(c => `- ${c}`).join('\n')}
 - Provide detailed but concise information
 - Show enthusiasm about the projects and work${enabledTools.send_email_to_shubharthak ? '\n- If someone wants to contact Shubharthak, offer to send a message via email' : ''}${enabledTools.googleSearch ? '\n- For questions about current events, news, weather, sports scores, latest tech updates, or anything requiring real-time information, Google Search will automatically provide accurate, up-to-date answers\n- Always cite sources when sharing information from Google Search' : ''}${toolUsageSection}
 
-**Example workflows:**${enabledTools.screenshot_and_email ? '\n- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)' : ''}${enabledTools.take_screenshot ? '\n- "Take a screenshot" → Use take_screenshot (just capture, don\'t email)' : ''}${enabledTools.read_file && enabledTools.send_email_to_shubharthak ? '\n- "Read the file /path/to/file.txt and email it to me" → Use read_file with asBase64=true, then send_email_to_shubharthak with the base64Content from read_file result' : ''}${enabledTools.browse_files ? '\n- "Show me files in /home/user/Documents" → Use browse_files with dirPath parameter' : ''}${enabledTools.copy_to_clipboard && enabledTools.paste_from_clipboard ? '\n- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard' : ''}${enabledTools.store_memory ? '\n- "Remember this for later" → Use store_memory with the content' : ''}${enabledTools.retrieve_memories ? '\n- "What did I ask you to remember?" → Use retrieve_memories' : ''}${enabledTools.get_clipboard_text ? '\n- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don\'t just read it back)' : ''}${enabledTools.paste_from_clipboard ? '\n- "Paste what I copied earlier" → Use paste_from_clipboard' : ''}
+**Example workflows:**${enabledTools.screenshot_and_email ? '\n- "Screenshot this and email it to Shubharthak" → Use screenshot_and_email (single tool call!)' : ''}${enabledTools.take_screenshot ? '\n- "Take a screenshot" → Use take_screenshot (just capture, don\'t email)' : ''}${enabledTools.read_file && enabledTools.send_email_to_shubharthak ? '\n- "Read the file /path/to/file.txt and email it to me" → Use read_file with asBase64=true, then send_email_to_shubharthak with the base64Content from read_file result' : ''}${enabledTools.browse_files ? '\n- "Show me files in /home/user/Documents" → Use browse_files with dirPath parameter' : ''}${enabledTools.create_file ? '\n- "Create a file called notes.txt with my todo list" → Use create_file with filePath and content' : ''}${enabledTools.edit_file ? '\n- "Add this line to my notes" → Use edit_file with mode="append"' : ''}${enabledTools.rename_file ? '\n- "Rename file.txt to document.txt" → Use rename_file' : ''}${enabledTools.delete_file ? '\n- "Delete old-file.txt" → ALWAYS ask user for confirmation first, then use delete_file with confirm=true' : ''}${enabledTools.open_url ? '\n- "Open google.com" → Use open_url' : ''}${enabledTools.fill_form ? '\n- "Fill this form at example.com/contact with my email" → Use fill_form with url and formData object' : ''}${enabledTools.click_element ? '\n- "Click the login button on example.com" → Use click_element with url and selector' : ''}${enabledTools.copy_to_clipboard && enabledTools.paste_from_clipboard ? '\n- "Copy this text and paste it" → Use copy_to_clipboard, then paste_from_clipboard' : ''}${enabledTools.store_memory ? '\n- "Remember this for later" → Use store_memory with the content' : ''}${enabledTools.retrieve_memories ? '\n- "What did I ask you to remember?" → Use retrieve_memories' : ''}${enabledTools.get_clipboard_text ? '\n- "Get text from clipboard and summarize it" → Use get_clipboard_text, then explain the content naturally (don\'t just read it back)' : ''}${enabledTools.paste_from_clipboard ? '\n- "Paste what I copied earlier" → Use paste_from_clipboard' : ''}
 
 **About Shubharthak Sangharasha:**
 
