@@ -10,7 +10,7 @@
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
-![Apsara Widget](assets/widget3.png)
+![Apsara Widget](assets/widget-main.png)
 
 ## 🌟 Features
 
