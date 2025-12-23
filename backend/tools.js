@@ -11,10 +11,34 @@ const { promisify } = require('util');
 
 const execAsync = promisify(exec);
 
-// Debug logging helper
-const debugLog = (...args) => {
-  const DEBUG_LOG = process.env.DEBUG_LOG !== 'false';
-  if (DEBUG_LOG) console.log(...args);
+// Structured debug configuration (per-feature)
+const DEBUG = {
+  tools: process.env.DEBUG_TOOLS === 'true',
+  email: process.env.DEBUG_EMAIL === 'true',
+  clipboard: process.env.DEBUG_CLIPBOARD === 'true',
+  memory: process.env.DEBUG_MEMORY === 'true'
+};
+
+const debugLog = (scope, ...args) => {
+  if (DEBUG[scope]) {
+    console.log(`[DEBUG:${scope.toUpperCase()}]`, ...args);
+  }
+};
+
+// Tool enable/disable allowlist. Disable everything except googleSearch by default.
+const ENABLED_TOOLS = {
+  googleSearch: true,
+
+  // Disabled by default for Gemini stability
+  send_email_to_shubharthak: false,
+  take_screenshot: false,
+  screenshot_and_email: false,
+  copy_to_clipboard: false,
+  get_clipboard_text: false,
+  paste_from_clipboard: false,
+  store_memory: false,
+  retrieve_memories: false,
+  clear_memories: false
 };
 
 // Email configuration
@@ -27,6 +51,11 @@ let memoryStore = [];
  * Initialize email transporter
  */
 function initEmailTransporter() {
+  // Respect configuration to avoid initializing Gmail when disabled
+  if (process.env.EMAIL_ENABLED !== 'true') {
+    throw new Error('Email tool is disabled by configuration (EMAIL_ENABLED != true)');
+  }
+
   if (!emailTransporter) {
     emailTransporter = nodemailer.createTransport({
       service: 'gmail',
@@ -35,7 +64,9 @@ function initEmailTransporter() {
         pass: process.env.EMAIL_APP_PASSWORD
       }
     });
+    debugLog('email', 'Email transporter initialized');
   }
+
   return emailTransporter;
 }
 
@@ -72,8 +103,9 @@ async function sendEmailToShubharthak(message, senderInfo = '', imageBase64 = nu
       }];
     }
 
+    debugLog('email', '📧 Sending email...', mailOptions);
     const info = await transporter.sendMail(mailOptions);
-    debugLog('✅ Email sent:', info.messageId);
+    debugLog('email', '✅ Email sent:', info.messageId);
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('❌ Email error:', error);
@@ -114,7 +146,7 @@ async function takeScreenshot() {
       // Clean up temp file
       fs.unlinkSync(screenshotPath);
       
-      debugLog('✅ Screenshot captured successfully');
+        debugLog('tools', '✅ Screenshot captured successfully');
       return { 
         success: true, 
         image: base64Image,
@@ -154,7 +186,7 @@ async function copyToClipboard(text) {
     }
 
     await execAsync(command);
-    debugLog('✅ Text copied to clipboard');
+  debugLog('clipboard', '✅ Text copied to clipboard');
     return { success: true, message: 'Text copied to clipboard successfully' };
   } catch (error) {
     console.error('❌ Clipboard error:', error);
@@ -182,7 +214,7 @@ async function getClipboardText() {
     }
 
     const { stdout } = await execAsync(command);
-    debugLog('✅ Retrieved clipboard text');
+  debugLog('clipboard', '✅ Retrieved clipboard text');
     return { success: true, text: stdout.trim() };
   } catch (error) {
     console.error('❌ Clipboard retrieval error:', error);
@@ -213,7 +245,7 @@ async function pasteFromClipboard() {
     }
 
     await execAsync(command);
-    debugLog('✅ Paste command executed');
+  debugLog('clipboard', '✅ Paste command executed');
     return { success: true, message: 'Paste command executed successfully' };
   } catch (error) {
     console.error('❌ Paste error:', error);
@@ -237,8 +269,8 @@ async function storeMemory(content, category = 'general') {
       date: new Date().toLocaleString()
     };
     
-    memoryStore.push(memory);
-    debugLog(`💾 Memory stored: [${category}] ${content.substring(0, 50)}...`);
+  memoryStore.push(memory);
+  debugLog('memory', `💾 Memory stored: [${category}] ${content.substring(0, 50)}...`);
     
     return { 
       success: true, 
@@ -273,7 +305,7 @@ async function retrieveMemories(query = '') {
       );
     }
     
-    debugLog(`🔍 Memory search for "${query}": ${results.length} results`);
+  debugLog('memory', `🔍 Memory search for "${query}": ${results.length} results`);
     
     return {
       success: true,
@@ -301,10 +333,10 @@ async function clearMemories(category = null) {
     
     if (category) {
       memoryStore = memoryStore.filter(m => m.category.toLowerCase() !== category.toLowerCase());
-      debugLog(`🗑️ Cleared memories in category: ${category}`);
+      debugLog('memory', `🗑️ Cleared memories in category: ${category}`);
     } else {
       memoryStore = [];
-      debugLog('🗑️ Cleared all memories');
+      debugLog('memory', '🗑️ Cleared all memories');
     }
     
     const clearedCount = beforeCount - memoryStore.length;
@@ -321,165 +353,92 @@ async function clearMemories(category = null) {
 }
 
 /**
- * Tool function declarations for Gemini API
+ * Tool function declarations for Gemini API (filtered by ENABLED_TOOLS)
  */
 const toolDeclarations = [
-  // Google Search - built-in
+  // Google Search - always expose
   { googleSearch: {} },
-  
-  // Custom tools
+
+  // Conditionally expose custom tools based on ENABLED_TOOLS
   {
     functionDeclarations: [
-      {
+      ENABLED_TOOLS.send_email_to_shubharthak && {
         name: 'send_email_to_shubharthak',
-        description: 'Send an email message to Shubharthak Sangharsha. Can include image attachments. Use this when users want to contact him, leave a message, send inquiries, or share screenshots/images.',
+        description: 'Send an email message to Shubharthak Sangharsha. Can include image attachments.',
         parameters: {
           type: 'object',
           properties: {
-            message: {
-              type: 'string',
-              description: 'The message content to send to Shubharthark'
-            },
-            senderInfo: {
-              type: 'string',
-              description: 'Optional information about the sender (name, contact info if provided)'
-            },
-            imageBase64: {
-              type: 'string',
-              description: 'Optional base64 encoded image to attach (without data URI prefix)'
-            },
-            imageFilename: {
-              type: 'string',
-              description: 'Optional filename for the attached image (default: screenshot.jpg)'
-            }
+            message: { type: 'string' },
+            senderInfo: { type: 'string' },
+            imageBase64: { type: 'string' },
+            imageFilename: { type: 'string' }
           },
           required: ['message']
         }
       },
-      {
+
+      ENABLED_TOOLS.take_screenshot && {
         name: 'take_screenshot',
-        description: 'Take a screenshot of the current screen. Returns base64 encoded image that can be viewed or emailed. Use this when user asks to capture the screen, take a screenshot, or wants to save what they\'re seeing.',
-        parameters: {
-          type: 'object',
-          properties: {},
-          required: []
-        }
+        description: 'Take a screenshot of the current screen.',
+        parameters: { type: 'object', properties: {} }
       },
-      {
+
+      ENABLED_TOOLS.screenshot_and_email && {
         name: 'screenshot_and_email',
-        description: 'Take a screenshot and immediately email it to Shubharthak. This is a COMBINED operation that does both in one step. Use this when user says "screenshot and email", "take a screenshot and send it", or similar combined requests.',
+        description: 'Take a screenshot and immediately email it to Shubharthak.',
         parameters: {
           type: 'object',
           properties: {
-            message: {
-              type: 'string',
-              description: 'The email message to send with the screenshot (default: "Screenshot attached")'
-            },
-            senderInfo: {
-              type: 'string',
-              description: 'Optional information about the sender or context'
-            }
-          },
-          required: []
+            message: { type: 'string' },
+            senderInfo: { type: 'string' }
+          }
         }
       },
-      {
+
+      ENABLED_TOOLS.copy_to_clipboard && {
         name: 'copy_to_clipboard',
-        description: 'Copy text to the system clipboard. Use when user asks to copy something, save text for later, or wants text readily available for pasting.',
+        description: 'Copy text to the system clipboard.',
         parameters: {
           type: 'object',
-          properties: {
-            text: {
-              type: 'string',
-              description: 'The text to copy to clipboard'
-            }
-          },
+          properties: { text: { type: 'string' } },
           required: ['text']
         }
       },
-      {
+
+      ENABLED_TOOLS.get_clipboard_text && {
         name: 'get_clipboard_text',
-        description: 'Get the current text from system clipboard. Use when user asks what\'s in clipboard, to read clipboard, or reference copied text.',
-        parameters: {
-          type: 'object',
-          properties: {},
-          required: []
-        }
+        description: 'Get the current text from system clipboard.',
+        parameters: { type: 'object', properties: {} }
       },
-      {
+
+      ENABLED_TOOLS.paste_from_clipboard && {
         name: 'paste_from_clipboard',
-        description: 'Simulate keyboard paste (Ctrl+V or Cmd+V) to paste clipboard content into the active application. Use when user asks to paste, insert clipboard content, or use what was copied.',
-        parameters: {
-          type: 'object',
-          properties: {},
-          required: []
-        }
+        description: 'Simulate keyboard paste (Ctrl+V/Cmd+V).',
+        parameters: { type: 'object', properties: {} }
       },
-      {
+
+      ENABLED_TOOLS.store_memory && {
         name: 'store_memory',
-        description: 'Store a memory/note for later retrieval. Optionally categorize memories. Use this to remember important information, user preferences, or any notes the user wants to keep.',
+        description: 'Store a memory/note for later retrieval.',
         parameters: {
           type: 'object',
-          properties: {
-            content: {
-              type: 'string',
-              description: 'The content of the memory/note'
-            },
-            category: {
-              type: 'string',
-              description: 'Optional category or tag for the memory'
-            }
-          },
+          properties: { content: { type: 'string' }, category: { type: 'string' } },
           required: ['content']
         }
       },
-      {
+
+      ENABLED_TOOLS.retrieve_memories && {
         name: 'retrieve_memories',
-        description: 'Retrieve stored memories/notes. Can search by query or filter by category. Use this to recall information, check stored notes, or find specific memories.',
-        parameters: {
-          type: 'object',
-          properties: {
-            query: {
-              type: 'string',
-              description: 'Optional search query or category to filter memories'
-            }
-          },
-          required: []
-        }
+        description: 'Retrieve stored memories/notes.',
+        parameters: { type: 'object', properties: { query: { type: 'string' } } }
       },
-      {
+
+      ENABLED_TOOLS.clear_memories && {
         name: 'clear_memories',
-        description: 'Clear all memories or those in a specific category. Use with caution. Use this to delete unnecessary memories, free up space, or remove outdated information.',
-        parameters: {
-          type: 'object',
-          properties: {
-            category: {
-              type: 'string',
-              description: 'Optional category to clear (clears all if not specified)'
-            }
-          },
-          required: []
-        }
-      },
-      {
-        name: 'screenshot_and_email',
-        description: 'Take a screenshot and email it to Shubharthak in one operation. Use this to quickly capture and send screen content without multiple steps.',
-        parameters: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: 'Email message content'
-            },
-            senderInfo: {
-              type: 'string',
-              description: 'Optional sender information'
-            }
-          },
-          required: []
-        }
+        description: 'Clear memories (all or by category).',
+        parameters: { type: 'object', properties: { category: { type: 'string' } } }
       }
-    ]
+    ].filter(Boolean)
   }
 ];
 
@@ -490,8 +449,14 @@ const toolDeclarations = [
  * @returns {Promise<Object>} Function result
  */
 async function executeTool(functionName, args) {
-  debugLog(`🔧 Executing tool: ${functionName}`, args);
-  
+  // Block execution of disabled tools as a safety net
+  if (!ENABLED_TOOLS[functionName]) {
+    console.warn(`🚫 Tool blocked by config: ${functionName}`);
+    return { success: false, error: 'Tool disabled by configuration' };
+  }
+
+  debugLog('tools', `🔧 Executing tool: ${functionName}`, args);
+
   try {
     switch (functionName) {
       case 'send_email_to_shubharthak':
@@ -546,7 +511,7 @@ async function executeTool(functionName, args) {
  */
 async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = '') {
   try {
-    debugLog('📸 Taking screenshot for email...');
+  debugLog('tools', '📸 Taking screenshot for email...');
     
     // Step 1: Take screenshot
     const screenshotResult = await takeScreenshot();
@@ -555,7 +520,7 @@ async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = 
       return { success: false, error: `Screenshot failed: ${screenshotResult.error}` };
     }
     
-    debugLog('✅ Screenshot captured, now sending email...');
+  debugLog('tools', '✅ Screenshot captured, now sending email...');
     
     // Step 2: Send email with screenshot
     const emailResult = await sendEmailToShubharthak(
@@ -569,7 +534,7 @@ async function screenshotAndEmail(message = 'Screenshot attached', senderInfo = 
       return { success: false, error: `Email failed: ${emailResult.error}` };
     }
     
-    debugLog('✅ Screenshot emailed successfully');
+  debugLog('email', '✅ Screenshot emailed successfully');
     return {
       success: true,
       message: 'Screenshot captured and emailed successfully',

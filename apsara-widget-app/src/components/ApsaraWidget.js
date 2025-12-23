@@ -751,12 +751,13 @@ const ApsaraWidget = () => {
   // Handle close button (for Electron)
   const handleCloseClick = (e) => {
     e.stopPropagation();
-    
-    // Send IPC message to close window (Electron)
+
+    // Send IPC message to close window (Electron).
+    // Pass { forceQuit: true } so Windows will quit instead of just hiding.
     if (typeof window !== 'undefined' && window.require) {
       try {
         const { ipcRenderer } = window.require('electron');
-        ipcRenderer.send('close-window');
+        ipcRenderer.send('close-window', { forceQuit: true });
       } catch (err) {
         debugLog('Not running in Electron');
       }
