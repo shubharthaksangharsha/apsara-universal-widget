@@ -7,14 +7,68 @@ const express = require('express');
 const WebSocket = require('ws');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 // Debug logging toggle
 const DEBUG_LOG = true; // Set to false to disable debug logging
 
+// Debug frame saving toggle
+const SAVE_DEBUG_FRAMES = true; // Set to false to disable saving screen frames
+
 // Debug log helper - only logs when DEBUG_LOG is true
 const debugLog = (...args) => {
   if (DEBUG_LOG) console.log(...args);
+};
+
+// Create debug frames directory if it doesn't exist
+const debugFramesDir = path.join(__dirname, 'debug_frames');
+if (SAVE_DEBUG_FRAMES && !fs.existsSync(debugFramesDir)) {
+  fs.mkdirSync(debugFramesDir, { recursive: true });
+  console.log('📁 Created debug_frames directory');
+}
+
+// Store last 2 frames for debugging
+let lastScreenFrames = [];
+let lastCameraFrames = [];
+
+// Helper function to save debug frame
+const saveDebugFrame = (base64Data, type) => {
+  if (!SAVE_DEBUG_FRAMES) return;
+  
+  const timestamp = new Date().toISOString().replace(/:/g, '-');
+  const filename = `${type}_${timestamp}.jpg`;
+  const filepath = path.join(debugFramesDir, filename);
+  
+  try {
+    // Convert base64 to buffer and save
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filepath, buffer);
+    
+    // Keep only last 2 frames
+    if (type === 'screen') {
+      lastScreenFrames.push(filepath);
+      if (lastScreenFrames.length > 2) {
+        const oldFile = lastScreenFrames.shift();
+        if (fs.existsSync(oldFile)) {
+          fs.unlinkSync(oldFile);
+        }
+      }
+    } else if (type === 'camera') {
+      lastCameraFrames.push(filepath);
+      if (lastCameraFrames.length > 2) {
+        const oldFile = lastCameraFrames.shift();
+        if (fs.existsSync(oldFile)) {
+          fs.unlinkSync(oldFile);
+        }
+      }
+    }
+    
+    debugLog(`💾 Saved ${type} frame: ${filename}`);
+  } catch (err) {
+    console.error(`❌ Error saving ${type} frame:`, err);
+  }
 };
 
 const app = express();
@@ -504,7 +558,11 @@ wss.on('connection', (clientWs) => {
                     return;
                 }
                 
-                debugLog('📹 Forwarding video frame to Gemini...');
+                debugLog('📹 Forwarding screen frame to Gemini...');
+                
+                // Save debug frame (last 2 only)
+                saveDebugFrame(message.data, 'screen');
+                
                 try {
                     geminiWs.sendRealtimeInput({
                         video: {
@@ -516,13 +574,17 @@ wss.on('connection', (clientWs) => {
                     console.error('❌ Error sending video to Gemini:', err);
                 }
             } else if (message.type === 'camera' && geminiWs) {
-                // Handle camera frames (prepared for future use)
+                // Handle camera frames
                 if (currentModality === 'SWITCHING') {
                     console.warn('⚠️ REJECTED camera frame during modality switch');
                     return;
                 }
                 
                 debugLog('📷 Forwarding camera frame to Gemini...');
+                
+                // Save debug frame (last 2 only)
+                saveDebugFrame(message.data, 'camera');
+                
                 try {
                     geminiWs.sendRealtimeInput({
                         video: {

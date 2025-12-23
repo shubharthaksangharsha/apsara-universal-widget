@@ -28,3 +28,5 @@ Thumbs.db
 *.swo
 *~
 
+# Debug frames (saved screenshots for debugging)
+debug_frames/
