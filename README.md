@@ -457,6 +457,7 @@ Apsara can use these tools to help you:
 | **open_url** | Open websites in default browser | "Open github.com" | ✅ Working |
 | **fill_form** | Fill web forms with pre-filled data | "Fill the search form at google.com with 'AI news'" | ✅ Working |
 | **click_element** | Interact with website elements | "Click the login button on example.com" | ✅ Working |
+| **generate_image** | AI image generation (Nano Banana) | "Generate an image of a futuristic city" | ✅ Working |
 | **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
 
 **How to Send Files via Email:**

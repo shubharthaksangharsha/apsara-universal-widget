@@ -27,6 +27,7 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const { GoogleGenAI } = require('@google/genai');
 
 const execAsync = promisify(exec);
 
@@ -66,7 +67,8 @@ let ENABLED_TOOLS = {
   delete_file: false,
   open_url: false,
   fill_form: false,
-  click_element: false
+  click_element: false,
+  generate_image: false
 };
 
 // Tool metadata for UI display (with async behavior support)
@@ -89,7 +91,8 @@ const TOOL_METADATA = {
   delete_file: { name: 'Delete File', description: 'Delete files', async: true },
   open_url: { name: 'Open URL', description: 'Open websites in browser', async: true },
   fill_form: { name: 'Fill Form', description: 'Fill web forms automatically', async: true },
-  click_element: { name: 'Click Element', description: 'Click elements on websites', async: true }
+  click_element: { name: 'Click Element', description: 'Click elements on websites', async: true },
+  generate_image: { name: 'Generate Image', description: 'AI image generation (Nano Banana)', async: true }
 };
 
 // Tool order and async settings (can be customized by user)
@@ -1099,6 +1102,123 @@ async function clickElement(url, selector) {
 }
 
 /**
+ * Generate an image using Nano Banana (Gemini Image Generation)
+ * @param {string} prompt - Text description of the image to generate
+ * @param {string} model - Model to use: 'flash' (gemini-2.5-flash-image) or 'pro' (gemini-3-pro-image-preview)
+ * @param {string} aspectRatio - Aspect ratio (e.g., '1:1', '16:9', '9:16')
+ * @param {string} imageSize - Image resolution: '1K', '2K', or '4K' (pro only, flash uses default)
+ * @returns {Promise<Object>} Result with base64 image data
+ */
+async function generateImage(prompt, model = 'flash', aspectRatio = '1:1', imageSize = '1K') {
+  try {
+    if (!prompt || prompt.trim() === '') {
+      return { success: false, error: 'Prompt is required for image generation' };
+    }
+    
+    // Validate model
+    const modelMap = {
+      'flash': 'gemini-2.5-flash-image',
+      'pro': 'gemini-3-pro-image-preview'
+    };
+    
+    const selectedModel = modelMap[model] || 'gemini-2.5-flash-image';
+    
+    // Initialize Google GenAI
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return { success: false, error: 'GEMINI_API_KEY not found in environment' };
+    }
+    
+    const ai = new GoogleGenAI({ apiKey });
+    
+    // Build config based on model
+    const config = {
+      responseModalities: ['IMAGE']
+    };
+    
+    // Add image config for aspect ratio and size
+    if (model === 'pro') {
+      config.imageConfig = {
+        aspectRatio: aspectRatio,
+        imageSize: imageSize.toUpperCase()
+      };
+    } else {
+      config.imageConfig = {
+        aspectRatio: aspectRatio
+      };
+    }
+    
+    debugLog('tools', `🎨 Generating image with ${selectedModel}...`);
+    debugLog('tools', `📝 Prompt: ${prompt.substring(0, 100)}${prompt.length > 100 ? '...' : ''}`);
+    
+    // Generate the image
+    const response = await ai.models.generateContent({
+      model: selectedModel,
+      contents: prompt,
+      config: config
+    });
+    
+    // Extract image data from response
+    let imageData = null;
+    let textResponse = '';
+    
+    for (const part of response.candidates[0].content.parts) {
+      if (part.text) {
+        textResponse += part.text;
+      } else if (part.inlineData) {
+        imageData = part.inlineData.data; // base64 encoded
+      }
+    }
+    
+    if (!imageData) {
+      return { 
+        success: false, 
+        error: 'No image was generated',
+        textResponse: textResponse 
+      };
+    }
+    
+    // Generate filename with timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `apsara-generated-${timestamp}.png`;
+    const filepath = path.join(__dirname, 'generated_images', filename);
+    
+    // Ensure directory exists
+    const dir = path.dirname(filepath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    // Save image to disk
+    const buffer = Buffer.from(imageData, 'base64');
+    fs.writeFileSync(filepath, buffer);
+    
+    debugLog('tools', `✅ Image generated and saved: ${filename}`);
+    
+    return {
+      success: true,
+      message: `Image generated successfully using ${selectedModel}`,
+      filename: filename,
+      filepath: filepath,
+      model: selectedModel,
+      aspectRatio: aspectRatio,
+      imageSize: model === 'pro' ? imageSize : 'default',
+      fileSize: `${Math.round(buffer.length / 1024)}KB`,
+      base64Image: imageData, // Include for direct use in UI
+      mimeType: 'image/png',
+      textResponse: textResponse || undefined
+    };
+  } catch (error) {
+    console.error('❌ Image generation error:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      details: error.stack
+    };
+  }
+}
+
+/**
  * Get MIME type from filename
  * @param {string} filename
  * @returns {string} MIME type
@@ -1390,6 +1510,38 @@ function getToolDeclarations() {
     }, 'click_element'));
   }
 
+  if (ENABLED_TOOLS.generate_image) {
+    functionDeclarations.push(addBehavior({
+      name: 'generate_image',
+      description: 'Generate AI images using Nano Banana (Gemini Image Generation). Creates high-quality images from text descriptions. Use "flash" model for speed, "pro" for best quality with text rendering and 4K resolution.',
+      parameters: {
+        type: 'object',
+        properties: {
+          prompt: { 
+            type: 'string', 
+            description: 'Detailed text description of the image to generate. Be specific about style, colors, composition, and details.' 
+          },
+          model: { 
+            type: 'string', 
+            enum: ['flash', 'pro'],
+            description: 'Model to use: "flash" (gemini-2.5-flash-image, fast) or "pro" (gemini-3-pro-image-preview, best quality). Default: flash' 
+          },
+          aspectRatio: { 
+            type: 'string',
+            enum: ['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9', '21:9'],
+            description: 'Aspect ratio of generated image. Default: 1:1' 
+          },
+          imageSize: { 
+            type: 'string',
+            enum: ['1K', '2K', '4K'],
+            description: 'Image resolution (pro model only): 1K, 2K, or 4K. Default: 1K' 
+          }
+        },
+        required: ['prompt']
+      }
+    }, 'generate_image'));
+  }
+
   // Add custom function declarations if any exist
   if (functionDeclarations.length > 0) {
     declarations.push({ functionDeclarations });
@@ -1475,6 +1627,9 @@ async function executeTool(functionName, args) {
       
       case 'click_element':
         return await clickElement(args.url, args.selector);
+      
+      case 'generate_image':
+        return await generateImage(args.prompt, args.model, args.aspectRatio, args.imageSize);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };

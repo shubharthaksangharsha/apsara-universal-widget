@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import './ApsaraWidget.css';
-import './themes.css'; // Import theme system
+import './themes.css';
+import GeneratedImageViewer from './GeneratedImageViewer'; // Import theme system
 
 // Debug logging toggle
 const DEBUG_LOG = true; // Set to false to disable debug logging
@@ -49,6 +50,7 @@ const ApsaraWidget = () => {
   const [showThemeSelector, setShowThemeSelector] = useState(false); // Theme selector visibility
   const [availableTools, setAvailableTools] = useState([]); // Available tools from backend
   const [showToolsSelector, setShowToolsSelector] = useState(false); // Tools selector visibility
+  const [generatedImage, setGeneratedImage] = useState(null); // Generated image data for viewer
 
   // Refs
   const wsRef = useRef(null);

@@ -150,6 +150,9 @@ function generateSystemPrompt() {
   if (enabledTools.open_url || enabledTools.fill_form || enabledTools.click_element) {
     capabilities.push('Opening websites, filling forms, and basic web automation');
   }
+  if (enabledTools.generate_image) {
+    capabilities.push('AI image generation using Nano Banana (create any image from text descriptions)');
+  }
   
   // Build tool usage section
   const toolUsageLines = [];
@@ -209,6 +212,9 @@ function generateSystemPrompt() {
   }
   if (enabledTools.click_element) {
     toolUsageLines.push('- click_element: Open websites and interact with specific elements');
+  }
+  if (enabledTools.generate_image) {
+    toolUsageLines.push('- generate_image: AI image generation with Nano Banana (creates images from text descriptions)');
   }
   if (enabledTools.googleSearch) {
     toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
