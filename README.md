@@ -3,10 +3,10 @@
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.5.0-blue)
+![Version](https://img.shields.io/badge/Version-1.6.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Version 1.5.0** - File System Tools & Persistent Memory
+**Version 1.6.0** - Voice-Controlled Theme Switching & Enhanced Voice Commands
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
@@ -22,6 +22,7 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
   - 🟢 **Green/Gold bars** when you speak
   - 🟠 **Dramatic orange spikes** when Apsara speaks
 - **Clean Visual Indicators**: Minimalist green pulsing dots show active camera/screen share status
+- **Voice-Controlled UI**: Change themes, share screen, activate camera - all with voice commands!
 
 ### Visual Capabilities
 - **Camera Sharing**: Share your camera feed with Apsara for visual interaction (green dot indicator when active)
@@ -86,6 +87,15 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - 📧 "Email Shubharthak saying the project is ready"
 - 📧 "Send me an email with my todo list"
 - 📧 "Email this screenshot to john@example.com"
+
+**Voice-Controlled UI:**
+- 🎨 "Change theme to dark"
+- 🎨 "Switch to dracula theme"
+- 🎨 "Make it nightly"
+- 🎨 "Use the nord theme"
+- 🖥️ "Share my screen"
+- 📹 "Share camera at 1280x720"
+- 🔄 "Switch to solarized dark"
 
 **Web Browsing:**
 - 🌐 "Open youtube.com"
@@ -455,9 +465,10 @@ Apsara can use these tools to help you:
 | **rename_file** | Rename files | "Rename oldname.txt to newname.txt" | ✅ Working |
 | **delete_file** | Delete files (with confirmation) | "Delete old-file.txt" | ✅ Working |
 | **open_url** | Open websites in default browser | "Open github.com" | ✅ Working |
-| **fill_form** | Fill web forms with pre-filled data | "Fill the search form at google.com with 'AI news'" | ✅ Working |
-| **click_element** | Interact with website elements | "Click the login button on example.com" | ✅ Working |
 | **generate_image** | AI image generation (Nano Banana) | "Generate an image of a futuristic city" | ✅ Working |
+| **share_screen** | Voice-activated screen sharing | "Share my screen at 1920x1080" | ✅ Working |
+| **share_camera** | Voice-activated camera sharing | "Share camera" or "Show me through camera" | ✅ Working |
+| **change_theme** | Voice-controlled theme switching | "Change theme to dark" or "Switch to dracula" | ✅ Working |
 | **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
 
 **How to Send Files via Email:**
@@ -757,13 +768,60 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.5.0** - December 2024
+**Version 1.6.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Multi Tools, Screenshare and webcam support*
+*Talk to Apsara - Your Intelligent Voice Assistant with Voice-Controlled UI, Multi Tools, Screenshare and Webcam Support*
 
 ---
 
 ## 📋 Changelog
+
+### Version 1.6.0 (December 25, 2024)
+**🎨 Voice-Controlled Theme Switching & Enhanced Voice Commands:**
+- ✨ **Voice-Controlled Theme Changes**: Change UI themes with voice commands!
+  - 🎨 Say "Change theme to dark" to switch to dark mode
+  - 🌈 Say "Switch to dracula" for purple/pink theme
+  - 🌙 Say "Make it nightly" for navy blue theme
+  - ❄️ Say "Use nord theme" for arctic blue theme
+  - ☀️ Say "Solarized light" for warm beige theme
+  - 🎨 8 themes available: light, dark, nightly, dracula, monokai, nord, solarized-light, solarized-dark
+- 🎤 **Always-Enabled Voice Tools**: Three core voice control tools
+  - 🎨 **change_theme**: Instant theme switching via voice (ASYNC)
+  - 🖥️ **share_screen**: Voice-activated screen sharing (ASYNC)
+  - 📹 **share_camera**: Voice-activated camera sharing (ASYNC)
+- 🚀 **Instant Response**: All voice commands execute asynchronously
+  - Apsara responds immediately while theme changes apply in background
+  - No waiting, no lag, seamless experience
+- 💬 **Natural Language Support**: Multiple ways to change themes
+  - "Change theme to X"
+  - "Switch to X theme"
+  - "Make it X"
+  - "Use X"
+  - Flexible, natural voice commands
+
+**New Voice Commands:**
+- "Change theme to dark" → Switches to dark mode
+- "Switch to dracula theme" → Applies dracula (purple/pink) theme
+- "Make it nightly" → Activates nightly (navy blue) theme
+- "Use monokai" → Applies monokai (yellow/green on dark) theme
+- "Solarized light please" → Activates warm beige theme
+- "Nord theme" → Applies arctic blue theme
+
+**Technical Improvements:**
+- Added `change_theme` tool to `backend/tools.js` (always enabled, ASYNC)
+- Theme validation with helpful error messages
+- Normalizes theme names (handles spaces, underscores, case)
+- WebSocket message `trigger_theme_change` for frontend communication
+- Frontend handler applies theme instantly and persists to localStorage
+- Updated system prompt with theme descriptions for better AI understanding
+- Bug fix: WebSocket variable name corrected (`clientWs` instead of `ws`)
+- Removed `fill_form` and `click_element` placeholder tools
+
+**Files Modified:**
+- `backend/tools.js` - New changeTheme() function, tool metadata, declarations
+- `backend/server.js` - WebSocket handler, system prompt updates
+- `apsara-widget-app/src/components/ApsaraWidget.js` - Theme change handler
+- `README.md` - Version 1.6.0, documentation updates
 
 ### Version 1.5.0 (December 24, 2024)
 **🗂️ File System Tools, Web Automation & Memory Persistence:**

@@ -412,6 +412,17 @@ const ApsaraWidget = () => {
         }
         break;
 
+      case 'trigger_theme_change':
+        // Trigger theme change from voice command
+        debugLog('🎨 Voice command: Change theme to', message.data?.theme);
+        if (message.data?.theme) {
+          const newTheme = message.data.theme;
+          setCurrentTheme(newTheme);
+          localStorage.setItem('apsara-theme', newTheme);
+          console.log(`✅ Theme changed to: ${newTheme}`);
+        }
+        break;
+
       case 'error':
         console.error('Backend error:', message.error);
         setStatusText('Error: ' + message.error);

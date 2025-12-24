@@ -156,6 +156,9 @@ function generateSystemPrompt() {
   if (enabledTools.share_screen || enabledTools.share_camera) {
     capabilities.push('Sharing screen and camera with you (you can see what user is doing)');
   }
+  if (enabledTools.change_theme) {
+    capabilities.push('Changing the UI theme/appearance on user request');
+  }
   
   // Build tool usage section
   const toolUsageLines = [];
@@ -218,6 +221,9 @@ function generateSystemPrompt() {
   }
   if (enabledTools.share_camera) {
     toolUsageLines.push('- share_camera: Share user\'s camera with you (you can see them). Optional resolution parameter.');
+  }
+  if (enabledTools.change_theme) {
+    toolUsageLines.push('- change_theme: Change the UI theme (light, dark, nightly, dracula, monokai, nord, solarized-light, solarized-dark).');
   }
   if (enabledTools.googleSearch) {
     toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
@@ -560,6 +566,17 @@ wss.on('connection', (clientWs) => {
                                     type: 'trigger_camera_share',
                                     data: {
                                         resolution: result.resolution
+                                    }
+                                }));
+                            }
+                            
+                            // If change_theme, trigger theme change in frontend
+                            if (fc.name === 'change_theme' && result.success && result.action === 'change_theme') {
+                                debugLog('🎨 Triggering theme change in frontend...');
+                                clientWs.send(JSON.stringify({
+                                    type: 'trigger_theme_change',
+                                    data: {
+                                        theme: result.theme
                                     }
                                 }));
                             }

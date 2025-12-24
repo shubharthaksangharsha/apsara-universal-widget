@@ -70,7 +70,8 @@ let ENABLED_TOOLS = {
   
   // Always enabled (internal tools)
   share_screen: true,
-  share_camera: true
+  share_camera: true,
+  change_theme: true
 };
 
 // Tool metadata for UI display (with async behavior support)
@@ -96,7 +97,8 @@ const TOOL_METADATA = {
   
   // Always enabled (internal tools)
   share_screen: { name: 'Share Screen', description: 'Share screen with Apsara', async: true },
-  share_camera: { name: 'Share Camera', description: 'Share camera with Apsara', async: true }
+  share_camera: { name: 'Share Camera', description: 'Share camera with Apsara', async: true },
+  change_theme: { name: 'Change Theme', description: 'Change UI theme', async: true }
 };
 
 // Tool order and async settings (can be customized by user)
@@ -1137,6 +1139,50 @@ async function shareCamera(resolution = null) {
 }
 
 /**
+ * Change the UI theme (triggers theme change in the frontend)
+ * @param {string} theme - Theme name (e.g., 'light', 'dark', 'nightly', 'dracula', 'monokai', 'nord', 'solarized-light', 'solarized-dark')
+ * @returns {Promise<Object>} Result object
+ */
+async function changeTheme(theme) {
+  try {
+    // This tool sends a message to the frontend to change the theme
+    
+    const availableThemes = [
+      'light', 'dark', 'nightly', 'dracula', 'monokai', 'nord', 'solarized-light', 'solarized-dark'
+    ];
+    
+    if (!theme) {
+      return { 
+        success: false, 
+        error: `Theme name is required. Available themes: ${availableThemes.join(', ')}` 
+      };
+    }
+    
+    // Normalize theme name (lowercase, handle variations)
+    const normalizedTheme = theme.toLowerCase().replace(/[_\s]/g, '-');
+    
+    // Validate theme
+    if (!availableThemes.includes(normalizedTheme)) {
+      return {
+        success: false,
+        error: `Invalid theme: ${theme}. Available themes: ${availableThemes.join(', ')}`
+      };
+    }
+    
+    return {
+      success: true,
+      action: 'change_theme',
+      theme: normalizedTheme,
+      message: `Changing theme to ${normalizedTheme}`,
+      note: 'Theme will be changed in the UI'
+    };
+  } catch (error) {
+    console.error('❌ Theme change error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Generate an image using Nano Banana (Gemini Image Generation)
  * @param {string} prompt - Text description of the image to generate
  * @param {string} model - Model to use: 'flash' (gemini-2.5-flash-image) or 'pro' (gemini-3-pro-image-preview)
@@ -1611,6 +1657,24 @@ function getToolDeclarations() {
     }, 'share_camera'));
   }
 
+  if (ENABLED_TOOLS.change_theme) {
+    functionDeclarations.push(addBehavior({
+      name: 'change_theme',
+      description: 'Change the UI theme/appearance. Use when user asks to change theme, switch themes, or make UI darker/lighter. Available themes: light (white/clean), dark (dark gray), nightly (navy blue), dracula (purple/pink), monokai (yellow/green on dark), nord (blue/teal arctic), solarized-light (warm beige), solarized-dark (dark blue).',
+      parameters: {
+        type: 'object',
+        properties: {
+          theme: { 
+            type: 'string',
+            enum: ['light', 'dark', 'nightly', 'dracula', 'monokai', 'nord', 'solarized-light', 'solarized-dark'],
+            description: 'Theme name to switch to. Examples: "dark" for dark mode, "dracula" for purple theme, "nightly" for navy blue, "nord" for arctic blue.' 
+          }
+        },
+        required: ['theme']
+      }
+    }, 'change_theme'));
+  }
+
   // Add custom function declarations if any exist
   if (functionDeclarations.length > 0) {
     declarations.push({ functionDeclarations });
@@ -1699,6 +1763,9 @@ async function executeTool(functionName, args) {
       
       case 'share_camera':
         return await shareCamera(args.resolution);
+      
+      case 'change_theme':
+        return await changeTheme(args.theme);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };
