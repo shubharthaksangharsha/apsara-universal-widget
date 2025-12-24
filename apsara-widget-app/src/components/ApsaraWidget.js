@@ -384,6 +384,34 @@ const ApsaraWidget = () => {
         setGeneratedImage(message.data);
         break;
 
+      case 'trigger_screen_share':
+        // Trigger screen sharing from voice command
+        debugLog('🖥️ Voice command: Start screen share', message.data);
+        if (!isScreenSharing) {
+          // Update resolution if provided
+          if (message.data?.resolution) {
+            setSelectedResolution(message.data.resolution);
+            localStorage.setItem('apsara-screen-resolution', message.data.resolution);
+          }
+          // Start screen share
+          setTimeout(() => startScreenShare(), 100); // Small delay to ensure state is updated
+        }
+        break;
+
+      case 'trigger_camera_share':
+        // Trigger camera sharing from voice command
+        debugLog('📷 Voice command: Start camera', message.data);
+        if (!isCameraActive) {
+          // Update resolution if provided
+          if (message.data?.resolution) {
+            setSelectedCameraResolution(message.data.resolution);
+            localStorage.setItem('apsara-camera-resolution', message.data.resolution);
+          }
+          // Start camera
+          setTimeout(() => startCamera(), 100); // Small delay to ensure state is updated
+        }
+        break;
+
       case 'error':
         console.error('Backend error:', message.error);
         setStatusText('Error: ' + message.error);

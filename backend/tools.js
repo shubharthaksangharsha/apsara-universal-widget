@@ -67,8 +67,11 @@ let ENABLED_TOOLS = {
   delete_file: false,
   open_url: false,
   fill_form: false,
-  click_element: false,
-  generate_image: false
+  generate_image: false,
+  
+  // Always enabled (internal tools)
+  share_screen: true,
+  share_camera: true
 };
 
 // Tool metadata for UI display (with async behavior support)
@@ -91,8 +94,11 @@ const TOOL_METADATA = {
   delete_file: { name: 'Delete File', description: 'Delete files', async: true },
   open_url: { name: 'Open URL', description: 'Open websites in browser', async: true },
   fill_form: { name: 'Fill Form', description: 'Fill web forms automatically', async: true },
-  click_element: { name: 'Click Element', description: 'Click elements on websites', async: true },
-  generate_image: { name: 'Generate Image', description: 'AI image generation (Nano Banana)', async: true }
+  generate_image: { name: 'Generate Image', description: 'AI image generation (Nano Banana)', async: true },
+  
+  // Always enabled (internal tools)
+  share_screen: { name: 'Share Screen', description: 'Share screen with Apsara', async: true },
+  share_camera: { name: 'Share Camera', description: 'Share camera with Apsara', async: true }
 };
 
 // Tool order and async settings (can be customized by user)
@@ -1103,36 +1109,75 @@ async function fillForm(url, formData = {}) {
 }
 
 /**
- * Click an element on a website (simulates browser automation)
- * @param {string} url - URL of the website
- * @param {string} selector - CSS selector or element description
+ * Share screen with Apsara (triggers screen sharing in the frontend)
+ * @param {string} resolution - Screen resolution (e.g., '1920x1080', '3072x1920')
  * @returns {Promise<Object>} Result object
  */
-async function clickElement(url, selector) {
+async function shareScreen(resolution = null) {
   try {
-    // Note: This is a placeholder implementation
-    // For real browser automation, use Puppeteer, Playwright, or Selenium
+    // This tool sends a message to the frontend to trigger screen sharing
+    // The frontend will use the provided resolution or fall back to UI selection
     
-    if (!url) {
-      return { success: false, error: 'URL is required' };
+    const availableResolutions = [
+      '1280x720', '1920x1080', '2560x1440', '3072x1920', '3840x2160'
+    ];
+    
+    // Validate resolution if provided
+    if (resolution && !availableResolutions.includes(resolution)) {
+      return {
+        success: false,
+        error: `Invalid resolution: ${resolution}. Available: ${availableResolutions.join(', ')}`
+      };
     }
-    
-    if (!selector) {
-      return { success: false, error: 'Element selector is required' };
-    }
-    
-    // For now, just open the URL and inform the user
-    await openUrl(url);
     
     return {
       success: true,
-      url: url,
-      selector: selector,
-      message: `Opened ${url}. To click element "${selector}", please use browser automation tools like Puppeteer.`,
-      note: 'This is a simplified implementation. For production use, integrate Puppeteer or Playwright for headless browser automation.'
+      action: 'start_screen_share',
+      resolution: resolution,
+      message: resolution 
+        ? `Starting screen share at ${resolution}` 
+        : 'Starting screen share at default resolution',
+      note: 'Screen sharing will be initiated in the UI'
     };
   } catch (error) {
-    console.error('❌ Click element error:', error);
+    console.error('❌ Screen share error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Share camera with Apsara (triggers camera sharing in the frontend)
+ * @param {string} resolution - Camera resolution (e.g., '640x480', '1280x720')
+ * @returns {Promise<Object>} Result object
+ */
+async function shareCamera(resolution = null) {
+  try {
+    // This tool sends a message to the frontend to trigger camera sharing
+    // The frontend will use the provided resolution or fall back to UI selection
+    
+    const availableResolutions = [
+      '640x480', '1280x720', '1920x1080'
+    ];
+    
+    // Validate resolution if provided
+    if (resolution && !availableResolutions.includes(resolution)) {
+      return {
+        success: false,
+        error: `Invalid resolution: ${resolution}. Available: ${availableResolutions.join(', ')}`
+      };
+    }
+    
+    return {
+      success: true,
+      action: 'start_camera',
+      resolution: resolution,
+      message: resolution 
+        ? `Starting camera at ${resolution}` 
+        : 'Starting camera at default resolution',
+      note: 'Camera sharing will be initiated in the UI'
+    };
+  } catch (error) {
+    console.error('❌ Camera share error:', error);
     return { success: false, error: error.message };
   }
 }
@@ -1561,21 +1606,6 @@ function getToolDeclarations() {
     }, 'fill_form'));
   }
 
-  if (ENABLED_TOOLS.click_element) {
-    functionDeclarations.push(addBehavior({
-      name: 'click_element',
-      description: 'Open a website and prepare to interact with a specific element (for basic automation).',
-      parameters: {
-        type: 'object',
-        properties: {
-          url: { type: 'string', description: 'URL of the website' },
-          selector: { type: 'string', description: 'CSS selector or description of element to click (e.g., "#submit-button" or "login button")' }
-        },
-        required: ['url', 'selector']
-      }
-    }, 'click_element'));
-  }
-
   if (ENABLED_TOOLS.generate_image) {
     functionDeclarations.push(addBehavior({
       name: 'generate_image',
@@ -1606,6 +1636,43 @@ function getToolDeclarations() {
         required: ['prompt']
       }
     }, 'generate_image'));
+  }
+
+  // Always enabled tools (internal, not in UI)
+  if (ENABLED_TOOLS.share_screen) {
+    functionDeclarations.push(addBehavior({
+      name: 'share_screen',
+      description: 'Share screen with Apsara. You can see what the user is doing on their screen. Optional resolution parameter (e.g., "1920x1080", "3072x1920"). If not specified, uses current UI selection.',
+      parameters: {
+        type: 'object',
+        properties: {
+          resolution: { 
+            type: 'string',
+            enum: ['1280x720', '1920x1080', '2560x1440', '3072x1920', '3840x2160'],
+            description: 'Screen capture resolution. Default: uses current UI selection' 
+          }
+        },
+        required: []
+      }
+    }, 'share_screen'));
+  }
+
+  if (ENABLED_TOOLS.share_camera) {
+    functionDeclarations.push(addBehavior({
+      name: 'share_camera',
+      description: 'Share camera with Apsara. You can see the user through their camera. Optional resolution parameter (e.g., "640x480", "1280x720"). If not specified, uses current UI selection.',
+      parameters: {
+        type: 'object',
+        properties: {
+          resolution: { 
+            type: 'string',
+            enum: ['640x480', '1280x720', '1920x1080'],
+            description: 'Camera capture resolution. Default: uses current UI selection' 
+          }
+        },
+        required: []
+      }
+    }, 'share_camera'));
   }
 
   // Add custom function declarations if any exist
@@ -1691,11 +1758,14 @@ async function executeTool(functionName, args) {
       case 'fill_form':
         return await fillForm(args.url, args.formData);
       
-      case 'click_element':
-        return await clickElement(args.url, args.selector);
-      
       case 'generate_image':
         return await generateImage(args.prompt, args.model, args.aspectRatio, args.imageSize);
+      
+      case 'share_screen':
+        return await shareScreen(args.resolution);
+      
+      case 'share_camera':
+        return await shareCamera(args.resolution);
       
       default:
         return { success: false, error: `Unknown function: ${functionName}` };

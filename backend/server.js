@@ -147,11 +147,14 @@ function generateSystemPrompt() {
   if (enabledTools.create_file || enabledTools.edit_file || enabledTools.move_file || enabledTools.rename_file || enabledTools.delete_file) {
     capabilities.push('Creating, editing, moving, renaming, and deleting files');
   }
-  if (enabledTools.open_url || enabledTools.fill_form || enabledTools.click_element) {
+  if (enabledTools.open_url || enabledTools.fill_form) {
     capabilities.push('Opening websites, filling forms, and basic web automation');
   }
   if (enabledTools.generate_image) {
     capabilities.push('AI image generation using Nano Banana (create any image from text descriptions)');
+  }
+  if (enabledTools.share_screen || enabledTools.share_camera) {
+    capabilities.push('Sharing screen and camera with you (you can see what user is doing)');
   }
   
   // Build tool usage section
@@ -210,11 +213,14 @@ function generateSystemPrompt() {
   if (enabledTools.fill_form) {
     toolUsageLines.push('- fill_form: Open web forms with pre-filled query parameters');
   }
-  if (enabledTools.click_element) {
-    toolUsageLines.push('- click_element: Open websites and interact with specific elements');
-  }
   if (enabledTools.generate_image) {
     toolUsageLines.push('- generate_image: AI image generation with Nano Banana (creates images from text descriptions)');
+  }
+  if (enabledTools.share_screen) {
+    toolUsageLines.push('- share_screen: Share user\'s screen with you (you can see what they\'re doing). Optional resolution parameter.');
+  }
+  if (enabledTools.share_camera) {
+    toolUsageLines.push('- share_camera: Share user\'s camera with you (you can see them). Optional resolution parameter.');
   }
   if (enabledTools.googleSearch) {
     toolUsageLines.push('- Google Search: Automatic real-time information retrieval');
@@ -535,6 +541,28 @@ wss.on('connection', (clientWs) => {
                                         imageSize: result.imageSize,
                                         fileSize: result.fileSize,
                                         mimeType: result.mimeType
+                                    }
+                                }));
+                            }
+                            
+                            // If share_screen, trigger screen sharing in frontend
+                            if (fc.name === 'share_screen' && result.success && result.action === 'start_screen_share') {
+                                debugLog('🖥️ Triggering screen share in frontend...');
+                                ws.send(JSON.stringify({
+                                    type: 'trigger_screen_share',
+                                    data: {
+                                        resolution: result.resolution
+                                    }
+                                }));
+                            }
+                            
+                            // If share_camera, trigger camera sharing in frontend
+                            if (fc.name === 'share_camera' && result.success && result.action === 'start_camera') {
+                                debugLog('📷 Triggering camera share in frontend...');
+                                ws.send(JSON.stringify({
+                                    type: 'trigger_camera_share',
+                                    data: {
+                                        resolution: result.resolution
                                     }
                                 }));
                             }
