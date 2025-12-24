@@ -147,8 +147,8 @@ function generateSystemPrompt() {
   if (enabledTools.create_file || enabledTools.edit_file || enabledTools.move_file || enabledTools.rename_file || enabledTools.delete_file) {
     capabilities.push('Creating, editing, moving, renaming, and deleting files');
   }
-  if (enabledTools.open_url || enabledTools.fill_form) {
-    capabilities.push('Opening websites, filling forms, and basic web automation');
+  if (enabledTools.open_url) {
+    capabilities.push('Opening websites in browser');
   }
   if (enabledTools.generate_image) {
     capabilities.push('AI image generation using Nano Banana (create any image from text descriptions)');
@@ -209,9 +209,6 @@ function generateSystemPrompt() {
   }
   if (enabledTools.open_url) {
     toolUsageLines.push('- open_url: Open URLs in default browser');
-  }
-  if (enabledTools.fill_form) {
-    toolUsageLines.push('- fill_form: Open web forms with pre-filled query parameters');
   }
   if (enabledTools.generate_image) {
     toolUsageLines.push('- generate_image: AI image generation with Nano Banana (creates images from text descriptions)');
@@ -548,7 +545,7 @@ wss.on('connection', (clientWs) => {
                             // If share_screen, trigger screen sharing in frontend
                             if (fc.name === 'share_screen' && result.success && result.action === 'start_screen_share') {
                                 debugLog('🖥️ Triggering screen share in frontend...');
-                                ws.send(JSON.stringify({
+                                clientWs.send(JSON.stringify({
                                     type: 'trigger_screen_share',
                                     data: {
                                         resolution: result.resolution
@@ -559,7 +556,7 @@ wss.on('connection', (clientWs) => {
                             // If share_camera, trigger camera sharing in frontend
                             if (fc.name === 'share_camera' && result.success && result.action === 'start_camera') {
                                 debugLog('📷 Triggering camera share in frontend...');
-                                ws.send(JSON.stringify({
+                                clientWs.send(JSON.stringify({
                                     type: 'trigger_camera_share',
                                     data: {
                                         resolution: result.resolution

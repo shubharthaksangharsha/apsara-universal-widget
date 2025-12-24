@@ -66,7 +66,6 @@ let ENABLED_TOOLS = {
   rename_file: false,
   delete_file: false,
   open_url: false,
-  fill_form: false,
   generate_image: false,
   
   // Always enabled (internal tools)
@@ -93,7 +92,6 @@ const TOOL_METADATA = {
   rename_file: { name: 'Rename File', description: 'Rename files', async: true },
   delete_file: { name: 'Delete File', description: 'Delete files', async: true },
   open_url: { name: 'Open URL', description: 'Open websites in browser', async: true },
-  fill_form: { name: 'Fill Form', description: 'Fill web forms automatically', async: true },
   generate_image: { name: 'Generate Image', description: 'AI image generation (Nano Banana)', async: true },
   
   // Always enabled (internal tools)
@@ -1065,50 +1063,6 @@ async function openUrl(url) {
 }
 
 /**
- * Fill a web form (opens URL with pre-filled query parameters)
- * @param {string} url - Base URL to fill form on
- * @param {Object} formData - Object with field names and values
- * @returns {Promise<Object>} Result object
- */
-async function fillForm(url, formData = {}) {
-  try {
-    // Note: This is a simplified implementation that constructs a URL with query parameters
-    // For complex form filling, consider using Puppeteer or Playwright
-    
-    if (!url) {
-      return { success: false, error: 'URL is required' };
-    }
-    
-    // Validate URL format
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      url = 'https://' + url;
-    }
-    
-    // Build query string from form data
-    const queryParams = new URLSearchParams(formData).toString();
-    const fullUrl = queryParams ? `${url}?${queryParams}` : url;
-    
-    // Open the URL with pre-filled parameters
-    const result = await openUrl(fullUrl);
-    
-    if (result.success) {
-      return {
-        success: true,
-        url: fullUrl,
-        formData: formData,
-        message: `Opened form URL with pre-filled data: ${fullUrl}`,
-        note: 'For advanced form automation, consider using browser automation tools'
-      };
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('❌ Form fill error:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-/**
  * Share screen with Apsara (triggers screen sharing in the frontend)
  * @param {string} resolution - Screen resolution (e.g., '1920x1080', '3072x1920')
  * @returns {Promise<Object>} Result object
@@ -1588,24 +1542,6 @@ function getToolDeclarations() {
     }, 'open_url'));
   }
 
-  if (ENABLED_TOOLS.fill_form) {
-    functionDeclarations.push(addBehavior({
-      name: 'fill_form',
-      description: 'Open a web form with pre-filled query parameters. Useful for search forms, contact forms, etc.',
-      parameters: {
-        type: 'object',
-        properties: {
-          url: { type: 'string', description: 'Base URL of the form' },
-          formData: { 
-            type: 'object', 
-            description: 'Object with field names as keys and values to fill (e.g., {"search": "query", "email": "user@example.com"})' 
-          }
-        },
-        required: ['url', 'formData']
-      }
-    }, 'fill_form'));
-  }
-
   if (ENABLED_TOOLS.generate_image) {
     functionDeclarations.push(addBehavior({
       name: 'generate_image',
@@ -1754,9 +1690,6 @@ async function executeTool(functionName, args) {
       
       case 'open_url':
         return await openUrl(args.url);
-      
-      case 'fill_form':
-        return await fillForm(args.url, args.formData);
       
       case 'generate_image':
         return await generateImage(args.prompt, args.model, args.aspectRatio, args.imageSize);
