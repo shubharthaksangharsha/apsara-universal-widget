@@ -153,6 +153,9 @@ function generateSystemPrompt() {
   if (enabledTools.generate_image) {
     capabilities.push('AI image generation using Nano Banana (create any image from text descriptions)');
   }
+  if (enabledTools.computer_use) {
+    capabilities.push('COMPUTER USE - Full mouse & keyboard control using screen coordinates (POWERFUL: requires screen sharing)');
+  }
   if (enabledTools.share_screen || enabledTools.share_camera) {
     capabilities.push('Sharing screen and camera with you (you can see what user is doing)');
   }
@@ -215,6 +218,9 @@ function generateSystemPrompt() {
   }
   if (enabledTools.generate_image) {
     toolUsageLines.push('- generate_image: AI image generation with Nano Banana (creates images from text descriptions)');
+  }
+  if (enabledTools.computer_use) {
+    toolUsageLines.push('- computer_use: **POWERFUL** Control mouse & keyboard using coordinates. REQUIRES screen sharing. Actions: click, double_click, right_click, type, key, scroll. Origin (0,0) = top-left. ALWAYS look at screen before clicking!');
   }
   if (enabledTools.share_screen) {
     toolUsageLines.push('- share_screen: Share user\'s screen with you (you can see what they\'re doing). Optional resolution parameter.');

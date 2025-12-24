@@ -67,6 +67,7 @@ let ENABLED_TOOLS = {
   delete_file: false,
   open_url: false,
   generate_image: false,
+  computer_use: false,  // POWERFUL: Mouse & keyboard control (disabled by default for safety)
   
   // Always enabled (internal tools)
   share_screen: true,
@@ -94,6 +95,7 @@ const TOOL_METADATA = {
   delete_file: { name: 'Delete File', description: 'Delete files', async: true },
   open_url: { name: 'Open URL', description: 'Open websites in browser', async: true },
   generate_image: { name: 'Generate Image', description: 'AI image generation (Nano Banana)', async: true },
+  computer_use: { name: 'Computer Use', description: 'Control mouse & keyboard (POWERFUL)', async: true },
   
   // Always enabled (internal tools)
   share_screen: { name: 'Share Screen', description: 'Share screen with Apsara', async: true },
@@ -1139,6 +1141,225 @@ async function shareCamera(resolution = null) {
 }
 
 /**
+ * Computer Use - Control mouse and keyboard using coordinates
+ * SAFETY: This is a POWERFUL tool. Use with extreme care.
+ * @param {string} action - Action to perform: 'click', 'double_click', 'right_click', 'type', 'key', 'scroll', 'move'
+ * @param {number} x - X coordinate (pixels from left edge, 0 = left)
+ * @param {number} y - Y coordinate (pixels from top edge, 0 = top)
+ * @param {string} text - Text to type (for 'type' action)
+ * @param {string} key - Key to press (for 'key' action): 'Return', 'Tab', 'Escape', 'Up', 'Down', 'Left', 'Right', etc.
+ * @param {string} direction - Scroll direction (for 'scroll' action): 'up' or 'down'
+ * @param {number} amount - Scroll amount in pixels or clicks (default: 100)
+ * @returns {Promise<Object>} Result object
+ */
+async function computerUse(action, x = null, y = null, text = null, key = null, direction = null, amount = 100) {
+  try {
+    const platform = process.platform; // 'linux', 'darwin' (macOS), 'win32' (Windows)
+    
+    // Validate action
+    const validActions = ['click', 'double_click', 'right_click', 'type', 'key', 'scroll', 'move'];
+    if (!validActions.includes(action)) {
+      return {
+        success: false,
+        error: `Invalid action: ${action}. Valid actions: ${validActions.join(', ')}`
+      };
+    }
+    
+    // Validate coordinates for actions that need them
+    if (['click', 'double_click', 'right_click', 'move'].includes(action)) {
+      if (x === null || y === null || x < 0 || y < 0) {
+        return {
+          success: false,
+          error: `Action '${action}' requires valid coordinates (x >= 0, y >= 0)`
+        };
+      }
+      // Basic sanity check (assuming max 8K resolution)
+      if (x > 7680 || y > 4320) {
+        return {
+          success: false,
+          error: `Coordinates out of reasonable bounds (max 7680x4320). Got: ${x}, ${y}`
+        };
+      }
+    }
+    
+    // Execute action based on platform
+    let command;
+    let result;
+    
+    switch (platform) {
+      case 'linux':
+        // Linux uses xdotool
+        switch (action) {
+          case 'click':
+            command = `xdotool mousemove ${x} ${y} click 1`;
+            break;
+          case 'double_click':
+            command = `xdotool mousemove ${x} ${y} click --repeat 2 1`;
+            break;
+          case 'right_click':
+            command = `xdotool mousemove ${x} ${y} click 3`;
+            break;
+          case 'move':
+            command = `xdotool mousemove ${x} ${y}`;
+            break;
+          case 'type':
+            if (!text) return { success: false, error: 'Text is required for type action' };
+            // Escape special characters for shell
+            const escapedText = text.replace(/'/g, "'\\''");
+            command = `xdotool type --delay 50 '${escapedText}'`;
+            break;
+          case 'key':
+            if (!key) return { success: false, error: 'Key is required for key action' };
+            command = `xdotool key ${key}`;
+            break;
+          case 'scroll':
+            if (!direction) return { success: false, error: 'Direction (up/down) is required for scroll' };
+            const scrollButton = direction === 'up' ? '4' : '5';
+            const scrollAmount = Math.floor(amount / 15) || 3; // Convert pixels to scroll clicks
+            command = `xdotool click --repeat ${scrollAmount} ${scrollButton}`;
+            break;
+        }
+        break;
+      
+      case 'darwin':
+        // macOS uses cliclick (needs to be installed: brew install cliclick)
+        switch (action) {
+          case 'click':
+            command = `cliclick m:${x},${y} c:${x},${y}`;
+            break;
+          case 'double_click':
+            command = `cliclick m:${x},${y} dc:${x},${y}`;
+            break;
+          case 'right_click':
+            command = `cliclick m:${x},${y} rc:${x},${y}`;
+            break;
+          case 'move':
+            command = `cliclick m:${x},${y}`;
+            break;
+          case 'type':
+            if (!text) return { success: false, error: 'Text is required for type action' };
+            command = `cliclick t:'${text.replace(/'/g, "'\\''")}'`;
+            break;
+          case 'key':
+            if (!key) return { success: false, error: 'Key is required for key action' };
+            // Map common keys to cliclick format
+            const keyMap = {
+              'Return': 'enter',
+              'Escape': 'esc',
+              'Tab': 'tab',
+              'Delete': 'delete',
+              'Up': 'arrow-up',
+              'Down': 'arrow-down',
+              'Left': 'arrow-left',
+              'Right': 'arrow-right'
+            };
+            const mappedKey = keyMap[key] || key.toLowerCase();
+            command = `cliclick kp:${mappedKey}`;
+            break;
+          case 'scroll':
+            if (!direction) return { success: false, error: 'Direction (up/down) is required for scroll' };
+            const scrollDir = direction === 'up' ? 'u' : 'd';
+            const scrollAmt = Math.floor(amount / 10) || 5;
+            command = `for i in {1..${scrollAmt}}; do cliclick w:${scrollDir}; done`;
+            break;
+        }
+        break;
+      
+      case 'win32':
+        // Windows uses PowerShell
+        switch (action) {
+          case 'click':
+          case 'double_click':
+          case 'right_click':
+          case 'move':
+            const clickType = action === 'right_click' ? 'Right' : 'Left';
+            const clickCount = action === 'double_click' ? 2 : 1;
+            const clickAction = action === 'move' ? '' : `;[System.Windows.Forms.Cursor]::Position.X=$($cursor.X);[System.Windows.Forms.Cursor]::Position.Y=$($cursor.Y);for($i=0;$i-lt${clickCount};$i++){Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.SendKeys]::SendWait('{${clickType}}');}`;
+            command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms;$cursor=New-Object System.Drawing.Point(${x},${y});[System.Windows.Forms.Cursor]::Position=$cursor${clickAction}"`;
+            break;
+          case 'type':
+            if (!text) return { success: false, error: 'Text is required for type action' };
+            // Escape PowerShell special characters
+            const psText = text.replace(/"/g, '`"').replace(/'/g, "''");
+            command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.SendKeys]::SendWait('${psText}')"`;
+            break;
+          case 'key':
+            if (!key) return { success: false, error: 'Key is required for key action' };
+            // Map keys to SendKeys format
+            const psKeyMap = {
+              'Return': '{ENTER}',
+              'Escape': '{ESC}',
+              'Tab': '{TAB}',
+              'Delete': '{DELETE}',
+              'Up': '{UP}',
+              'Down': '{DOWN}',
+              'Left': '{LEFT}',
+              'Right': '{RIGHT}'
+            };
+            const psKey = psKeyMap[key] || `{${key.toUpperCase()}}`;
+            command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.SendKeys]::SendWait('${psKey}')"`;
+            break;
+          case 'scroll':
+            if (!direction) return { success: false, error: 'Direction (up/down) is required for scroll' };
+            const scrollValue = direction === 'up' ? amount : -amount;
+            command = `powershell -Command "Add-Type -AssemblyName System.Windows.Forms;[System.Windows.Forms.SendKeys]::SendWait('{SCROLLUP ${Math.abs(scrollValue)}}')"`;
+            break;
+        }
+        break;
+      
+      default:
+        return { success: false, error: `Unsupported platform: ${platform}` };
+    }
+    
+    // Execute the command
+    debugLog('computer-use', `🖱️ Executing ${action} on ${platform}:`, command);
+    result = await execAsync(command);
+    
+    // Build response message
+    let message = '';
+    switch (action) {
+      case 'click':
+        message = `Clicked at (${x}, ${y})`;
+        break;
+      case 'double_click':
+        message = `Double-clicked at (${x}, ${y})`;
+        break;
+      case 'right_click':
+        message = `Right-clicked at (${x}, ${y})`;
+        break;
+      case 'move':
+        message = `Moved mouse to (${x}, ${y})`;
+        break;
+      case 'type':
+        message = `Typed: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`;
+        break;
+      case 'key':
+        message = `Pressed key: ${key}`;
+        break;
+      case 'scroll':
+        message = `Scrolled ${direction} by ${amount} pixels`;
+        break;
+    }
+    
+    return {
+      success: true,
+      action: action,
+      x: x,
+      y: y,
+      text: text,
+      key: key,
+      direction: direction,
+      amount: amount,
+      platform: platform,
+      message: message
+    };
+  } catch (error) {
+    console.error('❌ Computer use error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Change the UI theme (triggers theme change in the frontend)
  * @param {string} theme - Theme name (e.g., 'light', 'dark', 'nightly', 'dracula', 'monokai', 'nord', 'solarized-light', 'solarized-dark')
  * @returns {Promise<Object>} Result object
@@ -1620,6 +1841,85 @@ function getToolDeclarations() {
     }, 'generate_image'));
   }
 
+  if (ENABLED_TOOLS.computer_use) {
+    functionDeclarations.push(addBehavior({
+      name: 'computer_use',
+      description: `COMPUTER USE - Control mouse and keyboard using screen coordinates. REQUIRES SCREEN SHARING TO BE ACTIVE.
+
+**CRITICAL: Coordinate System**
+- Origin (0, 0) is TOP-LEFT corner of screen
+- X increases rightward (0 = left edge, max = right edge)
+- Y increases downward (0 = top edge, max = bottom edge)
+- You MUST see the screen via screen sharing to know where to click
+- ALWAYS look at the current screen content before acting
+- Calculate coordinates based on visual position of UI elements
+
+**Available Actions:**
+- click: Left-click at (x, y)
+- double_click: Double left-click at (x, y)
+- right_click: Right-click at (x, y)
+- move: Move mouse to (x, y) without clicking
+- type: Type text (uses currently focused input)
+- key: Press special key (Return, Tab, Escape, Up, Down, Left, Right)
+- scroll: Scroll up/down by amount
+
+**Example Workflow:**
+1. User: "Go to chatgpt.com and ask what is life"
+2. You: open_url("chatgpt.com") → wait 2-3 seconds
+3. You: Look at screen via screen sharing
+4. You: Identify "New Chat" button position (e.g., x=1200, y=150)
+5. You: computer_use("click", x=1200, y=150)
+6. You: Identify text input field (e.g., x=800, y=500)
+7. You: computer_use("click", x=800, y=500)
+8. You: computer_use("type", text="what is life?")
+9. You: computer_use("key", key="Return")
+
+**SAFETY:**
+- ONLY use when screen sharing is active
+- ALWAYS look at screen before clicking
+- NEVER click blindly - calculate coordinates from visual position
+- Start with approximate coordinates, adjust if needed
+- Wait 1-2 seconds between actions for UI to update`,
+      parameters: {
+        type: 'object',
+        properties: {
+          action: { 
+            type: 'string',
+            enum: ['click', 'double_click', 'right_click', 'move', 'type', 'key', 'scroll'],
+            description: 'Action to perform'
+          },
+          x: { 
+            type: 'number', 
+            description: 'X coordinate in pixels (horizontal, 0 = left edge). Required for click/double_click/right_click/move.' 
+          },
+          y: { 
+            type: 'number', 
+            description: 'Y coordinate in pixels (vertical, 0 = top edge). Required for click/double_click/right_click/move.' 
+          },
+          text: { 
+            type: 'string', 
+            description: 'Text to type. Required for "type" action. Will be typed in the currently focused input field.' 
+          },
+          key: { 
+            type: 'string',
+            enum: ['Return', 'Tab', 'Escape', 'Delete', 'Up', 'Down', 'Left', 'Right'],
+            description: 'Special key to press. Required for "key" action. Return = Enter key.'
+          },
+          direction: { 
+            type: 'string',
+            enum: ['up', 'down'],
+            description: 'Scroll direction. Required for "scroll" action.'
+          },
+          amount: { 
+            type: 'number', 
+            description: 'Scroll amount in pixels. Optional, defaults to 100. For "scroll" action.' 
+          }
+        },
+        required: ['action']
+      }
+    }, 'computer_use'));
+  }
+
   // Always enabled tools (internal, not in UI)
   if (ENABLED_TOOLS.share_screen) {
     functionDeclarations.push(addBehavior({
@@ -1757,6 +2057,9 @@ async function executeTool(functionName, args) {
       
       case 'generate_image':
         return await generateImage(args.prompt, args.model, args.aspectRatio, args.imageSize);
+      
+      case 'computer_use':
+        return await computerUse(args.action, args.x, args.y, args.text, args.key, args.direction, args.amount);
       
       case 'share_screen':
         return await shareScreen(args.resolution);

@@ -3,10 +3,10 @@
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
 ![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?logo=node.js)
-![Version](https://img.shields.io/badge/Version-1.6.0-blue)
+![Version](https://img.shields.io/badge/Version-1.7.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**Version 1.6.0** - Voice-Controlled Theme Switching & Enhanced Voice Commands
+**Version 1.7.0** - Computer Use: Full Mouse & Keyboard Control
 
 A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimental AI, featuring a beautiful React widget, Electron desktop app with camera and screen sharing, and Node.js backend with WebSocket communication.
 
@@ -39,6 +39,13 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Send Email with Attachments**: Send messages with files, screenshots, or documents
 - **Complete File System Control**: Read, create, edit, move, rename, delete files and browse directories
 - **Web Automation**: Open URLs in your default browser
+- **🖱️ COMPUTER USE (NEW!)**: Full mouse and keyboard control using screen coordinates
+  - Click, double-click, right-click at any position
+  - Type text and press special keys (Enter, Tab, etc.)
+  - Scroll up/down, move mouse
+  - Coordinate-based navigation (0,0 = top-left corner)
+  - Requires screen sharing to see what it's doing
+  - **Example**: "Go to chatgpt.com and ask 'what is life?'" → Apsara opens URL, clicks buttons, types, and submits!
 - **Screenshot & Clipboard**: Capture screen, manage clipboard, paste content
 - **Memory Management**: Store and retrieve information across sessions (persistent to disk)
 - **Help with Tasks**: Assistance with planning, problem-solving, and decision-making
@@ -96,6 +103,18 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - 🖥️ "Share my screen"
 - 📹 "Share camera at 1280x720"
 - 🔄 "Switch to solarized dark"
+
+**🖱️ Computer Use (POWERFUL!):**
+- 🌐 "Go to chatgpt.com and start a new conversation asking 'what is life?'"
+- 📝 "Fill out the form on this website with my information"
+- 🎨 "Open Photoshop and create a new document"
+- 📧 "Open Gmail, compose a new email, and type 'Hello team'"
+- 🔍 "Search for 'best restaurants near me' on Google"
+- 📂 "Open my Documents folder and find the latest PDF"
+- 🎮 "Launch Steam and start Dota 2"
+- ✏️ "Click the edit button and change this text"
+- 📊 "Scroll down to see more results"
+- **NOTE**: Requires screen sharing to be active so Apsara can see the screen!
 
 **Web Browsing:**
 - 🌐 "Open youtube.com"
@@ -466,6 +485,7 @@ Apsara can use these tools to help you:
 | **delete_file** | Delete files (with confirmation) | "Delete old-file.txt" | ✅ Working |
 | **open_url** | Open websites in default browser | "Open github.com" | ✅ Working |
 | **generate_image** | AI image generation (Nano Banana) | "Generate an image of a futuristic city" | ✅ Working |
+| **computer_use** | **POWERFUL** Mouse & keyboard control via coordinates | "Go to chatgpt.com and ask 'what is life?'" | ✅ Working |
 | **share_screen** | Voice-activated screen sharing | "Share my screen at 1920x1080" | ✅ Working |
 | **share_camera** | Voice-activated camera sharing | "Share camera" or "Show me through camera" | ✅ Working |
 | **change_theme** | Voice-controlled theme switching | "Change theme to dark" or "Switch to dracula" | ✅ Working |
@@ -768,13 +788,99 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 
 *Powered by React, Electron, Node.js, and Google Gemini AI*
 
-**Version 1.6.0** - December 2024
+**Version 1.7.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Voice-Controlled UI, Multi Tools, Screenshare and Webcam Support*
+*Talk to Apsara - Your Intelligent Voice Assistant with Computer Use, Voice-Controlled UI, Multi Tools, Screenshare and Webcam Support*
 
 ---
 
 ## 📋 Changelog
+
+### Version 1.7.0 (December 25, 2024)
+**🖱️ COMPUTER USE - Full Mouse & Keyboard Control via Coordinates:**
+- ✨ **Most Powerful Feature Yet**: Apsara can now control your mouse and keyboard!
+  - 🖱️ **Mouse Control**: Click, double-click, right-click at any screen coordinates
+  - ⌨️ **Keyboard Control**: Type text, press special keys (Enter, Tab, Escape, etc.)
+  - 📜 **Scrolling**: Scroll up/down by specified amounts
+  - 🎯 **Coordinate System**: Uses (0,0) as top-left corner, standard screen coordinates
+  - 👁️ **Vision-Based**: Requires screen sharing so Apsara can SEE where to click
+  - 🔒 **Disabled by Default**: Safety first - must be explicitly enabled in Configure Tools
+
+**How It Works:**
+1. Enable "Computer Use" in Configure Tools (disabled by default)
+2. Start screen sharing so Apsara can see your screen
+3. Say: "Go to chatgpt.com and ask 'what is life?'"
+4. Apsara:
+   - Calls `open_url("chatgpt.com")`
+   - Waits for page to load
+   - **Looks at screen** via screen sharing
+   - Calculates coordinates of "New Chat" button
+   - Clicks the button using `computer_use("click", x=1200, y=150)`
+   - Finds text input field position
+   - Clicks input field
+   - Types "what is life?" using `computer_use("type", text="what is life?")`
+   - Presses Enter using `computer_use("key", key="Return")`
+5. Done! ✅
+
+**Available Actions:**
+- `click` - Left-click at (x, y)
+- `double_click` - Double left-click at (x, y)
+- `right_click` - Right-click at (x, y)  
+- `move` - Move mouse to (x, y) without clicking
+- `type` - Type text string (in currently focused input)
+- `key` - Press special key (Return, Tab, Escape, Up, Down, Left, Right, Delete)
+- `scroll` - Scroll up/down by amount
+
+**Platform Support:**
+- ✅ **Linux**: Uses `xdotool` (already installed for clipboard!)
+- ✅ **macOS**: Uses `cliclick` (install with: `brew install cliclick`)
+- ✅ **Windows**: Uses PowerShell with System.Windows.Forms
+
+**Safety Features:**
+- 🔒 Disabled by default (user must enable)
+- 👁️ Requires screen sharing (Apsara must see what it's doing)
+- ✅ Coordinate validation (checks bounds)
+- 📏 Max resolution check (7680x4320 / 8K)
+- ⚠️ Clear warnings in system prompt
+- 🎯 Gemini is taught to be careful and deliberate
+
+**Example Use Cases:**
+- 🌐 "Fill out this web form with my information"
+- 📧 "Compose a new email in Gmail"
+- 🔍 "Search for 'AI news' on Google"
+- 🎨 "Open Photoshop and create a 1920x1080 canvas"
+- 📂 "Find and open the latest PDF in Downloads"
+- 🎮 "Launch Steam and start my favorite game"
+- ✏️ "Edit this document and change the title"
+- 📊 "Scroll down to see more results"
+
+**Technical Implementation:**
+- Added `computerUse()` function in `backend/tools.js`
+- Platform-specific command execution (xdotool, cliclick, PowerShell)
+- Comprehensive tool declaration with coordinate system explanation
+- Updated system prompt with detailed usage instructions
+- Safety checks for coordinate bounds and action validation
+- Support for all common mouse and keyboard operations
+
+**System Prompt Enhancements:**
+- Detailed explanation of coordinate system (origin, axes)
+- Step-by-step workflow examples
+- Emphasis on looking at screen before clicking
+- Safety warnings and best practices
+- Clear action descriptions and parameters
+
+**Files Modified:**
+- `backend/tools.js` - New computerUse() function, tool metadata, declarations
+- `backend/server.js` - System prompt updates with computer use capabilities
+- `README.md` - Version 1.7.0, comprehensive documentation
+
+**🚨 IMPORTANT NOTES:**
+- This is a VERY POWERFUL tool - use with caution!
+- ALWAYS have screen sharing active before using
+- Gemini calculates coordinates based on visual position
+- Wait 1-2 seconds between actions for UI to update
+- Works best with clear, unambiguous instructions
+- Gemini is smart enough to understand coordinate systems!
 
 ### Version 1.6.0 (December 25, 2024)
 **🎨 Voice-Controlled Theme Switching & Enhanced Voice Commands:**
