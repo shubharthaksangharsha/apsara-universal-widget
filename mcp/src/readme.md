@@ -12,58 +12,6 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 
 ![Apsara Widget](assets/widget-main.png)
 
-<details>
-<summary><b>Widget Gallery & Visual Features</b></summary>
-
-<div align="center">
-
-<table>
-  <tr>
-    <td><img src="assets/dracula.png" alt="Dracula Theme" width="180"/></td>
-    <td><img src="assets/light.png" alt="Light Theme" width="180"/></td>
-    <td><img src="assets/monokai.png" alt="Monokai Theme" width="180"/></td>
-  </tr>
-  <tr>
-    <td><b>Dracula</b></td>
-    <td><b>Light</b></td>
-    <td><b>Monokai</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/nord.png" alt="Nord Theme" width="180"/></td>
-    <td><img src="assets/solarized-dark.png" alt="Solarized Dark Theme" width="180"/></td>
-    <td><img src="assets/solarized-light.png" alt="Solarized Light Theme" width="180"/></td>
-  </tr>
-  <tr>
-    <td><b>Nord</b></td>
-    <td><b>Solarized Dark</b></td>
-    <td><b>Solarized Light</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/tools1.png" alt="Tools 1" width="180"/></td>
-    <td><img src="assets/tools2.png" alt="Tools 2" width="180"/></td>
-    <td><img src="assets/apsara-response.png" alt="Apsara Response" width="180"/></td>
-  </tr>
-  <tr>
-    <td><b>Tools 1</b></td>
-    <td><b>Tools 2</b></td>
-    <td><b>Apsara Response</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/resolution.png" alt="Resolution" width="180"/></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
-    <td><b>Resolution</b></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
-
-</div>
-
-</details>
-
 ## Features
 
 ### Voice Interaction
@@ -1013,7 +961,7 @@ Talk to Apsara - Your Intelligent Voice Assistant with Computer Use, Voice-Contr
 - Enhanced System Prompt: Added all new tools to capabilities
   - File operations, web automation tools shown in available tools
   - Clear workflow examples for "read and email" use cases
-  - Better tool descriptions for Gemini API
+  - Better tool descriptions for Gemini
 - Improved Tool Descriptions: Crystal-clear instructions
   - All tools include detailed parameter descriptions
   - Safety warnings for destructive operations (delete)
@@ -1198,4 +1146,27 @@ Each theme includes custom colors for:
 
 ---
 
-[Portfolio](https://devshubh.me) | [Contact](mailto:shubharthaksangharsha@gmail.com)
+[Production Demo](https://apsara-devshubh.devshubh.me) | [Contact](mailto:shubharthaksangharsha@gmail.com)
+
+---
+
+## What Else Can We Add to Apsara?
+
+**Potential Future Features:**
+- Music Control: Play/pause/skip music, adjust volume
+- Advanced Web Automation: Fill forms, click buttons, scrape data (basic URL opening DONE!)
+- Directory Operations: Create/delete folders, recursive operations (file operations DONE!)
+- Reminders & Alarms: Set reminders and alarms with voice
+- System Monitoring: CPU usage, memory, disk space, network stats
+- Application Control: Launch apps, switch windows, close programs
+- Webcam Photos: Take photos (not just video streaming)
+- Multi-Language Support: Speak in any language
+- Custom Integrations: Slack, Discord, Telegram, Twitter APIs
+- Note Taking: Create/edit notes in various formats
+- Password Manager: Securely store and retrieve passwords
+- Smart Home: Control smart lights, thermostats, devices
+- Phone Integration: Send SMS, make calls (with proper hardware)
+- Image Generation: Generate images with DALL-E or Stable Diffusion
+- Text-to-Speech: Save Apsara's responses as audio files
+
+**Which features would you like to see next? Let us know!**
