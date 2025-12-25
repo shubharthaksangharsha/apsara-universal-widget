@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# VERY IMPORTANT
 # Apsara Widget - Electron Setup Script
 # This script sets up the necessary dependencies for building a desktop app
 
