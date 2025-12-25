@@ -12,53 +12,103 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 
 ![Apsara Widget](assets/widget-main.png)
 
-<details>
-<summary><b>Widget Gallery & Visual Features</b></summary>
+## Widget Gallery & Visual Features
+
+<details open>
+<summary><h3>🎨 Theme Showcase</h3></summary>
 
 <div align="center">
+Available Themes
 
 <table>
   <tr>
-    <td><img src="assets/dracula.png" alt="Dracula Theme" width="180"/></td>
-    <td><img src="assets/light.png" alt="Light Theme" width="180"/></td>
-    <td><img src="assets/monokai.png" alt="Monokai Theme" width="180"/></td>
+    <td align="center" width="33%">
+      <img src="assets/dracula.png" alt="Dracula Theme" width="100%"/>
+      <br/>
+      <strong>Dracula</strong>
+      <br/>
+      <sub>Purple & Pink aesthetic</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/light.png" alt="Light Theme" width="100%"/>
+      <br/>
+      <strong>Light</strong>
+      <br/>
+      <sub>Clean & minimal</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/monokai.png" alt="Monokai Theme" width="100%"/>
+      <br/>
+      <strong>Monokai</strong>
+      <br/>
+      <sub>Yellow & Green on dark</sub>
+    </td>
   </tr>
   <tr>
-    <td><b>Dracula</b></td>
-    <td><b>Light</b></td>
-    <td><b>Monokai</b></td>
+    <td align="center" width="33%">
+      <img src="assets/nord.png" alt="Nord Theme" width="100%"/>
+      <br/>
+      <strong>Nord</strong>
+      <br/>
+      <sub>Arctic blue palette</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/solarized-dark.png" alt="Solarized Dark" width="100%"/>
+      <br/>
+      <strong>Solarized Dark</strong>
+      <br/>
+      <sub>Warm dark tones</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/solarized-light.png" alt="Solarized Light" width="100%"/>
+      <br/>
+      <strong>Solarized Light</strong>
+      <br/>
+      <sub>Warm beige palette</sub>
+    </td>
+  </tr>
+</table>
+
+### Interactive Features
+
+<table>
+  <tr>
+    <td align="center" colspan="3">
+      <img src="assets/apsara-response.png" alt="Apsara in Action" width="70%"/>
+      <br/>
+      <strong>Apsara Response</strong>
+      <br/>
+      <sub>Real-time voice interaction with audio visualization</sub>
+    </td>
   </tr>
   <tr>
-    <td><img src="assets/nord.png" alt="Nord Theme" width="180"/></td>
-    <td><img src="assets/solarized-dark.png" alt="Solarized Dark Theme" width="180"/></td>
-    <td><img src="assets/solarized-light.png" alt="Solarized Light Theme" width="180"/></td>
-  </tr>
-  <tr>
-    <td><b>Nord</b></td>
-    <td><b>Solarized Dark</b></td>
-    <td><b>Solarized Light</b></td>
-  </tr>
-  <tr>
-    <td colspan="3" align="center"><img src="assets/apsara-response.png" alt="Apsara Response" width="420"/></td>
-  </tr>
-  <tr>
-    <td colspan="3" align="center"><b>Apsara Response</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/tools1.png" alt="Tools 1" width="180"/></td>
-    <td><img src="assets/tools2.png" alt="Tools 2" width="180"/></td>
-    <td><img src="assets/resolution.png" alt="Resolution" width="180"/></td>
-  </tr>
-  <tr>
-    <td><b>Tools 1</b></td>
-    <td><b>Tools 2</b></td>
-    <td><b>Resolution</b></td>
+    <td align="center" width="33%">
+      <img src="assets/tools1.png" alt="Tools Configuration 1" width="100%"/>
+      <br/>
+      <strong>Tools Panel 1</strong>
+      <br/>
+      <sub>Configure available tools</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/tools2.png" alt="Tools Configuration 2" width="100%"/>
+      <br/>
+      <strong>Tools Panel 2</strong>
+      <br/>
+      <sub>Async/Sync settings</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="assets/resolution.png" alt="Resolution Settings" width="100%"/>
+      <br/>
+      <strong>Resolution</strong>
+      <br/>
+      <sub>Screen & camera quality</sub>
+    </td>
   </tr>
 </table>
 
 </div>
-
 </details>
+
 
 ## Features
 
