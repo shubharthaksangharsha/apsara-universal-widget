@@ -460,6 +460,10 @@ wss.on('connection', (clientWs) => {
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
             tools: currentToolDeclarations,  // Use dynamically generated tool declarations
+            thinkingConfig: {
+                thinkingBudget: 1024,
+                includeThoughts: true  // Enable thought summaries for logging
+            },
             speechConfig: {
                 voiceConfig: {
                     prebuiltVoiceConfig: {
@@ -472,13 +476,28 @@ wss.on('connection', (clientWs) => {
             responseModalities: responseModalities,
             systemInstruction: SYSTEM_PROMPT,
             mediaResolution: 'MEDIA_RESOLUTION_HIGH',
-            tools: currentToolDeclarations  // Use dynamically generated tool declarations
+            tools: currentToolDeclarations,  // Use dynamically generated tool declarations
+            thinkingConfig: {
+                thinkingBudget: 1024,
+                includeThoughts: true  // Enable thought summaries for logging
+            }
         };
 
+        // Log thinking configuration
+        if (config.thinkingConfig) {
+            console.log('🧠 Thinking enabled:', {
+                budget: config.thinkingConfig.thinkingBudget,
+                includeThoughts: config.thinkingConfig.includeThoughts
+            });
+        }
+        
         debugLog('🔧 Session config:', { 
             modality, 
             responseModalities: responseModalities.map(m => m === Modality.AUDIO ? 'AUDIO' : 'TEXT'),
             hasSpeechConfig: !!config.speechConfig,
+            hasThinkingConfig: !!config.thinkingConfig,
+            thinkingBudget: config.thinkingConfig?.thinkingBudget,
+            includeThoughts: config.thinkingConfig?.includeThoughts,
             configKeys: Object.keys(config),
             toolsCount: currentToolDeclarations.length
         });
@@ -498,12 +517,36 @@ wss.on('connection', (clientWs) => {
                 onmessage: async (message) => {
                     debugLog('📨 Received message from Gemini:', JSON.stringify(Object.keys(message)));
                     
+                    // Extract and log thoughts if present
+                    if (message.serverContent?.modelTurn?.thought) {
+                        const thought = message.serverContent.modelTurn.thought;
+                        console.log('\n🧠 ========== GEMINI THOUGHT ==========');
+                        if (thought.text) {
+                            console.log('💭 Thought Text:', thought.text);
+                        }
+                        if (thought.thoughtParts) {
+                            console.log('💭 Thought Parts:', JSON.stringify(thought.thoughtParts, null, 2));
+                        }
+                        console.log('🧠 ====================================\n');
+                    }
+                    
                     // Extract audio from serverContent.inlineData - ONLY in AUDIO mode
                     let audioData = null;
                     let textData = null;
                     
                     if (message.serverContent?.modelTurn?.parts) {
                         for (const part of message.serverContent.modelTurn.parts) {
+                            // Log thoughts from parts if present
+                            if (part.thought) {
+                                console.log('\n🧠 ========== PART THOUGHT ==========');
+                                if (part.thought.text) {
+                                    console.log('💭 Thought:', part.thought.text);
+                                }
+                                if (part.text) {
+                                    console.log('💭 Thought Context:', part.text);
+                                }
+                                console.log('🧠 ====================================\n');
+                            }
                             // Extract audio in AUDIO mode
                             if (currentModality === 'AUDIO' && part.inlineData) {
                                 if (part.inlineData.mimeType && part.inlineData.mimeType.includes('audio')) {

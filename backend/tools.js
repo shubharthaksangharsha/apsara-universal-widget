@@ -1140,7 +1140,7 @@ async function shareCamera(resolution = null) {
   }
 }
 
-/**
+`x`/**
  * Computer Use - Control mouse and keyboard using coordinates
  * SAFETY: This is a POWERFUL tool. Use with extreme care.
  * @param {string} action - Action to perform: 'click', 'double_click', 'right_click', 'type', 'key', 'scroll', 'move'
