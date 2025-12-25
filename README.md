@@ -39,24 +39,20 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
     <td><b>Solarized Light</b></td>
   </tr>
   <tr>
+    <td colspan="3" align="center"><img src="assets/apsara-response.png" alt="Apsara Response" width="420"/></td>
+  </tr>
+  <tr>
+    <td colspan="3" align="center"><b>Apsara Response</b></td>
+  </tr>
+  <tr>
     <td><img src="assets/tools1.png" alt="Tools 1" width="180"/></td>
     <td><img src="assets/tools2.png" alt="Tools 2" width="180"/></td>
-    <td><img src="assets/apsara-response.png" alt="Apsara Response" width="180"/></td>
+    <td><img src="assets/resolution.png" alt="Resolution" width="180"/></td>
   </tr>
   <tr>
     <td><b>Tools 1</b></td>
     <td><b>Tools 2</b></td>
-    <td><b>Apsara Response</b></td>
-  </tr>
-  <tr>
-    <td><img src="assets/resolution.png" alt="Resolution" width="180"/></td>
-    <td></td>
-    <td></td>
-  </tr>
-  <tr>
     <td><b>Resolution</b></td>
-    <td></td>
-    <td></td>
   </tr>
 </table>
 
@@ -541,7 +537,6 @@ Apsara can use these tools to help you:
 | **share_screen** | Voice-activated screen sharing | "Share my screen at 1920x1080" | Working |
 | **share_camera** | Voice-activated camera sharing | "Share camera" or "Show me through camera" | Working |
 | **change_theme** | Voice-controlled theme switching | "Change theme to dark" or "Switch to dracula" | Working |
-| **googleSearch** | Real-time web search | "What's the weather today?" | Working |
 
 **How to Send Files via Email:**
 1. **Screenshot**: "Take a screenshot and email it to me"
