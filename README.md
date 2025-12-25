@@ -1,4 +1,4 @@
-# Apsara AI - Voice Assistant System 🎙️✨
+# Apsara AI - Voice Assistant System
 
 ![Apsara Widget](https://img.shields.io/badge/React-19.2.3-61dafb?logo=react)
 ![Electron](https://img.shields.io/badge/Electron-39.2.7-47848f?logo=electron)
@@ -12,15 +12,15 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 
 ![Apsara Widget](assets/widget-main.png)
 
-## 🌟 Features
+## Features
 
 ### Voice Interaction
 - **Real-time Voice Chat**: Talk naturally to Apsara AI with ultra-low latency streaming
 - **Interrupt Capability**: Interrupt Apsara at any time to ask follow-up questions
 - **Smart Muting**: Mute your microphone while still seeing Apsara's responses
 - **Dynamic Visualizer**: Beautiful audio visualization that changes based on who's speaking
-  - 🟢 **Green/Gold bars** when you speak
-  - 🟠 **Dramatic orange spikes** when Apsara speaks
+  - Green/Gold bars when you speak
+  - Dramatic orange spikes when Apsara speaks
 - **Clean Visual Indicators**: Minimalist green pulsing dots show active camera/screen share status
 - **Voice-Controlled UI**: Change themes, share screen, activate camera - all with voice commands!
 
@@ -39,7 +39,7 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Send Email with Attachments**: Send messages with files, screenshots, or documents
 - **Complete File System Control**: Read, create, edit, move, rename, delete files and browse directories
 - **Web Automation**: Open URLs in your default browser
-- **🖱️ COMPUTER USE (NEW!)**: Full mouse and keyboard control using screen coordinates
+- **COMPUTER USE (NEW!)**: Full mouse and keyboard control using screen coordinates
   - Click, double-click, right-click at any position
   - Type text and press special keys (Enter, Tab, etc.)
   - Scroll up/down, move mouse
@@ -52,89 +52,89 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Creative Support**: Help with writing, brainstorming, and creative projects
 - **Real-time Interaction**: Ultra-low latency responses (typically 200-400ms)
 
-### 🎯 Use Cases - What You Can Ask Apsara
+### Use Cases - What You Can Ask Apsara
 
 **File & Document Management:**
-- 📄 "Read the file /home/user/notes.txt and tell me what's in it"
-- 📁 "Browse my Documents folder and list all PDF files"
-- 📧 "Read the file ./backend/start.sh and email it to me"
-- 📝 "Show me what files are in my Downloads directory"
-- 🔍 "Read config.json and explain what each setting does"
-- ✏️ "Create a file called todo.txt with my tasks for today"
-- 📝 "Add 'Remember to call mom' to my notes.txt"
-- 🔄 "Rename report-draft.pdf to report-final.pdf"
-- 📦 "Move screenshot.png to my Pictures folder"
-- 🗑️ "Delete old-backup.zip" (asks for confirmation first)
+- "Read the file /home/user/notes.txt and tell me what's in it"
+- "Browse my Documents folder and list all PDF files"
+- "Read the file ./backend/start.sh and email it to me"
+- "Show me what files are in my Downloads directory"
+- "Read config.json and explain what each setting does"
+- "Create a file called todo.txt with my tasks for today"
+- "Add 'Remember to call mom' to my notes.txt"
+- "Rename report-draft.pdf to report-final.pdf"
+- "Move screenshot.png to my Pictures folder"
+- "Delete old-backup.zip" (asks for confirmation first)
 
 **Screenshot & Visual:**
-- 📸 "Take a screenshot of my screen"
-- 📧 "Screenshot this and email it to me"
-- 👀 "What's on my screen right now?" (with screen share)
-- 🎥 "Can you see my camera?" (with camera active)
+- "Take a screenshot of my screen"
+- "Screenshot this and email it to me"
+- "What's on my screen right now?" (with screen share)
+- "Can you see my camera?" (with camera active)
 
 **Clipboard Operations:**
-- 📋 "Copy this text: Hello World"
-- 📋 "What's in my clipboard?"
-- 📋 "Paste what I copied earlier"
-- 📋 "Get clipboard text and summarize it"
+- "Copy this text: Hello World"
+- "What's in my clipboard?"
+- "Paste what I copied earlier"
+- "Get clipboard text and summarize it"
 
 **Memory & Information:**
-- 💾 "Remember that my favorite color is blue"
-- 🔍 "What did I ask you to remember about my project?"
-- 🗑️ "Clear all memories"
-- 📚 "Store this note: Meeting tomorrow at 3pm"
+- "Remember that my favorite color is blue"
+- "What did I ask you to remember about my project?"
+- "Clear all memories"
+- "Store this note: Meeting tomorrow at 3pm"
 
 **Research & Information:**
-- 🌐 "What's the latest news about AI?"
-- ⚽ "Who won the last soccer match between Brazil and Argentina?"
-- 🌤️ "What's the weather like today?"
-- 📈 "What's the current stock price of Tesla?"
+- "What's the latest news about AI?"
+- "Who won the last soccer match between Brazil and Argentina?"
+- "What's the weather like today?"
+- "What's the current stock price of Tesla?"
 
 **Communication:**
-- 📧 "Email Shubharthak saying the project is ready"
-- 📧 "Send me an email with my todo list"
-- 📧 "Email this screenshot to john@example.com"
+- "Email Shubharthak saying the project is ready"
+- "Send me an email with my todo list"
+- "Email this screenshot to john@example.com"
 
 **Voice-Controlled UI:**
-- 🎨 "Change theme to dark"
-- 🎨 "Switch to dracula theme"
-- 🎨 "Make it nightly"
-- 🎨 "Use the nord theme"
-- 🖥️ "Share my screen"
-- 📹 "Share camera at 1280x720"
-- 🔄 "Switch to solarized dark"
+- "Change theme to dark"
+- "Switch to dracula theme"
+- "Make it nightly"
+- "Use the nord theme"
+- "Share my screen"
+- "Share camera at 1280x720"
+- "Switch to solarized dark"
 
-**🖱️ Computer Use (POWERFUL!):**
-- 🌐 "Go to chatgpt.com and start a new conversation asking 'what is life?'"
-- 📝 "Fill out the form on this website with my information"
-- 🎨 "Open Photoshop and create a new document"
-- 📧 "Open Gmail, compose a new email, and type 'Hello team'"
-- 🔍 "Search for 'best restaurants near me' on Google"
-- 📂 "Open my Documents folder and find the latest PDF"
-- 🎮 "Launch Steam and start Dota 2"
-- ✏️ "Click the edit button and change this text"
-- 📊 "Scroll down to see more results"
+**Computer Use (POWERFUL!):**
+- "Go to chatgpt.com and start a new conversation asking 'what is life?'"
+- "Fill out the form on this website with my information"
+- "Open Photoshop and create a new document"
+- "Open Gmail, compose a new email, and type 'Hello team'"
+- "Search for 'best restaurants near me' on Google"
+- "Open my Documents folder and find the latest PDF"
+- "Launch Steam and start Dota 2"
+- "Click the edit button and change this text"
+- "Scroll down to see more results"
 - **NOTE**: Requires screen sharing to be active so Apsara can see the screen!
 
 **Web Browsing:**
-- 🌐 "Open youtube.com"
-- 🔍 "Open google.com and search for best restaurants near me"
-- 📰 "Open reddit.com"
-- 🎓 "Open github.com/shubharthaksangharsha"
+- "Open youtube.com"
+- "Open google.com and search for best restaurants near me"
+- "Open reddit.com"
+- "Open github.com/shubharthaksangharsha"
 
 **Productivity:**
-- 📝 "Help me write a professional email"
-- 💡 "Give me ideas for a birthday party"
-- ✅ "Create a checklist for moving to a new apartment"
-- 🎯 "Help me plan my day"
-- 📋 "Create a file with my meeting notes"
-- 🔄 "Organize my Documents folder"
+- "Help me write a professional email"
+- "Give me ideas for a birthday party"
+- "Create a checklist for moving to a new apartment"
+- "Help me plan my day"
+- "Create a file with my meeting notes"
+- "Organize my Documents folder"
 
 ### Platform Support
-- ✅ **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
-- ✅ **Linux Desktop**: Native desktop widget with Electron (fully tested and production-ready!)
-- ✅ **Windows Desktop**: Electron supports Windows - same codebase works (requires testing)
-- ✅ **macOS Desktop**: Electron supports macOS - same codebase works (requires testing)
+- **Web Browser**: Works in any modern browser (Chrome, Firefox, Safari, Edge)
+- **Linux Desktop**: Native desktop widget with Electron (fully tested and production-ready!)
+- **Windows Desktop**: Electron supports Windows - same codebase works (requires testing)
+- **macOS Desktop**: Electron supports macOS - same codebase works (requires testing)
 
 **Note on Cross-Platform:** The Electron app is built with cross-platform compatibility in mind. While fully tested on Linux, the same codebase should work on Windows and macOS with minimal to no changes. Electron abstracts OS-specific details, and our tools (screenshot, clipboard) include platform-specific implementations for Windows, macOS, and Linux.
 
@@ -145,14 +145,14 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Clickable Controls**: All buttons remain fully functional while dragging
 - **Close Button**: Red X button at top-right corner to exit the app
 - **Camera Sharing**: Full camera integration with visual feedback
-  - 🟢 **Green Indicator Dot**: Pulsing green dot on camera button when active
-  - 📹 **Real-time Streaming**: Camera feed sent to Gemini for visual interaction
-  - ⚡ **Optimized Quality**: High-quality video with efficient compression
+  - Green Indicator Dot: Pulsing green dot on camera button when active
+  - Real-time Streaming: Camera feed sent to Gemini for visual interaction
+  - Optimized Quality: High-quality video with efficient compression
 - **Screen Sharing**: Full native screen capture with clean visual feedback
-  - 🟢 **Green Indicator Dot**: Pulsing green dot on screen share button when active
-  - 🔴 **Fullscreen Red Border**: Animated pulsing border around entire monitor (Electron only)
-  - 🎯 **Automatic Primary Screen**: No dialog needed, instantly shares main display
-  - ⚡ **2 FPS Streaming**: Optimized frame rate for Gemini Live API
+  - Green Indicator Dot: Pulsing green dot on screen share button when active
+  - Fullscreen Red Border: Animated pulsing border around entire monitor (Electron only)
+  - Automatic Primary Screen: No dialog needed, instantly shares main display
+  - 2 FPS Streaming: Optimized frame rate for Gemini Live API
 - **Auto-Exit**: Properly closes both Electron and React dev server when closed
 - **No Sandbox Issues**: Configured to run without SUID sandbox errors on Linux
 - **Bottom-Right Position**: Automatically positions in bottom-right corner on launch
@@ -160,20 +160,20 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 
 ### User Interface
 - **Dynamic Audio Visualizer**: Real-time visualization with different colors for user and AI
-  - 🟢 **Green/Gold bars** (user speaking) - Standard amplitude
-  - 🟠 **Dramatic orange spikes** (Apsara speaking) - 2.5x larger, zero-smoothing, instant response
+  - Green/Gold bars (user speaking) - Standard amplitude
+  - Dramatic orange spikes (Apsara speaking) - 2.5x larger, zero-smoothing, instant response
   - Speech-frequency-focused for more reactive Apsara visualization
 - **Advanced Theme System** (NEW in v1.3.0): 8 beautiful minimalist themes with complete UI consistency
-  - 🎨 **8 Themes**: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
-  - 🔄 **Persistent Themes**: Theme selection saved to localStorage
-  - 🎯 **Adaptive Menus**: All dropdowns (theme selector, resolution menus) match the selected theme
-  - 🖌️ **Consistent Styling**: Button colors, text colors, and backgrounds adapt to each theme
-  - ⚙️ **Settings Button**: Gear icon positioned between camera and start button for easy access
-  - 💾 **Theme Persistence**: Your selected theme is remembered across sessions
+  - 8 Themes: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
+  - Persistent Themes: Theme selection saved to localStorage
+  - Adaptive Menus: All dropdowns (theme selector, resolution menus) match the selected theme
+  - Consistent Styling: Button colors, text colors, and backgrounds adapt to each theme
+  - Settings Button: Gear icon positioned between camera and start button for easy access
+  - Theme Persistence: Your selected theme is remembered across sessions
 - **Resolution Selectors**: Configurable screen and camera resolution with themed dropdowns
-  - 📺 **Screen Resolution**: Choose from 6 presets (720p to 4K)
-  - 📹 **Camera Resolution**: Choose from 4 presets (VGA to Full HD)
-  - 🎨 **Themed Menus**: Resolution menus match your selected theme
+  - Screen Resolution: Choose from 6 presets (720p to 4K)
+  - Camera Resolution: Choose from 4 presets (VGA to Full HD)
+  - Themed Menus: Resolution menus match your selected theme
 - **Smart Mute**: Mute button only works when connected, doesn't auto-connect
 - **Status Indicators**: Clear visual feedback for connection, listening, and speaking states
 - **Responsive Design**: Works on desktop and mobile devices
@@ -182,7 +182,7 @@ Apsara is powered by Google's Gemini 2.5 Flash Native Audio model with real-time
 - **Debug Logging**: Comprehensive logging system with on/off toggle
 - **Consistent Styling**: Camera and screen share indicators use identical styling for visual harmony
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 apsara_ai/
@@ -210,7 +210,7 @@ apsara_ai/
 └── README.md                # This file
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -336,7 +336,7 @@ npm run build
 npm run electron-build
 ```
 
-## 🎨 How to Use
+## How to Use
 
 ### Starting a Conversation
 
@@ -349,22 +349,22 @@ npm run electron-build
 
 | Button | Function | Description |
 |--------|----------|-------------|
-| 🎤 **Mute** | Mute/Unmute Microphone | Stops your audio from being sent (Apsara can still speak) |
-| 📺 **Screen Share** | Share Screen | ✅ **Working!** Share your entire screen with Apsara (Shows green dot when active) |
-| 📹 **Camera** | Toggle Camera | ✅ **Working!** Enable camera for visual interaction (Shows green dot when active) |
-| ⚙️ **Settings** | Theme Selector | 🎨 **NEW!** Choose from 8 beautiful themes (positioned between camera and start button) |
-| ❌ **End** | End/Start Call | Ends the current session or starts a new one |
-| ✖️ **Close** | Close Widget | Closes the desktop widget (Electron only) |
+| Mute | Mute/Unmute Microphone | Stops your audio from being sent (Apsara can still speak) |
+| Screen Share | Share Screen | Working! Share your entire screen with Apsara (Shows green dot when active) |
+| Camera | Toggle Camera | Working! Enable camera for visual interaction (Shows green dot when active) |
+| Settings | Theme Selector | NEW! Choose from 8 beautiful themes (positioned between camera and start button) |
+| End | End/Start Call | Ends the current session or starts a new one |
+| Close | Close Widget | Closes the desktop widget (Electron only) |
 
 ### Visual Indicators
 
-- **Green/Gold Bars**: You are speaking
-- **Orange Bars**: Apsara is speaking (more dramatic spikes!)
-- **No Bars**: Muted or idle
-- **Status Text**: Shows current state (Connecting, Listening, Speaking, Sharing screen, Camera active, etc.)
-- **🟢 Green Dot (Camera)**: Pulsing green indicator on camera button when active
-- **🟢 Green Dot (Screen Share)**: Pulsing green indicator on screen share button when active
-- **🔴 Red Border (Electron)**: Fullscreen animated border around monitor when sharing screen
+- Green/Gold Bars: You are speaking
+- Orange Bars: Apsara is speaking (more dramatic spikes!)
+- No Bars: Muted or idle
+- Status Text: Shows current state (Connecting, Listening, Speaking, Sharing screen, Camera active, etc.)
+- Green Dot (Camera): Pulsing green indicator on camera button when active
+- Green Dot (Screen Share): Pulsing green indicator on screen share button when active
+- Red Border (Electron): Fullscreen animated border around monitor when sharing screen
 
 ### Interrupt Feature
 
@@ -372,25 +372,25 @@ You can interrupt Apsara at any time while she's speaking:
 - Just start talking, and Apsara will stop and listen to you
 - Perfect for follow-up questions or corrections
 
-### Screen Sharing Feature (Electron) 🆕
+### Screen Sharing Feature (Electron)
 
 **Enhanced in Version 1.2.0!** Share your screen with Apsara for visual assistance with beautiful, minimalist UI:
 
 **How to Use:**
-1. Click the **📺 Screen Share** button (must be connected first)
+1. Click the Screen Share button (must be connected first)
 2. Electron automatically captures your primary display
-3. A **green pulsing dot** appears on the screen share button
-4. Fullscreen **animated red border** appears around your monitor (Electron only)
+3. A green pulsing dot appears on the screen share button
+4. Fullscreen animated red border appears around your monitor (Electron only)
 5. Frames are sent to Gemini at 2 FPS for analysis
 6. Ask Apsara questions about what's on your screen!
 7. Click the button again to stop sharing
 
 **Visual Feedback:**
-- 🟢 **Green Indicator Dot**: Clean, pulsing green dot on the screen share button (matches camera style)
-- 🔴 **Pulsing Red Border**: Fullscreen overlay around entire monitor (5-8px animated, Electron only)
-- 🎯 **Click-Through**: Border doesn't interfere with desktop interaction
--  **Status Text**: Shows "Sharing screen..." in widget
-- 🎨 **No Floating Banners**: Clean UI with indicators only on buttons
+- Green Indicator Dot: Clean, pulsing green dot on the screen share button (matches camera style)
+- Pulsing Red Border: Fullscreen overlay around entire monitor (5-8px animated, Electron only)
+- Click-Through: Border doesn't interfere with desktop interaction
+-  Status Text: Shows "Sharing screen..." in widget
+- No Floating Banners: Clean UI with indicators only on buttons
 
 **Platform Differences:**
 - **Electron (Desktop)**: Automatic primary screen capture, fullscreen red border + green dot indicator
@@ -407,7 +407,7 @@ You can interrupt Apsara at any time while she's speaking:
 - Sends base64-encoded frames via WebSocket
 - Backend forwards frames to Gemini Live API as video input
 
-## 🏗️ Architecture
+## Architecture
 
 ### Technology Stack
 
@@ -468,28 +468,28 @@ Apsara can use these tools to help you:
 
 | Tool | Description | Example Usage | Status |
 |------|-------------|---------------|--------|
-| **send_email_to_shubharthak** | Send messages with ANY file attachment (images, PDFs, documents, etc.) | "Email this screenshot to me" or "Send start.sh to my email" | ✅ Working |
-| **take_screenshot** | Capture the current screen | "Take a screenshot" | ✅ Working |
-| **read_file** | Read any file from local filesystem (text or base64) | "Read the file ~/notes.txt" or "Read config.json" | ✅ Working |
-| **browse_files** | List files and directories with details | "Show me files in /home/user/Documents" | ✅ Working |
-| **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" | ✅ Working |
-| **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" | ✅ Working |
-| **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" | ✅ Working |
-| **store_memory** | Save information for later (persistent to disk) | "Remember that I prefer Python" | ✅ Working |
-| **retrieve_memories** | Search and recall stored memories | "What did I ask you to remember?" | ✅ Working |
-| **clear_memories** | Delete stored memories | "Clear all memories" | ✅ Working |
-| **create_file** | Create new files with content | "Create a file called notes.txt with my ideas" | ✅ Working |
-| **edit_file** | Edit existing files (write/append) | "Add this line to my notes.txt" | ✅ Working |
-| **move_file** | Move files to different locations | "Move report.pdf to Documents folder" | ✅ Working |
-| **rename_file** | Rename files | "Rename oldname.txt to newname.txt" | ✅ Working |
-| **delete_file** | Delete files (with confirmation) | "Delete old-file.txt" | ✅ Working |
-| **open_url** | Open websites in default browser | "Open github.com" | ✅ Working |
-| **generate_image** | AI image generation (Nano Banana) | "Generate an image of a futuristic city" | ✅ Working |
-| **computer_use** | **POWERFUL** Mouse & keyboard control via coordinates | "Go to chatgpt.com and ask 'what is life?'" | ✅ Working |
-| **share_screen** | Voice-activated screen sharing | "Share my screen at 1920x1080" | ✅ Working |
-| **share_camera** | Voice-activated camera sharing | "Share camera" or "Show me through camera" | ✅ Working |
-| **change_theme** | Voice-controlled theme switching | "Change theme to dark" or "Switch to dracula" | ✅ Working |
-| **googleSearch** | Real-time web search | "What's the weather today?" | ✅ Working |
+| **send_email_to_shubharthak** | Send messages with ANY file attachment (images, PDFs, documents, etc.) | "Email this screenshot to me" or "Send start.sh to my email" | Working |
+| **take_screenshot** | Capture the current screen | "Take a screenshot" | Working |
+| **read_file** | Read any file from local filesystem (text or base64) | "Read the file ~/notes.txt" or "Read config.json" | Working |
+| **browse_files** | List files and directories with details | "Show me files in /home/user/Documents" | Working |
+| **copy_to_clipboard** | Copy text to system clipboard | "Copy this message" | Working |
+| **get_clipboard_text** | Read text from clipboard | "What's in my clipboard?" | Working |
+| **paste_from_clipboard** | Paste clipboard content (simulates Ctrl+V/Cmd+V) | "Paste what I copied" | Working |
+| **store_memory** | Save information for later (persistent to disk) | "Remember that I prefer Python" | Working |
+| **retrieve_memories** | Search and recall stored memories | "What did I ask you to remember?" | Working |
+| **clear_memories** | Delete stored memories | "Clear all memories" | Working |
+| **create_file** | Create new files with content | "Create a file called notes.txt with my ideas" | Working |
+| **edit_file** | Edit existing files (write/append) | "Add this line to my notes.txt" | Working |
+| **move_file** | Move files to different locations | "Move report.pdf to Documents folder" | Working |
+| **rename_file** | Rename files | "Rename oldname.txt to new.txt" | Working |
+| **delete_file** | Delete files (with confirmation) | "Delete old-file.txt" | Working |
+| **open_url** | Open websites in default browser | "Open github.com" | Working |
+| **generate_image** | AI image generation (Nano Banana) | "Generate an image of a futuristic city" | Working |
+| **computer_use** | POWERFUL Mouse & keyboard control via coordinates | "Go to chatgpt.com and ask 'what is life?'" | Working |
+| **share_screen** | Voice-activated screen sharing | "Share my screen at 1920x1080" | Working |
+| **share_camera** | Voice-activated camera sharing | "Share camera" or "Show me through camera" | Working |
+| **change_theme** | Voice-controlled theme switching | "Change theme to dark" or "Switch to dracula" | Working |
+| **googleSearch** | Real-time web search | "What's the weather today?" | Working |
 
 **How to Send Files via Email:**
 1. **Screenshot**: "Take a screenshot and email it to me"
@@ -500,18 +500,18 @@ Apsara can use these tools to help you:
    - Apsara: Calls `browse_files()` → Sends results in email
 
 **Example Workflows:**
-- 📸 "Screenshot this and email it to me" → Takes screenshot + sends email with image ✅
-- 📄 "Read start.sh and email it to me" → Reads file as base64 + sends email with attachment ✅
-- 📁 "Show me files in ~/Documents" → Lists all files with sizes and dates ✅
-- 📋 "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut ✅
-- 💾 "Remember my API key is xyz123" → Saves to persistent memory ✅
-- 🔍 "What API key did I give you?" → Retrieves from persistent memory ✅
-- 📧 "Send a message to john@example.com saying hello" → Send text email ✅
-- ✏️ "Create todo.txt with my tasks" → Creates new file with content ✅
-- 📝 "Add a note to my file" → Appends content to existing file ✅
-- 🔄 "Rename old.txt to new.txt" → Renames file in same directory ✅
-- 📦 "Move file.pdf to Documents" → Moves file to different location ✅
-- 🌐 "Open github.com" → Opens URL in default browser ✅
+- "Screenshot this and email it to me" → Takes screenshot + sends email with image
+- "Read start.sh and email it to me" → Reads file as base64 + sends email with attachment
+- "Show me files in ~/Documents" → Lists all files with sizes and dates
+- "Copy this text and paste it here" → Copy to clipboard + paste via keyboard shortcut
+- "Remember my API key is xyz123" → Saves to persistent memory
+- "What API key did I give you?" → Retrieves from persistent memory
+- "Send a message to john@example.com saying hello" → Send text email
+- "Create todo.txt with my tasks" → Creates new file with content
+- "Add a note to my file" → Appends content to existing file
+- "Rename old.txt to new.txt" → Renames file in same directory
+- "Move file.pdf to Documents" → Moves file to different location
+- "Open github.com" → Opens URL in default browser
 
 ### Environment Variables
 
@@ -524,7 +524,7 @@ The backend uses these environment variables (set in `.env`):
 | `EMAIL_USER` | No | Gmail address for sending emails |
 | `EMAIL_APP_PASSWORD` | No | Gmail app password for SMTP |
 
-## 🔧 Development
+## Development
 
 ### Available Scripts
 
@@ -632,7 +632,7 @@ gradient.addColorStop(0.5, '#f5a54a'); // Light Orange
 gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Backend Issues
 
@@ -700,111 +700,111 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Verify microphone permission granted
 - Look for audio debug logs
 
-## 📝 Development Journey
+## Development Journey
 
 ### Phase 1: Web Widget Foundation
-- ✅ Created original HTML/CSS/JS widget
-- ✅ Integrated with Gemini Live API
-- ✅ Built WebSocket backend server
-- ✅ Implemented audio streaming
+- Created original HTML/CSS/JS widget
+- Integrated with Gemini Live API
+- Built WebSocket backend server
+- Implemented audio streaming
 
 ### Phase 2: React Migration
-- ✅ Ported widget to React
-- ✅ Set up component architecture
-- ✅ Implemented state management
-- ✅ Created circular audio visualizer
+- Ported widget to React
+- Set up component architecture
+- Implemented state management
+- Created circular audio visualizer
 
 ### Phase 3: Desktop Widget
-- ✅ Integrated Electron
-- ✅ Made frameless, transparent window
-- ✅ Added always-on-top functionality
-- ✅ Positioned widget in bottom-right corner
-- ✅ Added draggable panel
-- ✅ Implemented IPC for close button
+- Integrated Electron
+- Made frameless, transparent window
+- Added always-on-top functionality
+- Positioned widget in bottom-right corner
+- Added draggable panel
+- Implemented IPC for close button
 
 ### Phase 4: Enhanced Audio Visualization
-- ✅ Dual-analyser system (mic + playback)
-- ✅ Dynamic color switching (user vs Apsara)
-- ✅ Zero-smoothing for dramatic Apsara spikes
-- ✅ Speech-frequency-focused visualization
-- ✅ Smart muting (preserves Apsara's visualizer)
+- Dual-analyser system (mic + playback)
+- Dynamic color switching (user vs Apsara)
+- Zero-smoothing for dramatic Apsara spikes
+- Speech-frequency-focused visualization
+- Smart muting (preserves Apsara's visualizer)
 
 ### Phase 5: UI/UX Polish
-- ✅ Always-visible mute and end buttons
-- ✅ Smart button behavior (Start/End toggle)
-- ✅ Fixed mute button to only handle muting (no auto-connect)
-- ✅ Real-time state tracking with refs
-- ✅ Smooth animations and transitions
-- ✅ Added placeholder screen share and video icons
-- ✅ Increased widget width to fit all controls
+- Always-visible mute and end buttons
+- Smart button behavior (Start/End toggle)
+- Fixed mute button to only handle muting (no auto-connect)
+- Real-time state tracking with refs
+- Smooth animations and transitions
+- Added placeholder screen share and video icons
+- Increased widget width to fit all controls
 
 ### Phase 6: Electron Optimization
-- ✅ Fixed transparent background (no purple rectangle)
-- ✅ Close button at top-right corner
-- ✅ Disabled sandbox for Linux compatibility
-- ✅ Proper app quit with `--kill-others` flag
-- ✅ Complete cleanup when window closes
-- ✅ Production-ready Electron setup
+- Fixed transparent background (no purple rectangle)
+- Close button at top-right corner
+- Disabled sandbox for Linux compatibility
+- Proper app quit with `--kill-others` flag
+- Complete cleanup when window closes
+- Production-ready Electron setup
 
 ### Phase 7: Screen Sharing & Visual Feedback
-- ✅ Implemented native screen sharing for Electron
-- ✅ Electron desktopCapturer integration
-- ✅ Automatic primary display selection
-- ✅ Fullscreen red border overlay (click-through, animated)
-- ✅ Floating "Screen Sharing Active" indicator
-- ✅ 2 FPS frame capture and streaming to backend
-- ✅ Backend video frame forwarding to Gemini API
-- ✅ IPC communication for border overlay control
+- Implemented native screen sharing for Electron
+- Electron desktopCapturer integration
+- Automatic primary display selection
+- Fullscreen red border overlay (click-through, animated)
+- Floating "Screen Sharing Active" indicator
+- 2 FPS frame capture and streaming to backend
+- Backend video frame forwarding to Gemini API
+- IPC communication for border overlay control
 
 ### Phase 8: Developer Experience
-- ✅ Added debug logging system (frontend & backend)
-- ✅ Conditional logging with `DEBUG_LOG` toggle
-- ✅ Clean console output control
-- ✅ Comprehensive error handling
-- ✅ Production-ready logging setup
+- Added debug logging system (frontend & backend)
+- Conditional logging with `DEBUG_LOG` toggle
+- Clean console output control
+- Comprehensive error handling
+- Production-ready logging setup
 
 ### Phase 9: Cross-Platform Support
-- ✅ Auto-switching between local and production backends
-- ✅ Mobile-responsive design
-- ✅ Desktop integration for Linux
-- ✅ Comprehensive documentation
-- ✅ Version 1.0 release ready!
+- Auto-switching between local and production backends
+- Mobile-responsive design
+- Desktop integration for Linux
+- Comprehensive documentation
+- Version 1.0 release ready!
 
 ### Phase 10: Advanced Theme System (v1.3.0)
-- ✅ Created comprehensive theme system with 8 minimalist themes
-- ✅ Implemented theme persistence with localStorage
-- ✅ Built adaptive UI that changes all components based on selected theme
-- ✅ Added settings button between camera and start button
-- ✅ Made theme selector panel theme-aware
-- ✅ Made resolution menus (screen & camera) theme-aware
-- ✅ Added theme-specific button colors and styling
-- ✅ Positioned theme selector for optimal UX
-- ✅ Increased widget width to accommodate new controls
-- ✅ Created `themes.css` for organized theme management
+- Created comprehensive theme system with 8 minimalist themes
+- Implemented theme persistence with localStorage
+- Built adaptive UI that changes all components based on selected theme
+- Added settings button between camera and start button
+- Made theme selector panel theme-aware
+- Made resolution menus (screen & camera) theme-aware
+- Added theme-specific button colors and styling
+- Positioned theme selector for optimal UX
+- Increased widget width to accommodate new controls
+- Created `themes.css` for organized theme management
 
 ---
 
-**Built with ❤️ by Shubharthak Sangharsha**
+Built with love by Shubharthak Sangharsha
 
-*Powered by React, Electron, Node.js, and Google Gemini AI*
+Powered by React, Electron, Node.js, and Google Gemini AI
 
 **Version 1.7.0** - December 2024
 
-*Talk to Apsara - Your Intelligent Voice Assistant with Computer Use, Voice-Controlled UI, Multi Tools, Screenshare and Webcam Support*
+Talk to Apsara - Your Intelligent Voice Assistant with Computer Use, Voice-Controlled UI, Multi Tools, Screenshare and Webcam Support
 
 ---
 
-## 📋 Changelog
+## Changelog
 
 ### Version 1.7.0 (December 25, 2024)
-**🖱️ COMPUTER USE - Full Mouse & Keyboard Control via Coordinates:**
-- ✨ **Most Powerful Feature Yet**: Apsara can now control your mouse and keyboard!
-  - 🖱️ **Mouse Control**: Click, double-click, right-click at any screen coordinates
-  - ⌨️ **Keyboard Control**: Type text, press special keys (Enter, Tab, Escape, etc.)
-  - 📜 **Scrolling**: Scroll up/down by specified amounts
-  - 🎯 **Coordinate System**: Uses (0,0) as top-left corner, standard screen coordinates
-  - 👁️ **Vision-Based**: Requires screen sharing so Apsara can SEE where to click
-  - 🔒 **Disabled by Default**: Safety first - must be explicitly enabled in Configure Tools
+**COMPUTER USE - Full Mouse & Keyboard Control via Coordinates:**
+- Most Powerful Feature Yet: Apsara can now control your mouse and keyboard!
+  - Mouse Control: Click, double-click, right-click at any screen coordinates
+  - Keyboard Control: Type text, press special keys (Enter, Tab, Escape, etc.)
+  - Scrolling: Scroll up/down by specified amounts
+  - Coordinate System: Uses (0,0) as top-left corner, standard screen coordinates
+  - Vision-Based: Requires screen sharing so Apsara can SEE where to click
+  - Disabled by Default: Safety first - must be explicitly enabled in Configure Tools
 
 **How It Works:**
 1. Enable "Computer Use" in Configure Tools (disabled by default)
@@ -813,14 +813,14 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 4. Apsara:
    - Calls `open_url("chatgpt.com")`
    - Waits for page to load
-   - **Looks at screen** via screen sharing
+   - Looks at screen via screen sharing
    - Calculates coordinates of "New Chat" button
    - Clicks the button using `computer_use("click", x=1200, y=150)`
    - Finds text input field position
    - Clicks input field
    - Types "what is life?" using `computer_use("type", text="what is life?")`
    - Presses Enter using `computer_use("key", key="Return")`
-5. Done! ✅
+5. Done!
 
 **Available Actions:**
 - `click` - Left-click at (x, y)
@@ -832,27 +832,27 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - `scroll` - Scroll up/down by amount
 
 **Platform Support:**
-- ✅ **Linux**: Uses `xdotool` (already installed for clipboard!)
-- ✅ **macOS**: Uses `cliclick` (install with: `brew install cliclick`)
-- ✅ **Windows**: Uses PowerShell with System.Windows.Forms
+- **Linux**: Uses `xdotool` (already installed for clipboard!)
+- **macOS**: Uses `cliclick` (install with: `brew install cliclick`)
+- **Windows**: Uses PowerShell with System.Windows.Forms
 
 **Safety Features:**
-- 🔒 Disabled by default (user must enable)
-- 👁️ Requires screen sharing (Apsara must see what it's doing)
-- ✅ Coordinate validation (checks bounds)
-- 📏 Max resolution check (7680x4320 / 8K)
-- ⚠️ Clear warnings in system prompt
-- 🎯 Gemini is taught to be careful and deliberate
+- Disabled by default (user must enable)
+- Requires screen sharing (Apsara must see what it's doing)
+- Coordinate validation (checks bounds)
+- Max resolution check (7680x4320 / 8K)
+- Clear warnings in system prompt
+- Gemini is taught to be careful and deliberate
 
 **Example Use Cases:**
-- 🌐 "Fill out this web form with my information"
-- 📧 "Compose a new email in Gmail"
-- 🔍 "Search for 'AI news' on Google"
-- 🎨 "Open Photoshop and create a 1920x1080 canvas"
-- 📂 "Find and open the latest PDF in Downloads"
-- 🎮 "Launch Steam and start my favorite game"
-- ✏️ "Edit this document and change the title"
-- 📊 "Scroll down to see more results"
+- "Fill out this web form with my information"
+- "Compose a new email in Gmail"
+- "Search for 'AI news' on Google"
+- "Open Photoshop and create a 1920x1080 canvas"
+- "Find and open the latest PDF in Downloads"
+- "Launch Steam and start my favorite game"
+- "Edit this document and change the title"
+- "Scroll down to see more results"
 
 **Technical Implementation:**
 - Added `computerUse()` function in `backend/tools.js`
@@ -874,7 +874,7 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - `backend/server.js` - System prompt updates with computer use capabilities
 - `README.md` - Version 1.7.0, comprehensive documentation
 
-**🚨 IMPORTANT NOTES:**
+**IMPORTANT NOTES:**
 - This is a VERY POWERFUL tool - use with caution!
 - ALWAYS have screen sharing active before using
 - Gemini calculates coordinates based on visual position
@@ -883,22 +883,22 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Gemini is smart enough to understand coordinate systems!
 
 ### Version 1.6.0 (December 25, 2024)
-**🎨 Voice-Controlled Theme Switching & Enhanced Voice Commands:**
-- ✨ **Voice-Controlled Theme Changes**: Change UI themes with voice commands!
-  - 🎨 Say "Change theme to dark" to switch to dark mode
-  - 🌈 Say "Switch to dracula" for purple/pink theme
-  - 🌙 Say "Make it nightly" for navy blue theme
-  - ❄️ Say "Use nord theme" for arctic blue theme
-  - ☀️ Say "Solarized light" for warm beige theme
-  - 🎨 8 themes available: light, dark, nightly, dracula, monokai, nord, solarized-light, solarized-dark
-- 🎤 **Always-Enabled Voice Tools**: Three core voice control tools
-  - 🎨 **change_theme**: Instant theme switching via voice (ASYNC)
-  - 🖥️ **share_screen**: Voice-activated screen sharing (ASYNC)
-  - 📹 **share_camera**: Voice-activated camera sharing (ASYNC)
-- 🚀 **Instant Response**: All voice commands execute asynchronously
+**Voice-Controlled Theme Switching & Enhanced Voice Commands:**
+- Voice-Controlled Theme Changes: Change UI themes with voice commands!
+  - Say "Change theme to dark" to switch to dark mode
+  - Say "Switch to dracula" for purple/pink theme
+  - Say "Make it nightly" for navy blue theme
+  - Say "Use nord theme" for arctic blue theme
+  - Say "Solarized light" for warm beige theme
+  - 8 themes available: light, dark, nightly, dracula, monokai, nord, solarized-light, solarized-dark
+- Always-Enabled Voice Tools: Three core voice control tools
+  - change_theme: Instant theme switching via voice (ASYNC)
+  - share_screen: Voice-activated screen sharing (ASYNC)
+  - share_camera: Voice-activated camera sharing (ASYNC)
+- Instant Response: All voice commands execute asynchronously
   - Apsara responds immediately while theme changes apply in background
   - No waiting, no lag, seamless experience
-- 💬 **Natural Language Support**: Multiple ways to change themes
+- Natural Language Support: Multiple ways to change themes
   - "Change theme to X"
   - "Switch to X theme"
   - "Make it X"
@@ -919,7 +919,6 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Normalizes theme names (handles spaces, underscores, case)
 - WebSocket message `trigger_theme_change` for frontend communication
 - Frontend handler applies theme instantly and persists to localStorage
-- Updated system prompt with theme descriptions for better AI understanding
 - Bug fix: WebSocket variable name corrected (`clientWs` instead of `ws`)
 - Removed `fill_form` and `click_element` placeholder tools
 
@@ -930,40 +929,40 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - `README.md` - Version 1.6.0, documentation updates
 
 ### Version 1.5.0 (December 24, 2024)
-**🗂️ File System Tools, Web Automation & Memory Persistence:**
-- ✨ **Read File Tool**: Read any local file (text or base64) for viewing or emailing
-  - 📄 Reads text files directly for viewing content
-  - 📦 Converts to base64 for email attachments
-  - 🎯 Returns filename, file size, MIME type, and content
-  - 🔧 Proper workflow for "read file and email it" use case
-- 🗂️ **Browse Files Tool**: List files and directories with full details
-  - 📁 Shows directories and files separately (sorted)
-  - 📊 Displays file sizes, modification dates, and types
-  - 🔍 Optional hidden files display
-  - 🏠 Defaults to user's home directory
-- ✏️ **File Operations Tools** (5 new tools!):
-  - 📝 **Create File**: Create new files with content (auto-creates parent directories)
-  - ✍️ **Edit File**: Edit existing files with write or append mode
-  - 📦 **Move File**: Move files to different locations (with overwrite protection)
-  - 🔄 **Rename File**: Rename files (stays in same directory)
-  - 🗑️ **Delete File**: Delete files with safety confirmation (always asks user first)
-- 🌐 **Web Automation**:
-  - 🔗 **Open URL**: Open any URL in default browser (auto-adds https://)
+**File System Tools, Web Automation & Memory Persistence:**
+- Read File Tool: Read any local file (text or base64) for viewing or emailing
+  - Reads text files directly for viewing content
+  - Converts to base64 for email attachments
+  - Returns filename, file size, MIME type, and content
+  - Proper workflow for "read file and email it" use case
+- Browse Files Tool: List files and directories with full details
+  - Shows directories and files separately (sorted)
+  - Displays file sizes, modification dates, and types
+  - Optional hidden files display
+  - Defaults to user's home directory
+- File Operations Tools (5 new tools!):
+  - Create File: Create new files with content (auto-creates parent directories)
+  - Edit File: Edit existing files with write or append mode
+  - Move File: Move files to different locations (with overwrite protection)
+  - Rename File: Rename files (stays in same directory)
+  - Delete File: Delete files with safety confirmation (always asks user first)
+- Web Automation:
+  - Open URL: Open any URL in default browser (auto-adds https://)
   - Works on Linux (xdg-open), macOS (open), Windows (start)
-- 💾 **Persistent Memory Storage**: Memories now saved to JSON file
-  - 💽 Survives backend restarts and system reboots
-  - 📁 Stored in `backend/apsara-memory.json`
-  - 🔄 Auto-loads on backend startup
-  - 💪 No more lost memories!
-- 🐛 **Fixed Select All/Clear All**: Parameter mismatch resolved
+- Persistent Memory Storage: Memories now saved to JSON file
+  - Survives backend restarts and system reboots
+  - Stored in `backend/apsara-memory.json`
+  - Auto-loads on backend startup
+  - No more lost memories!
+- Fixed Select All/Clear All: Parameter mismatch resolved
   - Frontend was sending `{ enabled }`, backend expected `{ tools }`
   - UI checkmarks now update correctly
   - Backend properly receives and applies changes
-- 📝 **Enhanced System Prompt**: Added all new tools to capabilities
+- Enhanced System Prompt: Added all new tools to capabilities
   - File operations, web automation tools shown in available tools
   - Clear workflow examples for "read and email" use cases
   - Better tool descriptions for Gemini
-- 🎯 **Improved Tool Descriptions**: Crystal-clear instructions
+- Improved Tool Descriptions: Crystal-clear instructions
   - All tools include detailed parameter descriptions
   - Safety warnings for destructive operations (delete)
   - Example workflows added to system prompt
@@ -997,29 +996,29 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - `README.md` - Version 1.5.0, comprehensive use cases, all new tools documented
 
 ### Version 1.4.0 (December 24, 2024)
-**🔧 Advanced Tools Configuration System & Enhanced UX:**
-- ✨ **Tools Selector Panel**: Configure which tools Apsara can use before starting a session
-- 🔄 **Async/Sync Function Calling**: Toggle between blocking and non-blocking tool execution
-  - 🟢 **ASYNC (Non-blocking)**: Apsara continues talking while tool executes in background
-  - 🔵 **SYNC (Blocking)**: Apsara waits for tool completion before responding
-  - 🎯 **Visual Badges**: Each tool shows ASYNC or SYNC badge with color coding
-- 🛠️ **Dynamic Tool Declarations**: Backend generates tool list based on enabled tools only
-- 🎨 **Backend Not Running Message**: Shows helpful error when backend is offline
-- 💾 **Persistent Settings**: All preferences saved to localStorage and restored on restart
-  - ✨ **Theme Persistence**: Theme selection now properly saves and loads (no more white flash!)
-  - 📺 Screen resolution preference
-  - 📹 Camera resolution preference
-  - 🔧 Tool configurations (enabled/disabled, async/sync)
-  - 🚀 **Zero White Flash**: Intelligent preload system ensures your theme loads instantly
-- 🖱️ **Improved Click-Outside**: All dropdown menus close when clicking anywhere outside
-- 🎯 **Smaller Visualizer Orb**: Reduced from 60px to 42px for cleaner, more balanced look
-- 🐛 **Fixed Screenshot Tool**: No longer crashes with "Request contains invalid argument"
+**Advanced Tools Configuration System & Enhanced UX:**
+- Tools Selector Panel: Configure which tools Apsara can use before starting a session
+- Async/Sync Function Calling: Toggle between blocking and non-blocking tool execution
+  - ASYNC (Non-blocking): Apsara continues talking while tool executes in background
+  - SYNC (Blocking): Apsara waits for tool completion before responding
+  - Visual Badges: Each tool shows ASYNC or SYNC badge with color coding
+- Dynamic Tool Declarations: Backend generates tool list based on enabled tools only
+- Backend Not Running Message: Shows helpful error when backend is offline
+- Persistent Settings: All preferences saved to localStorage and restored on restart
+  - Theme Persistence: Theme selection now properly saves and loads (no more white flash!)
+  - Screen resolution preference
+  - Camera resolution preference
+  - Tool configurations (enabled/disabled, async/sync)
+  - Zero White Flash: Intelligent preload system ensures your theme loads instantly
+- Improved Click-Outside: All dropdown menus close when clicking anywhere outside
+- Smaller Visualizer Orb: Reduced from 60px to 42px for cleaner, more balanced look
+- Fixed Screenshot Tool: No longer crashes with "Request contains invalid argument"
   - Returns lightweight metadata to Gemini instead of large base64 images
   - Screenshot data stored internally for email workflows
-- 📏 **Electron Window Height**: Increased to 600px to fit all tools without cutting off
-- 🔌 **Better Disconnect Handling**: Status properly resets to "Talk to Apsara" on disconnect
-- 📊 **Tool Metadata**: Each tool includes name, description, and default async behavior
-- 🪟 **Platform-Specific Optimizations**: Windows shows immediately, Linux/Mac use smart preload (no flashing)
+- Electron Window Height: Increased to 600px to fit all tools without cutting off
+- Better Disconnect Handling: Status properly resets to "Talk to Apsara" on disconnect
+- Tool Metadata: Each tool includes name, description, and default async behavior
+- Platform-Specific Optimizations: Windows shows immediately, Linux/Mac use smart preload (no flashing)
 
 **New Capabilities:**
 - Configure tools before starting conversation
@@ -1036,9 +1035,9 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - Backend `/api/tools/update` endpoint - Update tool configuration
 - Tool behavior automatically applied to Gemini function declarations
 - localStorage integration for persistent metadata
-- **Theme Preload System**: Inline script loads theme before React renders
-- **React State Initialization**: useState reads localStorage immediately on component creation
-- **Platform Detection**: Electron window shows differently on Windows vs Linux/Mac
+- Theme Preload System: Inline script loads theme before React renders
+- React State Initialization: useState reads localStorage immediately on component creation
+- Platform Detection: Electron window shows differently on Windows vs Linux/Mac
 - Improved click-outside detection logic for all menus
 
 **Files Modified:**
@@ -1051,17 +1050,18 @@ gradient.addColorStop(1, '#d46e1a');   // Dark Orange
 - `apsara-widget-app/public/index.html` - Theme preload system, zero white flash
 
 ### Version 1.3.0 (December 23, 2024)
-**🎨 Advanced Theme System & Adaptive UI:**
-- ✨ **8 Beautiful Themes**: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
-- 🎯 **Complete UI Consistency**: All menus and dropdowns adapt to the selected theme
-- 💾 **Theme Persistence**: Selected theme saved to localStorage and restored on reload
-- ⚙️ **Settings Button**: Gear icon positioned between camera and start button
-- 🎨 **Adaptive Theme Selector**: Theme picker panel matches current theme colors
-- 📺 **Themed Resolution Menus**: Screen and camera resolution selectors match theme
-- 🖌️ **Theme-Specific Styling**: Buttons, text, backgrounds, and accents change per theme
-- 📐 **Increased Widget Width**: Expanded to fit new controls comfortably
-- 📁 **New File**: Created `themes.css` for organized theme management
-- 🔄 **React Portal Theming**: Wrapped all portals with theme classes for consistency
+**Advanced Theme System & Adaptive UI:**
+- 8 Beautiful Themes: Light, Dark, Nightly, Dracula, Monokai, Nord, Solarized Light, Solarized Dark
+- Complete UI Consistency: All menus and dropdowns adapt to the selected theme
+- Theme Persistence: Selected theme saved to localStorage and restored on reload
+- Settings Button: Gear icon positioned between camera and start button
+- Adaptive Theme Selector: Theme picker panel matches current theme colors
+- Themed Resolution Menus: Screen and camera resolution selectors match theme
+- Theme-Specific Styling: Buttons, text, backgrounds, and accents change per theme
+- Increased Widget Width: Expanded to fit new controls comfortably
+- New File: Created `themes.css` for organized theme management
+- React Portal Theming: Wrapped all portals with theme classes for consistency
+- Comprehensive CSS selectors for all UI elements
 
 **Theme Details:**
 Each theme includes custom colors for:
@@ -1087,13 +1087,13 @@ Each theme includes custom colors for:
 
 ### Version 1.2.0 (December 23, 2024)
 **New Features:**
-- ✨ Native screen sharing for Electron desktop widget
-- 🔴 Fullscreen animated red border overlay during screen sharing
-- 📺 Automatic primary display capture (no dialog needed)
-- 🎯 Click-through border overlay (doesn't block desktop interaction)
-- 🖥️ Backend video frame processing and Gemini API integration
-- 📝 Debug logging system for frontend and backend
-- 💬 Floating "Screen Sharing Active" indicator
+- Native screen sharing for Electron desktop widget
+- Fullscreen animated red border overlay during screen sharing
+- Automatic primary display capture (no dialog needed)
+- Click-through border overlay (doesn't block desktop interaction)
+- Backend video frame processing and Gemini API integration
+- Debug logging system for frontend and backend
+- Floating "Screen Sharing Active" indicator
 
 **Improvements:**
 - Optimized frame capture at 2 FPS (640x360 JPEG)
@@ -1111,19 +1111,19 @@ Each theme includes custom colors for:
 
 ### Version 1.2.0 (December 23, 2024)
 **UI/UX Enhancement & Visual Consistency + Advanced Tools:**
-- ✨ **Clean Green Indicators**: Both camera and screen share now use elegant green pulsing dots
-- 🎨 **Removed Floating Banners**: No more red "Screen Sharing Active" floating indicator
-- 🟢 **Consistent Styling**: Camera and screen share indicators use identical styling for visual harmony
-- 🔧 **Backend Debug Controls**: Added `SAVE_DEBUG_FRAMES` toggle for optional frame saving (default: OFF)
-- 📹 **Camera Support**: Full camera integration with green indicator dot
-- ⚙️ **High-Quality Video**: Backend configured with `MEDIA_RESOLUTION_HIGH` for optimal quality
-- 🛠️ **Modular Tools System**: Created `backend/tools.js` for organized tool management
-- 📸 **Screenshot Tool**: Take screenshots and email them to Shubharthak
-- 📋 **Clipboard Tools**: Copy, read, and paste clipboard content
-- 📧 **Email with Attachments**: Send images and screenshots via email
-- 🌐 **Cross-Platform Tools**: Screenshot and clipboard work on Linux, Windows, and macOS
-- 📝 **Enhanced Documentation**: Updated README with tools, cross-platform support, and widget screenshot
-- 🐛 **Bug Fixes**: Fixed Gemini API event handling (async iterator), CSS corruption, duplicate indicators
+- Clean Green Indicators: Both camera and screen share now use elegant green pulsing dots
+- Removed Floating Banners: No more red "Screen Sharing Active" floating indicator
+- Consistent Styling: Camera and screen share indicators use identical styling for visual harmony
+- Backend Debug Controls: Added `SAVE_DEBUG_FRAMES` toggle for optional frame saving (default: OFF)
+- Camera Support: Full camera integration with green indicator dot
+- High-Quality Video: Backend configured with `MEDIA_RESOLUTION_HIGH` for optimal quality
+- Modular Tools System: Created `backend/tools.js` for organized tool management
+- Screenshot Tool: Take screenshots and email them to Shubharthak
+- Clipboard Tools: Copy, read, and paste clipboard content
+- Email with Attachments: Send images and screenshots via email
+- Cross-Platform Tools: Screenshot and clipboard work on Linux, Windows, and macOS
+- Enhanced Documentation: Updated README with tools, cross-platform support, and widget screenshot
+- Bug Fixes: Fixed Gemini API event handling (async iterator), CSS corruption, duplicate indicators
 
 **New Capabilities:**
 - "Take a screenshot" - Captures current screen
@@ -1134,39 +1134,16 @@ Each theme includes custom colors for:
 
 ### Version 1.0.0 (December 2024)
 **Initial Release:**
-- ✅ React widget with Gemini Live API integration
-- ✅ Electron desktop app for Linux
-- ✅ WebSocket backend server
-- ✅ Real-time audio visualization with dual analyzers
-- ✅ Smart muting and controls
-- ✅ Draggable, transparent widget
-- ✅ Email integration
-- ✅ Google Search integration
-- ✅ Complete documentation
+- React widget with Gemini Live API integration
+- Electron desktop app for Linux
+- WebSocket backend server
+- Real-time audio visualization with dual analyzers
+- Smart muting and controls
+- Draggable, transparent widget
+- Email integration
+- Google Search integration
+- Complete documentation
 
 ---
 
-🌐 [Production Demo](https://apsara-devshubh.devshubh.me) | 📧 [Contact](mailto:shubharthaksangharsha@gmail.com)
-
----
-
-## 💡 What Else Can We Add to Apsara?
-
-**Potential Future Features:**
-- 🎵 **Music Control**: Play/pause/skip music, adjust volume
-- 🌐 **Advanced Web Automation**: Fill forms, click buttons, scrape data (basic URL opening ✅ DONE!)
-- 📁 **Directory Operations**: Create/delete folders, recursive operations (file operations ✅ DONE!)
-- 🔔 **Reminders & Alarms**: Set reminders and alarms with voice
-- 📊 **System Monitoring**: CPU usage, memory, disk space, network stats
-- 🎮 **Application Control**: Launch apps, switch windows, close programs
-- 📸 **Webcam Photos**: Take photos (not just video streaming)
-- 🗣️ **Multi-Language Support**: Speak in any language
-- 🤖 **Custom Integrations**: Slack, Discord, Telegram, Twitter APIs
-- 📝 **Note Taking**: Create/edit notes in various formats
-- 🔐 **Password Manager**: Securely store and retrieve passwords
-- 🌡️ **Smart Home**: Control smart lights, thermostats, devices
-- 📱 **Phone Integration**: Send SMS, make calls (with proper hardware)
-- 🎨 **Image Generation**: Generate images with DALL-E or Stable Diffusion
-- 🔊 **Text-to-Speech**: Save Apsara's responses as audio files
-
-**Which features would you like to see next? Let us know!**
+[Portfolio](https://devshubh.me) | [Contact](mailto:shubharthaksangharsha@gmail.com)
