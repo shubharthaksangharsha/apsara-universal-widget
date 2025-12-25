@@ -15,7 +15,7 @@ A complete voice assistant system powered by Google's Gemini 2.5 Flash Experimen
 ## Widget Gallery & Visual Features
 
 <details open>
-<summary><h3>🎨 Theme Showcase</h3></summary>
+<summary><h3>Theme Showcase</h3></summary>
 
 <div align="center">
 Available Themes
